@@ -1,20 +1,20 @@
 # Created by .ignore support plugin (hsz.mobi)
-将删除 .gitignore
-将删除 .idea/workspace.xml
-将删除 .mymetadata
-将删除 .classpath
-将删除 .project
-将删除 .idea
-将删除 .settings
-将删除 .svn/
-将删除 WebRoot/WEB-INF/classes/
-将删除 WebRoot/treeoperate/root/Clusters/
-将删除 WebRoot/treeoperate/root/Database_links/
-将删除 WebRoot/treeoperate/root/Profiles/
-将删除 WebRoot/treeoperate/root/Queue_tables/
-将删除 WebRoot/treeoperate/root/Queues/
-将删除 WebRoot/treeoperate/root/Roles/
-将删除 WebRoot/treeoperate/root/Synonyms/
-将删除 WebRoot/treeoperate/root/Tables/
-将删除 WebRoot/treeoperate/root/Tablespaces/
-将删除 WebRoot/treeoperate/root/Users/
+.gitignore
+.idea/workspace.xml
+.mymetadata
+.classpath
+.project
+.idea
+.settings
+.svn/
+WebRoot/WEB-INF/classes/
+WebRoot/treeoperate/root/Clusters/
+WebRoot/treeoperate/root/Database_links/
+WebRoot/treeoperate/root/Profiles/
+WebRoot/treeoperate/root/Queue_tables/
+WebRoot/treeoperate/root/Queues/
+WebRoot/treeoperate/root/Roles/
+WebRoot/treeoperate/root/Synonyms/
+WebRoot/treeoperate/root/Tables/
+WebRoot/treeoperate/root/Tablespaces/
+WebRoot/treeoperate/root/Users/
