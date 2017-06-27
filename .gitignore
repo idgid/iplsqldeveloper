@@ -6,6 +6,7 @@
 .project
 .idea
 .settings
+out/
 .svn/
 WebRoot/WEB-INF/classes/
 WebRoot/treeoperate/root/Clusters/
@@ -18,3 +19,5 @@ WebRoot/treeoperate/root/Synonyms/
 WebRoot/treeoperate/root/Tables/
 WebRoot/treeoperate/root/Tablespaces/
 WebRoot/treeoperate/root/Users/
+
+/.gitignore
