@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="iplsqldeveloper"
+  id="myeclipse.1284302799104"
+  context-root="/iplsqldeveloper"
+  j2ee-spec="5.0"
+  archive="iplsqldeveloper.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

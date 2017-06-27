@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faceted-project>
+  <runtime name="Apache Tomcat v5.5"/>
+  <secondary-runtime name="BEA WebLogic Server v9.2"/>
+  <fixed facet="wst.jsdt.web"/>
+  <installed facet="java" version="1.5"/>
+  <installed facet="jst.web" version="2.4"/>
+  <installed facet="wst.jsdt.web" version="1.0"/>
+</faceted-project>
