@@ -67,6 +67,8 @@ if (nodeType == null) var nodeType = "root";
 //全局用户对像
 if (UserObject == null ) var UserObject;
 
+if (mygrid == null)  var mygrid;
+
 //设置提示 --已改
 function setFootView(errNo, ename) {
 	if (errNo == 0) parent.editorFrame.$('footview').set('text','Initializing...');
@@ -1624,7 +1626,7 @@ function menuShowObjPD (str, flag, strTopX, strTopY) {
 function createOutResultMenu(divname) {
 	var stemp ='<a onclick="execClearAll(\'myTextarea\',event);" href="#">Clear</a>' +
 	'<a onclick="execClearResults(event);" href="#">Clear Results</a>' +
-	'<a onclick="execExportResults(\'myTextarea\',event);" ><font color="#808080">Export Results</font></a>' +  //未实现功能的菜单先恢化
+	'<a onclick="execExportResults(\'myTextarea\',event);"  href="#">Export Results</a>' +  //未实现功能的菜单先恢化
 	'<ul></ul>' +
 	'<a onclick="execFetchNextPage(event);" href="#">Fetch Next Page</a>' +
 	'<a onclick="execFetchLastPage(event);" href="#">Fetch Last Page</a>' +
@@ -1656,8 +1658,10 @@ function execClearResults(e) {
 }
 
 //工作结果输出区右键Export Results命令执行函数
-function execExportResults(textareaname, e) {
+function execExportResults(oName, e) {
 	hiddenBaisworkMenu(e);
+    console.log(mygrid);
+    mygrid.toExcel('../excel/toExcel.action','gray');
 }
 
 //工作结果输出区右键Fetch Next Page命令执行函数
@@ -1680,7 +1684,7 @@ function execCopyResults(e) {
 }
 
 //工作结果输出区右键Export Results命令执行函数
-function execExportResults(e) {
+function execExportResults_bak(e) {
 	hiddenBaisworkMenu(e);
 }
 
@@ -2992,6 +2996,7 @@ function getUserObject(data) {
 	UserObject = data;
 	//alert(UserObject[1][0]);
 }
+
 
 //关于我们团队
 function aboutUS() {

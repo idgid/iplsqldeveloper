@@ -33,4 +33,8 @@
 		<action name="showMenu" class="org.reddragonfly.iplsqldevj.action.tree.ShowMenuAction"></action>
 	</package>
 
+	<package name="excel" namespace="/excel" extends="myDefault">
+		<action name="toExcel" class="org.reddragonfly.iplsqldevj.action.excel.ExcelGeneratorAction"></action>
+	</package>
+
 </struts>
