@@ -4,7 +4,7 @@
 <struts>
 	<constant name="struts.devMode" value="true" />
 	<constant name="struts.ui.theme" value="simple" />
-	
+
 	<package name="myDefault" extends="struts-default">
 	   	<interceptors>
 	       <interceptor name="myInterceptor" class="org.reddragonfly.iplsqldevj.interceptor.MyInterceptor"></interceptor>
@@ -22,14 +22,15 @@
 	   	   <exception-mapping result="exception" exception="java.lang.Exception"></exception-mapping>
 	   	</global-exception-mappings>
 	</package>
-	
+
 	<package name="login" namespace="/login" extends="myDefault">
 		<action name="login" class="org.reddragonfly.iplsqldevj.action.login.LoginAction"><result name="success">/login/main.jsp</result></action>
 		<action name="quit" class="org.reddragonfly.iplsqldevj.action.login.QuitAction"></action>
 	</package>
-	
+
 	<package name="tree" namespace="/tree" extends="myDefault">
 		<action name="showTree" class="org.reddragonfly.iplsqldevj.action.tree.ShowTreeAction"></action>
+		<action name="showTree1" class="org.reddragonfly.iplsqldevj.action.tree.ShowTreeAction1"></action>
 		<action name="showMenu" class="org.reddragonfly.iplsqldevj.action.tree.ShowMenuAction"></action>
 	</package>
 
