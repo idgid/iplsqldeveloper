@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="org.reddragonfly.iplsqldevj.bean.UserBean"%>
 
-<%	
+<%
     UserBean ub = (UserBean)session.getAttribute("user");
 	//得到提交过来的isglobal
 	String isglobal = request.getParameter("isglobal");
@@ -17,8 +17,8 @@
 	<head>
 		<title>tree</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<META HTTP-EQUIV="pragma"   CONTENT="no-cache">   
-        <META HTTP-EQUIV="Cache-Control"   CONTENT="no-cache,   must-revalidate">   
+		<META HTTP-EQUIV="pragma"   CONTENT="no-cache">
+        <META HTTP-EQUIV="Cache-Control"   CONTENT="no-cache,   must-revalidate">
         <META HTTP-EQUIV="expires"   CONTENT="Mon,   23   Jan   1978   12:52:30   GMT">
 		<link type="text/css" rel="stylesheet" href="../css/xtree2.links.css">
 		<link type="text/css" rel="stylesheet" href="../css/xtree2.css">
@@ -38,9 +38,12 @@
 	 			//重新加载新的页面文件
 				parent.leftFrame.location.replace("./tree.jsp");
 	 		}
-	 	</script>
+
+			parent.leftFrame.document.oncontextmenu=function(){return false;};
+
+		</script>
 	</head>
-	
+
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="background-color: FFFFFF" oncontextmenu="return false">
 	<div style="background-color: buttonface; overflow: no; height:25px;">
 		<table width="100%" style="height:25px;" border='0' cellpadding="0" cellspacing="0" style="background-color: buttonface" align="center" valign="middle">
