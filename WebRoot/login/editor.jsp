@@ -151,7 +151,7 @@ table {
 </style>
 		<script language="JavaScript1.5">
 			if (window.moz == true) document.getElementById("mozGrooveCSS").removeAttribute("disabled");
-			
+
 		</script>
 		<script type="text/javascript">
 	/*
@@ -172,20 +172,22 @@ table {
 	</script>
 
 		<script type="text/javascript">
-	
+
 		var sqlhighlighter = new SQLHighlighter();
 		var ctrlKeyDown = false;
 		function doHighlight(event){
+
 			if(ctrlKeyDown) return;
 			var keyCode = event.keyCode;
-			if(keyCode == 16 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 119) return;
+			console.log(keyCode);
+			if(keyCode == 13 || keyCode == 16 || keyCode == 35 || keyCode == 36 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 119) return;
 			sqlhighlighter.highlight(document.getElementById('myTextarea'));
 		}
 		function detectCtrlKey(event){
 			if(event.ctrlKey) ctrlKeyDown = true;
 			else ctrlKeyDown = false;
 		}
-		
+
 	</script>
 
 	</head>
@@ -196,12 +198,11 @@ table {
 			<div id="myText"
 				style="border: 2px; overflow: no; background-color: ButtonFace; WIDTH: 100%; HEIGHT: 35%">
 				<div id="editortop" class="webfxGrid" style="width: 100%">
+					<!-- onkeyup="doHighlight(event)" -->
 					<div id="myTextarea" class="editor" contentEditable
 						onkeydown="detectCtrlKey(event)" onkeyup=""
 						onclick='hiddenBaisworkMenu(event)'
-						onmouseup='showBaisworkMenu("myTextarea","BaisworkMenu",event)'>
-						<!-- onkeyup="doHighlight(event)" -->
-					</div>
+						onmouseup='showBaisworkMenu("myTextarea","BaisworkMenu",event)'></div>
 					<div
 						style="border: 0px; width: 3%; height: 100%; background: ButtonFace; float: right; vertical-align: middle;">
 						<table border="0" id="rightToolBar"
@@ -363,7 +364,7 @@ table {
 		</div>
 		<script type="text/javascript"> createBaisWorkMenu('BaisworkMenu');</script>
 		<script>
-			function rightToolBarButton() {		
+			function rightToolBarButton() {
 							var rightcells = document.getElementById('rightToolBar').rows[1].cells;
 							//alert(rightcells[0]);
 							for (var i = 0; i < rightcells.length; i++)
@@ -408,8 +409,8 @@ table {
 
 			//cells[1].setToggle(true);
 			cells[7].setToggle(true); //Query By Example true
-			cells[7].setEnabled(false); 
-			cells[9].setEnabled(false); 
+			cells[7].setEnabled(false);
+			cells[9].setEnabled(false);
 			cells[2].setEnabled(false);
 			cells[3].setEnabled(false);
 			cells[4].setEnabled(false);
@@ -419,8 +420,8 @@ table {
 			cells[10].setEnabled(false);
 			cells[11].setEnabled(false);
 			cells[12].setEnabled(false);
-			
-			cells[9].setToggle(true); 
+
+			cells[9].setToggle(true);
 			//cells[5].setEnabled(false);
 			//cells[6].setEnabled(false);
 			// cells1[0].setValue(true, true);
@@ -431,7 +432,7 @@ table {
 			{
 				createButton(cells1[i]);
 				//cells1[i].setAlwaysUp(true)
-				
+
 			}
 
 			cells1[1].setToggle(true);
