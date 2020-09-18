@@ -15,19 +15,19 @@ if (transactionFlag == null)   	var transactionFlag = 0;
 if (executeFlag == null)	var executeFlag = 0;
 
 //设置锁定标志，默认为已锁定
-if (lockFlag == null) 	var lockFlag = 1; 
+if (lockFlag == null) 	var lockFlag = 1;
 
 //设置数据是否改变标志，默认为没有改变
-if (postChangeFlag == null) 	var postChangeFlag = 0; 
+if (postChangeFlag == null) 	var postChangeFlag = 0;
 
 //设置单个数据显示是否改变标志，默认为没有改变
-if (singleRecordViewFlag == null) 	var singleRecordViewFlag = 0; 
+if (singleRecordViewFlag == null) 	var singleRecordViewFlag = 0;
 
 //设置for update标志
-if (forUpdateFlag == null) 	var forUpdateFlag = 0; 
-	
-//设置errOracleMsg 
-if (errOracleMsg == null) 	var errOracleMsg = ""; 	
+if (forUpdateFlag == null) 	var forUpdateFlag = 0;
+
+//设置errOracleMsg
+if (errOracleMsg == null) 	var errOracleMsg = "";
 
 //设置queryByExample标志
 if (queryByExampleFlag == null) var queryByExampleFlag = 0;
@@ -36,7 +36,7 @@ if (queryByExampleFlag == null) var queryByExampleFlag = 0;
 if (baisworkSQL == null) var baisworkSQL="";
 
 //结果集head的备份
-if (resultbakHead == null )  var resultbakHead=""; 
+if (resultbakHead == null )  var resultbakHead="";
 
 //数据是否存在
 if (globaldataFlag == null) var globaldataFlag = false;
@@ -54,9 +54,9 @@ if (globalTrRow == null) var globalTrRow = "";
 
 if (globalSameWindowFlag == null) var globalSameWindowFlag = false;
 
-//全局调用JSP页面地址 
-if (warname == null) var warname = ""; //包名,换包名时需修改该值
-if (sqlURL == null) var sqlURL = warname + "/login/editor.jsp";
+//全局调用JSP页面地址
+if (warname == null) var warname = "iplsqldevJ"; //包名,换包名时需修改该值
+if (sqlURL == null) var sqlURL = warname + "/login/editor1.jsp";
 if (funURL == null) var funURL = "../treeoperate/common/New.jsp";
 if (funViewURL == null) var funViewURL = "../treeoperate/common/View.jsp";
 if (funEditURL == null) var funEditURL = "../treeoperate/common/Edit.jsp";
@@ -69,15 +69,24 @@ if (UserObject == null ) var UserObject;
 
 if (mygrid == null)  var mygrid;
 
+//全局编辑区间textarea名称
+if (gMyTextArea == null)  var gMyTextArea='myTextarea';
+
+// 2020-09-16 新的编辑区间 div 全局名称
+if (GTDID == null) var GTDID = '';
+
+if (GGETFRAME == null) var GGETFRAME = '';
+
+
 //设置提示 --已改
 function setFootView(errNo, ename) {
-	if (errNo == 0) parent.editorFrame.$('footview').set('text','Initializing...');
-	else if (errNo == 1) parent.editorFrame.$('footview').set('text','Executing...');
-	else if (errNo == 2) parent.editorFrame.$('footview').set('text','Compiling...');
-	else if (errNo == 3) parent.editorFrame.$('footview').set('text','Compiled succesfully');
-	else if (errNo == 4) parent.editorFrame.$('footview').set('text','Compiled with errors');
-	else if (errNo == 5) parent.editorFrame.$('footview').set('text','File is read-only');
-	else if (errNo == 9999) parent.editorFrame.$('footview').set('text',ename);
+	if (errNo == 0) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Initializing...');
+	else if (errNo == 1) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Executing...');
+	else if (errNo == 2) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiling...');
+	else if (errNo == 3) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiled succesfully');
+	else if (errNo == 4) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiled with errors');
+	else if (errNo == 5) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','File is read-only');
+	else if (errNo == 9999) parent.parent.editorFrame.GGETFRAME.$('footview').set('text',ename);
 }
 
 
@@ -93,9 +102,9 @@ function callBackHello(mydata) {
 function createNew(textareaname) {
 	parent.editorFrame.$(textareaname).set('text','');
 }
-                        
-                
-//页面重载  --不用改 正常                 	
+
+
+//页面重载  --不用改 正常
 function myreload(){
 	parent.leftFrame.location.reload();
 	parent.topFrame.location.reload();
@@ -105,24 +114,24 @@ function myreload(){
 function relogon() {
 	window.open("./relogin.jsp", "", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,copyhistory=no,width=320,height=260,top=360,left=500");
 }
-          	
+
 //使执行按钮不可用，同时停止按钮可用 （按下execute按钮） --已改
 function executebuttonpress() {
 
 	var executeId = 'executeTd';
 	var breakId = 'breakTd';
-	var executeObject = parent.editorToolFrame.document.getElementById(executeId);
-	var breakObject = parent.editorToolFrame.document.getElementById(breakId);
-	
+	var executeObject = parent.parent.editorToolFrame.document.getElementById(executeId);
+	var breakObject = parent.parent.editorToolFrame.document.getElementById(breakId);
+
 	if((!getExecuteFlag()) && (!breakObject.getEnabled()) ) {
-		parent.editorToolFrame.setExecuteFlag(1);
-		if (parent.leftFrameList.getWindowType() == "SQL") {
+		parent.parent.editorToolFrame.setExecuteFlag(1);
+		if (parent.parent.leftFrameList.getWindowType() == "SQL") {
 			changeNextSql("nextSql"); //右侧的向下按钮
 		}
 		executeObject.setEnabled(false); //执行按钮被按，不可再次被按
 		breakObject.setEnabled(true);	//同时中止按钮可用
 	}
-	
+
 }
 
 
@@ -131,12 +140,12 @@ function breakbuttonpress() {
 
 	var executeId = 'executeTd';
 	var breakId = 'breakTd';
-	var executeObject = parent.editorToolFrame.document.getElementById(executeId);
-	var breakObject = parent.editorToolFrame.document.getElementById(breakId);
-	
-	
+	var executeObject = parent.parent.editorToolFrame.document.getElementById(executeId);
+	var breakObject = parent.parent.editorToolFrame.document.getElementById(breakId);
+
+
 	if(getExecuteFlag() && breakObject.getEnabled()) {
-		parent.editorToolFrame.setExecuteFlag(0);
+		parent.parent.editorToolFrame.setExecuteFlag(0);
 		executeObject.setEnabled(true); //执行按钮恢复
 		breakObject.setEnabled(false);	//同时中止按钮不可用
 	}
@@ -147,8 +156,8 @@ function breakbuttonpress() {
 //false : 不可按
 function fetchnextbuttonpress() {
 	var fetchnextId = 'fetchNextTd';
-	var fetchnextObject = parent.editorFrame.document.getElementById(fetchnextId);
-	
+	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
+
 	if (fetchnextObject.getEnabled()) {
 		return true;
 	} else  {
@@ -162,8 +171,8 @@ function fetchnextbuttonpress() {
 //false : 不可按
 function fetchlastbuttonpress() {
 	var fetchLastTd = 'fetchLastTd';
-	var fetchLastObject = parent.editorFrame.document.getElementById(fetchLastTd);
-	
+	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastTd);
+
 	if (fetchLastObject.getEnabled()) {
 		return true;
 	} else  {
@@ -180,7 +189,7 @@ function logout() {
 	if(confirm(' Are you sure logout? ')){
 		//Cookie.remove(name);
 		parent.location.replace("./quit.action");
-		
+
 	}
 	} else {
 		//Cookie.remove(name);
@@ -204,7 +213,7 @@ function changeAutorefresh(imagesName) {
 	}
 	//alert($('myTextarea').getSelected());
 	//这一句加入测试用
-	
+
 	//parent.parent.leftFrameList.createNewSql("PRO", "myTextarea");
 	//parent.editorFrame.location.replace("../treeoperate/common/View.jsp");
 }
@@ -212,25 +221,25 @@ function changeAutorefresh(imagesName) {
 
 //改变save execute图标  --已改
 function changeExecNoRun(runFlag,imagesName) {
-	var execNoRunIcon = '../images/exec_norun.gif';
-	var execRunningIcon = '../images/exec_running.gif';
-	
-	if (parent.leftFrameList.getWindowType() != "SQL") {
+	var execNoRunIcon = '../../images/exec_norun.gif';
+	var execRunningIcon = '../../images/exec_running.gif';
+
+	if (parent.parent.leftFrameList.getWindowType() != "SQL") {
 			execNoRunIcon = '../../images/exec_norun.gif';
 			execRunningIcon = '../../images/exec_running.gif';
 		}
-	
+
 	if (runFlag) {
-		parent.editorFrame.$(imagesName).setProperty('src',execRunningIcon);
+		parent.parent.editorFrame.GGETFRAME.$(imagesName).setProperty('src',execRunningIcon);
 	} else {
-		parent.editorFrame.$(imagesName).setProperty('src',execNoRunIcon);
+		parent.parent.editorFrame.GGETFRAME.$(imagesName).setProperty('src',execNoRunIcon);
 	}
 }
-	
+
 
 //改变lock 图标 --框架内元素，不用改，正常
 function changeLock(imagesName) {
-	
+
 	var lockIcon = '../images/lock.gif';
 	var unlockIcon = '../images/unlock.gif';
 	if (lockFlag) {
@@ -250,16 +259,16 @@ function changeLock(imagesName) {
 			deleteRecordObject.setEnabled(false);
 			setPostChangeFlag(0);	//再次锁定，置数据改变标志为0
 			changePostChange();		//使post_change按钮自动失效
-			
+
 	}
 }
 
 
 //插入数据 --已失效，需重写方法体
 function insertRecord() {
-	
+
 	var insertRecordObject = document.getElementById('insertRecordTd');
-	
+
 	if (insertRecordObject.getEnabled() ) {
 		setPostChangeFlag(1);
 		changePostChange();
@@ -272,7 +281,7 @@ function insertRecord() {
 function deleteRecord() {
 
 	var deleteRecordObject = document.getElementById('deleteRecordTd');
-	
+
 	if (deleteRecordObject.getEnabled() ) {
 		setPostChangeFlag(1);
 		changePostChange();
@@ -295,69 +304,70 @@ function postChangeRecord() {
 //改变post_change图标 --暂未使用，需重写方法体
 function changePostChange() {
 	var postChangeObject = parent.editorFrame.document.getElementById('postChangesTd');
-	if (getPostChangeFlag()) { 
+	if (getPostChangeFlag()) {
 		postChangeObject.setEnabled(true);
-	} else { 
-		postChangeObject.setEnabled(false);	
+	} else {
+		postChangeObject.setEnabled(false);
 	}
 }
 
 
 //改变previous sql按钮，使其可用  --已改
 function changePreviousSql(tdID) {
-	
+
 	var nextSqlObject = parent.editorFrame.document.getElementById('nextSql');
-	
+
 	if (nextSqlObject.getEnabled() ) {
 		var tdObject = parent.editorFrame.document.getElementById(tdID);
 		tdObject.setEnabled(true);
-	
+
 		//执行实际操作
 		//ExecuteCommand( 'myTextarea', 'Undo' );
 		execSysCommand('myTextarea','undo');
 	}
-	
-	
+
+
 }
 
 
 //改变querybyExample按钮
 function changeQueryByExample(queryFlag) {
-	var queryByExampleObject = parent.editorFrame.document.getElementById('queryByExampleTd');
+	var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('queryByExampleTd');
 	queryByExampleObject.setEnabled(queryFlag);
 }
 
 //改变querybyExample按钮
 function changeSingleRecordView(queryFlag) {
-	var singleRecordViewObject = parent.editorFrame.document.getElementById('singleRecordViewTd');
+	var singleRecordViewObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('singleRecordViewTd');
 	singleRecordViewObject.setEnabled(queryFlag);
 }
 
 //改变querybyExample按钮
 function changeExportResultResults(queryFlag) {
-	var exportResultResultsObject = parent.editorFrame.document.getElementById('exportResultResultsTd');
+	var exportResultResultsObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('exportResultResultsTd');
 	exportResultResultsObject.setEnabled(queryFlag);
 }
 
 
 //改变next sql按钮，使其可用 --已改
 function changeNextSql(tdID) {
-	
-	var tdObject = parent.editorFrame.document.getElementById(tdID);
+
+	//var tdObject = parent.editorFrame.document.getElementById(tdID); 2020-09-16
+    var tdObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(tdID);
 	tdObject.setEnabled(true);
-	
+
 }
 
 //改变next sql 按钮，使其可用  --已改
 function execNextSql() {
-	var nextSqlObject = parent.editorFrame.document.getElementById('nextSql');
+	var nextSqlObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('nextSql');
 	if (nextSqlObject.getEnabled() ) {
-		
+
 		//执行实际操作
 		//ExecuteCommand( 'myTextarea', 'Redo' );
 		execSysCommand('myTextarea','redo');
 	}
-	
+
 }
 
 
@@ -366,22 +376,22 @@ function changeRecordView() {
 
 	var nextRecordId = 'nextRecord';
 	var previousRecordId = 'previousRecord';
-	var nextRecordObject = parent.editorFrame.document.getElementById(nextRecordId);
-	var previousRecordObject = parent.editorFrame.document.getElementById(previousRecordId);
-	
+	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
+	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
+
 	if(!getsingleRecordViewFlag() && globaldataFlag == true ) { //如果按钮外于未被按下状态，则做如下动作，本身按钮显示为按下
-		
+
 		nextRecordObject.setEnabled(true);  //使 nextrecord 按钮可用
 		previousRecordObject.setEnabled(true);  //使 previousrecord 按钮可用
 		setsingleRecordViewFlag(1); //使 singlerecord 按钮状态改为按下 singleRecordViewFlag = 1
-		
+
 		changeRecordViewInit();	//调用列表功能初始化函数
-		
+
 	} else {	//如果按钮是已按下状态，则做如下动作，本身按钮显示为未按下
 		nextRecordObject.setEnabled(false);  //使 nextrecord 按钮不可用
 		previousRecordObject.setEnabled(false); //使 previousrecord 按钮不可用
 		setsingleRecordViewFlag(0); //使 singlerecord 按钮状态改未按下 singleRecordViewFlag = 0
-		
+
 		changeRecordViewRestore(); //调用列表功能恢复函数
 	}
 }
@@ -392,14 +402,14 @@ function changeRecordViewInit() {
 	var nextRecordObject = parent.editorFrame.document.getElementById(nextRecordId);
 	var previousRecordObject = parent.editorFrame.document.getElementById(previousRecordId);
 	$('outResultDiv').set('style','display:none');
-	
+
 	setDivValueNull ('changeOutResultDiv');
-	
+
 	//setDivValueHtml ('changeOutResultDiv','asdfasdfas');
 	//执行显示函数changeNextRecordView
-	if( !mygrid.getSelectedId() ) { 
+	if( !mygrid.getSelectedId() ) {
 		mygrid.setSelectedRow(mygrid.getRowId(0));
-	} 
+	}
 	if (mygrid.getSelectedId() == 1) {	//如果为第一行，则向前按钮不可用
 			previousRecordObject.setEnabled(false);
 	}
@@ -416,7 +426,7 @@ function changeRecordViewInit() {
 			nextRecordObject.setEnabled(false);
 		}
 	changeRecordShowHtml();
-	
+
 	$('changeOutResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
 	//alert($('changeOutResultDiv').get('style'));
 }
@@ -428,7 +438,7 @@ function changeNextRecordView() {
 	var nextRecordObject = document.getElementById(nextRecordId);
 	var previousRecordObject = document.getElementById(previousRecordId);
 	if (nextRecordObject.getEnabled()) {
-		if( !mygrid.getSelectedId() ) { 
+		if( !mygrid.getSelectedId() ) {
 			mygrid.setSelectedRow(mygrid.getRowId(0));
 			previousRecordObject.setEnabled(false);
 		} else {
@@ -472,9 +482,9 @@ function changePreviousRecordView() {
 function controlbuttonReset() {
 	var nextRecordId = 'nextRecord';
 	var previousRecordId = 'previousRecord';
-	var nextRecordObject = parent.editorFrame.document.getElementById(nextRecordId);
-	var previousRecordObject = parent.editorFrame.document.getElementById(previousRecordId);
-	
+	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
+	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
+
 	nextRecordObject.setEnabled(false);
 	previousRecordObject.setEnabled(false);
 	setFetchNext(false);
@@ -483,7 +493,7 @@ function controlbuttonReset() {
 
 
 function changeRecordViewRestore() {
-	
+
 	setDivValueNull ('changeOutResultDiv');
 	$('changeOutResultDiv').set('style','display:none');
 	$('outResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
@@ -496,7 +506,7 @@ function setExecuteFlag(exFlag) {
 
 //得到执行标志
 function getExecuteFlag() {
-	return executeFlag; 
+	return executeFlag;
 }
 
 //改变锁定标志
@@ -506,7 +516,7 @@ function setLockFlag(loFlag) {
 
 //得到锁定标志
 function getLockFlag() {
-	return lockFlag; 
+	return lockFlag;
 }
 
 
@@ -517,7 +527,7 @@ function setPostChangeFlag(poFlag) {
 
 //得到数据是否改变标志
 function getPostChangeFlag() {
-	return postChangeFlag; 
+	return postChangeFlag;
 }
 
 function setsingleRecordViewFlag(siFlag) {
@@ -526,7 +536,7 @@ function setsingleRecordViewFlag(siFlag) {
 
 
 function getsingleRecordViewFlag() {
-	return singleRecordViewFlag; 
+	return singleRecordViewFlag;
 }
 
 
@@ -554,12 +564,12 @@ function setDivValueText (divName,textvalue) {
 }
 
 //监听F8/F9/F10/F12按键事件，正常
-function mykeydown(myevent,textareaname){
+function mykeydown_old(myevent,textareaname){
 		//alert(myevent.key);
 		//$('myTextarea').focus();
 		if(myevent.key == 'f8') {
 			//'F8' 按下，和点击图标调用同一个事件处理函数
-			parent.editorToolFrame.executeRun(textareaname);
+            parent.editorFrame.executeRun(textareaname);
 		}
 		if(myevent.key == 'f9') {
 			//'F9' 按下，和点击图标调用同一个事件处理函数
@@ -574,32 +584,65 @@ function mykeydown(myevent,textareaname){
 			//'F12' 按下，和点击图标调用同一个事件处理函数
 			parent.editorFrame.rollback();
 		}
-		
+
+
+}
+
+//监听F8/F9/F10/F12按键事件，正常
+function mykeydown(myevent_key,textareaname){
+	//alert(myevent.key);
+	//$('myTextarea').focus();
+	if(myevent_key == 'f8') {
+		//'F8' 按下，和点击图标调用同一个事件处理函数
+        //debugger
+        if (parent.parent.editorFrame.GGETFRAME == 'undefined') {
+            parent.parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+        } else {
+            parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+        }
+	}
+	if(myevent_key == 'f9') {
+		//'F9' 按下，和点击图标调用同一个事件处理函数
+		//parent.editorFrame.rollback();
+		alert("coding...");
+	}
+	if(myevent_key == 'f10') {
+		//'F10' 按下，和点击图标调用同一个事件处理函数
+        parent.parent.editorFrame.GGETFRAME.commit();
+	}
+	if(myevent_key == 'f12') {
+		//'F12' 按下，和点击图标调用同一个事件处理函数
+        parent.parent.editorFrame.GGETFRAME.rollback();
+	}
+
 
 }
 
 //execute执行按钮的function --正常
 function executeRun(textareaname) {
 	tempSql = getTextareaContents(textareaname);
-	alltmpSql = parent.editorFrame.$(textareaname).get('text');
+	console.log(tempSql);
+	// alltmpSql = parent.parent.editorFrame.GGETFRAME.$(textareaname).get('text');
+    alltmpSql = parent.parent.editorFrame.GGETFRAME.getTextareaContents(textareaname);
 	if(tempSql == "") {
 		alert("Error: SQL can not null!");
 	} else {
-	
-		var currWindoType = parent.leftFrameList.getWindowType();
-	 
-	 
+
+		var currWindoType = parent.parent.leftFrameList.getWindowType();
+
+
 		//调用真正的设置相应按钮状态函数
 		executebuttonpress();
 		//设置页脚注释 初始化...
 		setFootView(0, "");
 		//改变左下角执行图标状态
-		parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton");
+        parent.parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton");
 		//by phanrider 2009-08-02 增加左边框架中的windowList的更改与恢复
-		parent.leftFrameList.changeWindowListTitle(parent.leftFrameList.getWindowType(),parent.leftFrameList.getWindowTr(),alltmpSql);
-		
-		if (currWindoType == "SQL") {	
-			parent.editorFrame.executeSQL(textareaname);
+        parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(),alltmpSql);
+
+		if (currWindoType == "SQL") {
+
+            parent.parent.editorFrame.executeSQL(textareaname);
 		} else if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
 					|| currWindoType == "PAB" || currWindoType == "TYP" || currWindoType == "TYB"
 					|| currWindoType == "TRI" || currWindoType == "JAV" || currWindoType == "VIE"
@@ -618,26 +661,26 @@ function executeSQL(textareaname) {
 		//设置commit、rollback按钮可用
 		setCommit(true);
 		setRollback(true);
-		
+
 		//提交给接口
 		//getResultFromSql(tempSql); 有问题
 		//alert("oK");
 	} else if (getIfDelete(textareaname) || getIfInsertInto(textareaname) || !getIfSelect(textareaname)) {
-		
+
 		//提交给接口
 		var deleteFlag = 0;
-		if (getIfInsertInto(textareaname))  { 
+		if (getIfInsertInto(textareaname))  {
 			setCommit(true);
 			setRollback(true);
-			deleteFlag = 1; 
+			deleteFlag = 1;
 		} else if (getIfDelete(textareaname)) {
 					setCommit(true);
 					setRollback(true);
-					deleteFlag = 2; 
+					deleteFlag = 2;
 				} else {
 					deleteFlag = 3;
 					//alert("h");
-					
+
 		}
 		if (deleteFlag == 2) {
 			var msg = "Are you sure you want to delete all records?";
@@ -657,22 +700,23 @@ function executeSQL(textareaname) {
 		} else {
 			execResultFromSql(tempSql,deleteFlag);
  		}
- 		//alert("delete or insert");	
+ 		//alert("delete or insert");
 		} else {
 		//其他sql语句
 		//设置commit、rollback按钮不可用
 		//setCommit(false);
 		//setRollback(false);
 		//否则为正常select
-		
+
 		setFetchNext(false);
 		setFetchLast(false);
 		//提交给接口
+
 		getResultFromSql(tempSql);
 		//alert(tempSql);
 		//breakRun(textareaname);
 		//changeExecute();
-		
+
 		}
 
 }
@@ -690,7 +734,7 @@ function getStrFunctionName(sqlString,currWindoType) {
 	var tmpStr = "";
 	var endStr = "";
 	if (currWindoType == "FUN" || currWindoType == "PRO") {
-		if (currWindoType == "FUN") { 
+		if (currWindoType == "FUN") {
 			tmpStr = "function ";
 			endStr = " return";
 		} else if (currWindoType == "PRO") {
@@ -740,8 +784,8 @@ function getStrFunctionName(sqlString,currWindoType) {
 function breakRun(textareaname) {
 	//tempSql = getTextareaContents(textareaname);
 	//调用真正的得到结果函数
-	parent.editorToolFrame.breakbuttonpress();
-	
+	parent.parent.editorToolFrame.breakbuttonpress();
+
 	//var oracleTitle = "OK";	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
 	//setFootView(9999, oracleTitle);
 	changeExecNoRun(0, "execIsRunButton"); //恢复左下角执行图标状态
@@ -750,29 +794,43 @@ function breakRun(textareaname) {
 
 //得到获取编辑器中选取文字内容div  --已改
 function getTextareaContents(EditorName) {
-	var Objname = parent.editorFrame.document.getElementById(EditorName);
+	//var Objname = parent.parent.editorFrame.GGETFRAME.document.getElementById(EditorName);
 	var myText = "";
 	var ie = /msie/i.test(navigator.userAgent);
 	if (ie) {
-		var range = Objname.document.selection.createRange();
-		if (range.text.length > 0) {
+		// var range = Objname.document.selection.createRange();
+        var range = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getSelectedText(EditorName);
+
+        if (range.text.length > 0) {
 			myText = range.text;
 		} else {
             //如果未选中任何文字，则取编辑区所有内容
-			myText = parent.editorFrame.$(EditorName).get('text');
+            myText = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getValue(EditorName);
 		}
 	} else {
-       
-       var range = getSelectedText();
-       //	var  range = Objname.value.substr(Objname.selectionStart,Objname.selectionEnd-Objname.selectionStart);
+
+        //旧的数据取值方法
+        //var range = getSelectedText();
+        // var range = getSelectedText(EditorName) ;
+
+        // var range = parent.editorFrame.editAreaLoader.getSelectedText(EditorName) ;
+        var range = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getSelectedText(EditorName);
+
+
+        //	var  range = Objname.value.substr(Objname.selectionStart,Objname.selectionEnd-Objname.selectionStart);
 		if (range.length > 0)  {
 			myText = range;
 		}
 		else
 		{
 			//如果未选中任何文字，则取编辑区所有内容
-			myText = parent.editorFrame.$(EditorName).get('text');
-		}
+            //旧的数据取值方法
+			//myText = parent.editorFrame.$(EditorName).get('text');
+            //myText =  parent.editorFrame.editAreaLoader.getValue(EditorName);
+            myText = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getValue(EditorName);
+            // myText =  getValue(EditorName);
+
+        }
 	}
 	//alert(myText);
 	return myText;
@@ -808,9 +866,9 @@ function addComment(EditorName) {
 		}
 	} else {
            var range = getSelectedText();
-    	   myText = range;   
+    	   myText = range;
 	}
-	
+
 	//myText.replace();
 	myText = "<font color='red'>/*" + myText + "*/</red>";
 	alert(myText);
@@ -823,7 +881,7 @@ function resetEditor() {
 	var footcorpy = $('foot_outputDiv').clone();
 	//删除t_controlDiv及其所有子div
 	$('t_controlDiv').dispose();
-	
+
 	footcorpy.injectAfter('myTextToolbar');
 }
 
@@ -917,16 +975,19 @@ function isGreatZeroFloat(str){       //是否是一个大于或等于0的实数
 }
 
 
-//将展用新的展示方式， 对数据进行动态创建表格 
+//将展用新的展示方式， 对数据进行动态创建表格
 //phanrider 2009-05-21
 function showDataHtml(rows,data) {
-	
-    mygrid = new dhtmlXGridObject('outResultDiv');
-	
+
+   // mygrid = new dhtmlXGridObject('outResultDiv');
+
+    mygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject('outResultDiv');
+
+
     mygrid.setImagePath("../imgs/");
 
 	resultbakHead = data[0];    //得到head的备份
-	
+
 	tlow_flag_num = data.length; //表格展示的行数
 	if (data.length > 21) {
 			//tlow 表格展示的行数
@@ -947,15 +1008,15 @@ function showDataHtml(rows,data) {
     		strSort = strSort + "str" + ",";
     	}
     }
-    
-    
+
+
     strHeader = " ," + strHeader; //前面加一个空行
     strSort = "int," + strSort; //前面数字排序
     mygrid.setHeader(strHeader);
     mygrid.setColAlign("right");
-	//mygrid.setColTypes("ro,ed"); 
+	//mygrid.setColTypes("ro,ed");
 	mygrid.setColSorting(strSort);
-	
+
 
 	var strHeaderWidth = "";
 	var size = 100;
@@ -964,7 +1025,7 @@ function showDataHtml(rows,data) {
 	    for( var ii = 0; ii < tlow ;  ii++) {
 	    	if ( data[ii][i].length > word ) word = data[ii][i].length;
 	    }
-	    
+
 	    if (word > 8 && word <= 15 ) size = 120;
 					else if  (word > 15 && word <= 20 ) size = 160;
 					else if  (word > 20 && word <= 30 ) size = 240;
@@ -972,7 +1033,7 @@ function showDataHtml(rows,data) {
     	if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
     	else strHeaderWidth = strHeaderWidth + size + "," ;
     }
-    
+
     var i = tlow;
     var leftwidth = 20;
     if ( i < 99 ) leftwidth = 20;
@@ -980,141 +1041,144 @@ function showDataHtml(rows,data) {
     else if ( i < 9999 && i >= 1000 ) leftwidth = 40;
     else if ( i < 99999 && i >= 10000 ) leftwidth = 50;
     else if ( i < 999999 && i >= 100000 ) leftwidth = 60;
-                		
-    strHeaderWidth = leftwidth + "," + strHeaderWidth; 
-	
-					
+
+    strHeaderWidth = leftwidth + "," + strHeaderWidth;
+
+
 	mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
-    
+
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
     	alert(data[0][1]);
     } else {
-    	
+
     	mygrid.init();  //进行初始化
     	globaldataFlag = true;
-    
+
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
     	var trstyle = "";
     	for (var j = 0; j < tcell; j++) {
-    		
+
     		var tmpS = changeHtml(data[i][j]);
-    		
+
     		if(j == (tcell - 1)) strRow = strRow + tmpS;
     		else strRow = strRow + tmpS + "," ;
-    		
+
     		//if(j == (tcell - 1)) strRow = strRow + data[i][j];
     		//else strRow = strRow + data[i][j] + "," ;
-    		
-    		
+
+
     		if (i % 2 != 0) {
-    			if (data[i][j] == "")  
+    			if (data[i][j] == "")
     				if (j == (tcell - 1)) trstyle = trstyle + "#FFFFE5";  //空值 白淡黄色
     				else trstyle = trstyle + "#FFFFE5" + ",";
 				else
 					if (j == (tcell - 1)) trstyle = trstyle + "#FFFFFF";  //空值 白色
     				else trstyle = trstyle + "#FFFFFF" + ",";
-				
+
 			} else {
-				if (data[i][j] == "")  
+				if (data[i][j] == "")
 					if (j == (tcell - 1)) trstyle = trstyle + "#F2FFE5";  //空值 绿淡黄色
     				else trstyle = trstyle + "#F2FFE5" + ",";
-				else 
+				else
 					if (j == (tcell - 1)) trstyle = trstyle + "#E5FFE5";  //空值 绿色
     				else trstyle = trstyle + "#E5FFE5" + ",";
 			}
     	}
     	//alert(strRow);
-    
-    	
-    	trstyle="#D4D0C8"+ "," + trstyle; 
-    	
+
+
+    	trstyle="#D4D0C8"+ "," + trstyle;
+
 		mygrid.setColumnColor(trstyle);
-		strRow = i + "," + strRow; 
-    	mygrid.addRow(i,strRow); 
-    	
+		strRow = i + "," + strRow;
+    	mygrid.addRow(i,strRow);
+
     	if (getsingleRecordViewFlag()) {
     		changeRecordViewInit();
     	}
     	//mygrid.setRowColor(i,trstyle);
     	//mygrid.setColumnColor(trstyle);
     	}
-    	
+
     	//最终得到数据，呈现后的其他按钮状态和改变
     	resetBaseWorkToolBar(true);
-    	
+
     }
-       	
+
     function addRow(){
    	var newId = (new Date()).valueOf()
    	mygrid.addRow(newId,"",mygrid.getRowsNum())
   	 mygrid.selectRow(mygrid.getRowIndex(newId),false,false,true);
   	}
-  	
+
   	function removeRow(){
    	var selId = mygrid.getSelectedId()
    	mygrid.deleteRow(selId);
   	}
-  
+
   	function doOnRowSelected(rowID,celInd){
   	alert("Selected row ID is "+rowID+"\nUser clicked cell with index "+celInd);
   }
-    
+
 }
 
 function addDataHtml(rows,data) {
 	//mygrid = new dhtmlXGridObject('outResultDiv');
-	
-	tlow_flag_num = data.length; //表格展示的行数
-	
+
+    mygrid = parent.parent.editorFrame.mygrid;
+
+
+    tlow_flag_num = data.length; //表格展示的行数
+
 	if (data.length > 20) {
 			//tlow 表格展示的行数
 			tlow = data.length - 1;  //去掉最后一个测试标志行
 		} else {
 			tlow = data.length ;  //无标志行可去
 	}
-	
+
 	tcell = data[0].length; //表格展示的列数
 	for(var i = 0; i < tlow; i++) {
     	var strRow = "";
     	var trstyle = "";
     	for (var j = 0; j < tcell; j++) {
-    	
+
     		var tmpS = changeHtml(data[i][j]);
     		if(j == (tcell - 1)) strRow = strRow + tmpS;
     		else strRow = strRow + tmpS + "," ;
-    		
+
     		//if(j == (tcell - 1)) strRow = strRow + data[i][j];
     		//else strRow = strRow + data[i][j] + "," ;
-    		
-    		
+
+
     		if (i % 2 == 0) {
-    			if (data[i][j] == "")  
+    			if (data[i][j] == "")
     				if (j == (tcell - 1)) trstyle = trstyle + "#FFFFE5";  //空值 白淡黄色
     				else trstyle = trstyle + "#FFFFE5" + ",";
 				else
 					if (j == (tcell - 1)) trstyle = trstyle + "#FFFFFF";  //空值 白色
     				else trstyle = trstyle + "#FFFFFF" + ",";
-				
+
 			} else {
-				if (data[i][j] == "")  
+				if (data[i][j] == "")
 					if (j == (tcell - 1)) trstyle = trstyle + "#F2FFE5";  //空值 绿淡黄色
     				else trstyle = trstyle + "#F2FFE5" + ",";
-				else 
+				else
 					if (j == (tcell - 1)) trstyle = trstyle + "#E5FFE5";  //空值 绿色
     				else trstyle = trstyle + "#E5FFE5" + ",";
 			}
     	}
     	//alert(strRow);
-    
-    	
-    	trstyle="#D4D0C8"+ "," + trstyle; 
-    	
+
+
+    	trstyle="#D4D0C8"+ "," + trstyle;
+
 		mygrid.setColumnColor(trstyle);
 		var ii = i + 1  + (rows - 1) * countPage ;
-		strRow = ii + "," + strRow; 
-    	mygrid.addRow(ii,strRow,mygrid.getRowsNum()); 
+		strRow = ii + "," + strRow;
+    	mygrid.addRow(ii,strRow,mygrid.getRowsNum());
     	//mygrid.setRowColor(i,trstyle);
     	//mygrid.setColumnColor(trstyle);
     	if (getsingleRecordViewFlag()) {
@@ -1126,53 +1190,56 @@ function addDataHtml(rows,data) {
 
 function addFullDataHtml(rows,data) {
 	//mygrid = new dhtmlXGridObject('outResultDiv');
-	
-	tlow_flag_num = data.length; //表格展示的行数
-		
-	tlow = data.length ;  
-	
+
+    mygrid = parent.parent.editorFrame.mygrid;
+
+
+    tlow_flag_num = data.length; //表格展示的行数
+
+	tlow = data.length ;
+
 	tcell = data[0].length; //表格展示的列数
 	for(var i = 0; i < tlow; i++) {
     	var strRow = "";
     	var trstyle = "";
     	for (var j = 0; j < tcell; j++) {
-    	
+
     		var tmpS = changeHtml(data[i][j]);
     		if(j == (tcell - 1)) strRow = strRow + tmpS;
     		else strRow = strRow + tmpS + "," ;
-    		
+
     		//if(j == (tcell - 1)) strRow = strRow + data[i][j];
     		//else strRow = strRow + data[i][j] + "," ;
-    		
-    		
+
+
     		if (i % 2 == 0) {
-    			if (data[i][j] == "")  
+    			if (data[i][j] == "")
     				if (j == (tcell - 1)) trstyle = trstyle + "#FFFFE5";  //空值 白淡黄色
     				else trstyle = trstyle + "#FFFFE5" + ",";
 				else
 					if (j == (tcell - 1)) trstyle = trstyle + "#FFFFFF";  //空值 白色
     				else trstyle = trstyle + "#FFFFFF" + ",";
-				
+
 			} else {
-				if (data[i][j] == "")  
+				if (data[i][j] == "")
 					if (j == (tcell - 1)) trstyle = trstyle + "#F2FFE5";  //空值 绿淡黄色
     				else trstyle = trstyle + "#F2FFE5" + ",";
-				else 
+				else
 					if (j == (tcell - 1)) trstyle = trstyle + "#E5FFE5";  //空值 绿色
     				else trstyle = trstyle + "#E5FFE5" + ",";
 			}
     	}
     	//alert(strRow);
-    
-    	
-    	trstyle="#D4D0C8"+ "," + trstyle; 
-    	
+
+
+    	trstyle="#D4D0C8"+ "," + trstyle;
+
 		mygrid.setColumnColor(trstyle);
 		var ii = i + 1  + (rows - 1) * countPage ;
-		strRow = ii + "," + strRow; 
+		strRow = ii + "," + strRow;
 
-		mygrid.addRow(ii,strRow,mygrid.getRowsNum()); 
-		
+		mygrid.addRow(ii,strRow,mygrid.getRowsNum());
+
 		if (getsingleRecordViewFlag()) {
     		changeRecordViewInit();
     	}
@@ -1184,48 +1251,48 @@ function addFullDataHtml(rows,data) {
 
 //改变记录显示的grid
 function changeRecordShowHtml() {
-	
+
 	var tmprows = mygrid.getSelectedId();
 	if (mygrid.getSelectedId() == null) tmprows = "0";
 	changemygrid = new dhtmlXGridObject('changeOutResultDiv');
 	changemygrid.setImagePath("../imgs/");
     changemygrid.setHeader(" ,Row " + tmprows + ",Fields");
     changemygrid.setInitWidths("20,180,300"); //定义各列的宽度
-    changemygrid.setColTypes("ro,ro,ed"); 
+    changemygrid.setColTypes("ro,ro,ed");
     changemygrid.setColSorting("str,str,str");
     changemygrid.init();
     //得到列的总数
     var mygridlength = mygrid.getColumnCount();
-    
+
     for (i = 1; i < mygridlength; i++) {
     	var strrow = "";
     	var tmpcol = "";
     	var trstyle = "";
-	
+
 		if (mygrid.getSelectedId() == null) {	//为空，则特殊处理
 			tmpcol = " ";
 		} else {
     		tmpcol = mygrid.cells(mygrid.getSelectedId(),i).getValue();
     	}
     	strRow = " ," + resultbakHead[i-1] + ",";
-    	
+
     	var tmpS = changeHtml(tmpcol);
-    		
+
     	strRow = strRow + tmpS ;
-    	
+
     	if ((mygrid.getSelectedId()-1) % 2 == 0) {
     			if (tmpcol == "")  {
     				trstyle = "#FFFFE5";  //空值 白淡黄色
     			}
 			}
 		if (mygrid.getSelectedId() % 2 == 0) {
-				if (tmpcol == "") { 
+				if (tmpcol == "") {
 					trstyle = "#F2FFE5";  //空值 绿淡黄色
     			}
 			}
 		trstyle = "#D4D0C8,#D4D0C8," + trstyle ;
 		changemygrid.setColumnColor(trstyle);
-		changemygrid.addRow(i-1,strRow);     	
+		changemygrid.addRow(i-1,strRow);
 		//alert(strRow);
     }
 }
@@ -1235,30 +1302,31 @@ function changeRecordShowHtml() {
 //设置分页按钮状态 True 或者 False
 function setFetchNext(flag) {
 	var fetchnextId = 'fetchNextTd';
-	var fetchnextObject = parent.editorFrame.document.getElementById(fetchnextId);
-	
+
+	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
+
 	fetchnextObject.setEnabled(flag);
 }
 
 //设置全部分页按钮状态 True 或者 False
 function setFetchLast(flag) {
 	var fetchLastId = 'fetchLastTd';
-	var fetchLastObject = parent.editorFrame.document.getElementById(fetchLastId);
-	
+	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastId);
+
 	fetchLastObject.setEnabled(flag);
 }
 
 //按钮Fetch next page按下执行的函数
 function getFYSql() {
-	if ( fetchnextbuttonpress () ) { 
-		//改变相互作用的按钮状态	
+	if ( fetchnextbuttonpress () ) {
+		//改变相互作用的按钮状态
 		executebuttonpress();
 		//设置页脚注释 正在执行...
 		setFootView(1, "");
 		//改变左下角执行图标状态
 		changeExecNoRun(1, "execIsRunButton");
 		//同时更改左边工具条的状态
-		parent.leftFrameList.changeWindowListTitle(parent.leftFrameList.getWindowType(),parent.leftFrameList.getWindowTr(),parent.editorFrame.$('myTextarea').get('text'));
+		parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), parent.parent.editorFrame.GGETFRAME.getTextareaContents('myTextarea'));
 		//调用真正的分页执行方法
 		getFYSql_run();
 	}
@@ -1268,41 +1336,41 @@ function getFYSql() {
 //按钮Fetch last page按下执行的函数
 function getFYQSql() {
 	if( fetchlastbuttonpress() ) {
-		//改变相互作用的按钮状态	
+		//改变相互作用的按钮状态
 		executebuttonpress();
 		//设置页脚注释 正在执行...
 		setFootView(1, "");
 		//改变左下角执行图标状态
 		changeExecNoRun(1, "execIsRunButton");
 		//同时更改左边工具条的状态
-		parent.leftFrameList.changeWindowListTitle(parent.leftFrameList.getWindowType(),parent.leftFrameList.getWindowTr(),parent.editorFrame.$('myTextarea').get('text'));
+        parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(), parent.parent.leftFrameList.getWindowTr(), parent.parent.editorFrame.GGETFRAME.getTextareaContents('myTextarea'));
 		//调用真正的全部分页执行方法
 		getFYQSql_run();
 	}
 }
-   	
 
-//是否显示for update时的警告信息   	
+
+//是否显示for update时的警告信息
 function setWarning(flag) {
 	var lockButtonObject = parent.editorFrame.document.getElementById('lockButtonTd');
 	if(flag == 0) {
-		
+
 		errMsg="These query results are not updateable.\nInclude the ROWID to get updateable results.";
 		alert(errMsg);
-		
-		//lockButtonObject.setToggle(false);	
+
+		//lockButtonObject.setToggle(false);
 		return false;
 	} else {
-		
+
 		return true;
 	}
-}   	
+}
 
 //得到sql语句是否为for update
 //返回值： true or false
 function getIfForupdate(textareaname) {
 	var tempStr =  getTextareaContents(textareaname);
-	var lockButtonObject = parent.editorFrame.document.getElementById('lockButtonTd');
+	var lockButtonObject = parent.editorFrame.GGETFRAME.$('lockButtonTd');
 	if (tempStr.trim().test(" for update$","i")) {
 		//设置forupdate标志为1
 		forUpdateFlag = 1;
@@ -1349,7 +1417,7 @@ function getIfDelete(textareaname) {
 function getIfInsertInto(textareaname) {
 	var tempStr =  getTextareaContents(textareaname);
 	var Flag = false;
-	if (tempStr.trim().test("^insert into ","i") || 
+	if (tempStr.trim().test("^insert into ","i") ||
 		tempStr.trim().test("^update ","i") ) {
 		Flag = true;
 	} else {
@@ -1364,7 +1432,7 @@ function getIfInsertInto(textareaname) {
 function getIfDDL(textareaname) {
 	var tempStr =  getTextareaContents(textareaname);
 	var Flag = false;
-	if (tempStr.trim().test("^alter ","i") || 
+	if (tempStr.trim().test("^alter ","i") ||
 		tempStr.trim().test("^drop ","i") ||
 		tempStr.trim().test("^create ","i") ) {
 		Flag = true;
@@ -1380,9 +1448,9 @@ function getIfDDL(textareaname) {
 function setCommit(commitFlag) {
 	var commitId = 'commitTd';
 	var commitObject = parent.editorToolFrame.document.getElementById(commitId);
-	
+
 	commitObject.setEnabled(commitFlag);
-	
+
 }
 
 //设置rollback按钮的可用或不可用
@@ -1391,9 +1459,9 @@ function setCommit(commitFlag) {
 function setRollback(rollbackFlag) {
 	var rollbackId = 'rollbackTd';
 	var rollbackObject = parent.editorToolFrame.document.getElementById(rollbackId);
-	
+
 	rollbackObject.setEnabled(rollbackFlag);
-	
+
 }
 
 function setNoresult(divname,str) {
@@ -1404,7 +1472,7 @@ function setNoresult(divname,str) {
 
 function commit() {
 	var commitID = 'commitTd';
-	var commitObject = parent.editorToolFrame.document.getElementById(commitID);
+	var commitObject = parent.parent.editorToolFrame.document.getElementById(commitID);
 
 	if(commitObject.getEnabled()) {
 		BaisWorkBean.setDbCommit();
@@ -1417,8 +1485,8 @@ function commit() {
 
 function rollback() {
 	var rollbackID = 'rollbackTd';
-	var rollbackObject = parent.editorToolFrame.document.getElementById(rollbackID);
-	
+	var rollbackObject = parent.parent.editorToolFrame.document.getElementById(rollbackID);
+
 	if(rollbackObject.getEnabled()) {
 		BaisWorkBean.setDbRollback();
 		setCommit(false);
@@ -1446,7 +1514,7 @@ function queryByExample() {
 	var clearRecordID = 'clearRecordTd';
 	var queryByExampleObject = parent.editorFrame.document.getElementById(queryByExampleID);
 	var clearRecordObject = parent.editorFrame.document.getElementById(clearRecordID);
-	
+
 	if (!clearRecordObject.getEnabled() && queryByExampleFlag == 0 && queryByExampleObject.getEnabled())  {
 		clearRecordObject.setEnabled(true);
 		queryByExampleFlag = 1;
@@ -1466,7 +1534,7 @@ function clearRecord() {
 
 
 function showBaisworkMenu(divName,menuname,evt) {
-	
+
 	var isie=document.all;
     var rightnum=isie?event.button:evt.which;
     if ((isie && rightnum==2) || (!isie && rightnum==3)){        //IE or firefox
@@ -1498,8 +1566,8 @@ function hiddenBaisworkMenu(evt) {
     if ((isie && rightnum==2) || (!isie && rightnum==3)){        //IE or firefox
     	return true;
     } else {
-    	parent.editorFrame.document.getElementById('BaisworkMenu').style.display = "none";
-    	parent.editorFrame.document.getElementById('outResultMenu').style.display = "none";
+    	parent.parent.editorFrame.GGETFRAME.document.getElementById('BaisworkMenu').style.display = "none";
+        parent.parent.editorFrame.GGETFRAME.document.getElementById('outResultMenu').style.display = "none";
     }
 }
 
@@ -1523,7 +1591,7 @@ function createBaisWorkMenu(divname) {
 	'<a onclick="execEditDatat(\'myTextarea\',event)" ><font color="#808080">Edit data</font></a>' +
 	'<ul></ul>' +
 	'<a onclick="execClear(\'myTextarea\',event);" href="#">Clear</a>';
-	
+
 	setDivValueHtml(divname,stemp);
 }
 
@@ -1603,7 +1671,7 @@ function execClear(textareaname, e) {
 }
 
 //str: 属性或描述字符串
-//flag: 1 表示显示属性或描述 
+//flag: 1 表示显示属性或描述
 //		  2 表示显示视图（view）
 //从右键菜单中显示对象的 Properties 和 Describe
 function menuShowObjPD (str, flag, strTopX, strTopY) {
@@ -1633,7 +1701,7 @@ function createOutResultMenu(divname) {
 	'<ul></ul>' +
 	'<a onclick="execCopyResults(event);" ><font color="#808080">Copy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ctrl+C</font></a>' + //未实现功能的菜单先恢化
 	'<a onclick="execExportResults(event);" ><font color="#808080">Copy to Excel</font></a>'; //未实现功能的菜单先恢化
-	
+
 	setDivValueHtml(divname,stemp);
 }
 
@@ -1660,8 +1728,8 @@ function execClearResults(e) {
 //工作结果输出区右键Export Results命令执行函数
 function execExportResults(oName, e) {
 	hiddenBaisworkMenu(e);
-    console.log(mygrid);
-    mygrid.toExcel('../excel/toExcel.action','gray');
+    console.log(parent.mygrid);
+    parent.mygrid.toExcel('../../excel/toExcel.action','gray');
 }
 
 //工作结果输出区右键Fetch Next Page命令执行函数
@@ -1690,17 +1758,17 @@ function execExportResults_bak(e) {
 
 //Properties phanrider add by 2009-06-17
 function showDataHtmlP(data) {
-	
+
     mygrid = new dhtmlXGridObject('resultdiv');
-	
+
     mygrid.setImagePath("../../imgs/");
 
 	//alert(data.length);
-	
+
 	tlow_flag_num = data.length; //表格展示的行数
-	
+
 	tlow = data.length ;  //无标志行可去
-	
+
 	//alert(data.length);
     tcell = data[0].length; //表格展示的列数
     var strHeader = "";
@@ -1714,15 +1782,15 @@ function showDataHtmlP(data) {
     		strSort = strSort + "str" + ",";
     	}
     }
-    
-    	
+
+
     strHeader = " ," + strHeader; //前面加一个空行
     strSort = "int," + strSort; //前面数字排序
     mygrid.setHeader(strHeader);
     mygrid.setColAlign("right");
-	//mygrid.setColTypes("ro,ed"); 
+	//mygrid.setColTypes("ro,ed");
 	mygrid.setColSorting(strSort);
-	
+
 
 	var strHeaderWidth = "";
 	var size = 150;
@@ -1731,7 +1799,7 @@ function showDataHtmlP(data) {
 	    for( var ii = 0; ii < tlow ;  ii++) {
 	    	if ( data[ii][i].length > word ) word = data[ii][i].length;
 	    }
-	    
+
 	    if (word > 8 && word <= 15 ) size = 190;
 					else if  (word > 15 && word <= 20 ) size = 220;
 					else if  (word > 20 && word <= 30 ) size = 260;
@@ -1739,7 +1807,7 @@ function showDataHtmlP(data) {
     	if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
     	else strHeaderWidth = strHeaderWidth + size + "," ;
     }
-    
+
     var i = tlow;
     var leftwidth = 20;
     if ( i < 99 ) leftwidth = 30;
@@ -1747,51 +1815,51 @@ function showDataHtmlP(data) {
     else if ( i < 9999 && i >= 1000 ) leftwidth = 50;
     else if ( i < 99999 && i >= 10000 ) leftwidth = 60;
     else if ( i < 999999 && i >= 100000 ) leftwidth = 70;
-                		
-    strHeaderWidth = leftwidth + "," + strHeaderWidth; 
-	
-					
+
+    strHeaderWidth = leftwidth + "," + strHeaderWidth;
+
+
 	mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
-    
+
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
     	alert(data[0][1]);
     } else {
     	mygrid.enableAutoHeigth(true);
-    	
+
     	mygrid.init();  //进行初始化
 
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
     	var trstyle = "";
     	for (var j = 0; j < tcell; j++) {
-    		
+
     		var tmpS = changeHtml(data[i][j]);
     		if(j == (tcell - 1)) strRow = strRow + tmpS;
     		else strRow = strRow + tmpS + "," ;
-    		
+
     		//if(j == (tcell - 1)) strRow = strRow + data[i][j];
     		//else strRow = strRow + data[i][j] + "," ;
     	}
-    	trstyle="#D4D0C8"+ "," + trstyle; 
-    	
+    	trstyle="#D4D0C8"+ "," + trstyle;
+
 		mygrid.setColumnColor(trstyle);
-		strRow = i + "," + strRow; 
-    	mygrid.addRow(i,strRow); 
+		strRow = i + "," + strRow;
+    	mygrid.addRow(i,strRow);
     	}
     }
-       	
+
 }
 
 //Describe phanrider add by 2009-06-17
 function showDataHtmlD(data) {
-	
+
     mygrid = new dhtmlXGridObject('resultdiv');
-	
+
     mygrid.setImagePath("../../imgs/");
 
 	//alert(data.length);
-	
+
 	tlow_flag_num = data.length; //表格展示的行数
 	tlow = data.length ;  //无标志行可去
 
@@ -1808,16 +1876,16 @@ function showDataHtmlD(data) {
     		strSort = strSort + "str" + ",";
     	}
     }
-    
-    	
+
+
     strHeader = " ," + strHeader; //前面加一个空行
     strSort = "int," + strSort; //前面数字排序
     mygrid.setHeader(strHeader);
     mygrid.setColAlign("right");
-	//mygrid.setColTypes("ro,ed"); 
-    
+	//mygrid.setColTypes("ro,ed");
+
 	mygrid.setColSorting(strSort);
-		
+
 
 	var strHeaderWidth = "";
 	var size = 50;
@@ -1826,14 +1894,14 @@ function showDataHtmlD(data) {
 	    for( var ii = 0; ii < tlow ;  ii++) {
 	    	if ( data[ii][i].length > word ) word = data[ii][i].length;
 	    }
-	    
+
 	    if (word > 8 && word <= 15 ) size = 115;
 					else if  (word > 15 && word <= 20 ) size = 150;
 					else if  (word > 20 ) size = 200;
     	if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
     	else strHeaderWidth = strHeaderWidth + size + "," ;
     }
-    
+
     var i = tlow;
     var leftwidth = 20;
     if ( i < 99 ) leftwidth = 20;
@@ -1841,37 +1909,37 @@ function showDataHtmlD(data) {
     else if ( i < 9999 && i >= 1000 ) leftwidth = 40;
     else if ( i < 99999 && i >= 10000 ) leftwidth = 50;
     else if ( i < 999999 && i >= 100000 ) leftwidth = 60;
-                		
-    strHeaderWidth = leftwidth + "," + strHeaderWidth; 
-	
-					
+
+    strHeaderWidth = leftwidth + "," + strHeaderWidth;
+
+
 	mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
-    
+
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
     	alert(data[0][1]);
     } else {
-    	
+
     	//mygrid.enableAutoHeigth(true,380);
-    	
+
     	mygrid.init();  //进行初始化
-    	
+
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
     	var trstyle = "";
     	for (var j = 0; j < tcell; j++) {
-    	
+
     		var tmpS = changeHtml(data[i][j]);
     		if(j == (tcell - 1)) strRow = strRow + tmpS;
     		else strRow = strRow + tmpS + "," ;
-    		
+
     		//if(j == (tcell - 1)) strRow = strRow + data[i][j];
     		//else strRow = strRow + data[i][j] + "," ;
     	}
-    	trstyle="#D4D0C8"+ "," + trstyle; 
+    	trstyle="#D4D0C8"+ "," + trstyle;
     	mygrid.setColumnColor(trstyle);
-		strRow = i + "," + strRow; 
-    	mygrid.addRow(i,strRow); 
+		strRow = i + "," + strRow;
+    	mygrid.addRow(i,strRow);
     	}
     }
 }
@@ -1921,16 +1989,16 @@ function showDataHtmlReal(data, divname)
     		strSort = strSort + "str" + ",";
     	}
     }
-    
-    	
+
+
     strHeader = " ," + strHeader; //前面加一个空行
     strSort = "int," + strSort; //前面数字排序
     mygrid.setHeader(strHeader);
     mygrid.setColAlign("right");
-	//mygrid.setColTypes("ro,ed"); 
-    
+	//mygrid.setColTypes("ro,ed");
+
 	mygrid.setColSorting(strSort);
-		
+
 
 	var strHeaderWidth = "";
 	var size = 50;
@@ -1939,14 +2007,14 @@ function showDataHtmlReal(data, divname)
 	    for( var ii = 0; ii < tlow ;  ii++) {
 	    	if ( data[ii][i].length > word ) word = data[ii][i].length;
 	    }
-	    
+
 	    if (word > 8 && word <= 15 ) size = 115;
 					else if  (word > 15 && word <= 20 ) size = 150;
 					else if  (word > 20 ) size = 200;
     	if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
     	else strHeaderWidth = strHeaderWidth + size + "," ;
     }
-    
+
     var i = tlow;
     var leftwidth = 20;
     if ( i < 99 ) leftwidth = 20;
@@ -1954,37 +2022,37 @@ function showDataHtmlReal(data, divname)
     else if ( i < 9999 && i >= 1000 ) leftwidth = 40;
     else if ( i < 99999 && i >= 10000 ) leftwidth = 50;
     else if ( i < 999999 && i >= 100000 ) leftwidth = 60;
-                		
-    strHeaderWidth = leftwidth + "," + strHeaderWidth; 
-	
-					
+
+    strHeaderWidth = leftwidth + "," + strHeaderWidth;
+
+
 	mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
-    
+
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
     	alert(data[0][1]);
     } else {
-    	
+
     	//mygrid.enableAutoHeigth(true,380);
-    	
+
     	mygrid.init();  //进行初始化
-    	
+
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
     	var trstyle = "";
     	for (var j = 0; j < tcell; j++) {
-    	
+
     		var tmpS = changeHtml(data[i][j]);
     		if(j == (tcell - 1)) strRow = strRow + tmpS;
     		else strRow = strRow + tmpS + "," ;
-    		
+
     		//if(j == (tcell - 1)) strRow = strRow + data[i][j];
     		//else strRow = strRow + data[i][j] + "," ;
     	}
-    	trstyle="#D4D0C8"+ "," + trstyle; 
+    	trstyle="#D4D0C8"+ "," + trstyle;
     	mygrid.setColumnColor(trstyle);
-		strRow = i + "," + strRow; 
-    	mygrid.addRow(i,strRow); 
+		strRow = i + "," + strRow;
+    	mygrid.addRow(i,strRow);
     	}
     }
 }
@@ -2022,25 +2090,25 @@ function showNewObject(type,name,parameters,returnType,operate,nodetype,tablelis
 	tmptype = "SQL";
 	if(type == "function") {
 		tmptype = "FUN";
-	} else if(type == "procedure") { 
+	} else if(type == "procedure") {
 		tmptype = "PRO";
-	} else if(type == "package") { 
+	} else if(type == "package") {
 		tmptype = "PAC";
-	} else if(type == "package_body") { 
+	} else if(type == "package_body") {
 		tmptype = "PAB";
-	} else if(type == "type") { 
+	} else if(type == "type") {
 		tmptype = "TYP";
-	} else if(type == "type_body") { 
+	} else if(type == "type_body") {
 		tmptype = "TYB";
-	} else if(type == "trigger") { 
+	} else if(type == "trigger") {
 		tmptype = "TRI";
-	} else if(type == "java_source") { 
+	} else if(type == "java_source") {
 		tmptype = "JAV";
-	} else if(type == "view") { 
+	} else if(type == "view") {
 		tmptype = "VIE";
-	} else if(type == "materialized_view") { 
+	} else if(type == "materialized_view") {
 		tmptype = "VIM";
-	} else if(type == "table") { 
+	} else if(type == "table") {
 		tmptype = "TAB";
 	}
 	//alert(url);
@@ -2061,25 +2129,25 @@ function showViewObject(type,name,field,operate) {
 	tmptype = "SQL";
 	if(type == "function") {
 		tmptype = "FUN";
-	} else if(type == "procedure") { 
+	} else if(type == "procedure") {
 		tmptype = "PRO";
-	} else if(type == "package") { 
+	} else if(type == "package") {
 		tmptype = "PAC";
-	} else if(type == "package body") { 
+	} else if(type == "package body") {
 		tmptype = "PAB";
-	} else if(type == "type") { 
+	} else if(type == "type") {
 		tmptype = "TYP";
-	} else if(type == "type body") { 
+	} else if(type == "type body") {
 		tmptype = "TYB";
-	} else if(type == "trigger") { 
+	} else if(type == "trigger") {
 		tmptype = "TRI";
-	} else if(type == "java source") { 
+	} else if(type == "java source") {
 		tmptype = "JAV";
-	} else if(type == "view") { 
+	} else if(type == "view") {
 		tmptype = "VIE";
-	} else if(type == "materialized view") { 
+	} else if(type == "materialized view") {
 		tmptype = "VIM";
-	} else if(type == "table") { 
+	} else if(type == "table") {
 		tmptype = "TAB";
 	}
 	parent.parent.leftFrameList.createNewSql(tmptype, "myTextarea");
@@ -2097,25 +2165,25 @@ function showEditObject(type,name,field,operate) {
 	tmptype = "SQL";
 	if(type == "function") {
 		tmptype = "FUN";
-	} else if(type == "procedure") { 
+	} else if(type == "procedure") {
 		tmptype = "PRO";
-	} else if(type == "package") { 
+	} else if(type == "package") {
 		tmptype = "PAC";
-	} else if(type == "package body") { 
+	} else if(type == "package body") {
 		tmptype = "PAB";
-	} else if(type == "type") { 
+	} else if(type == "type") {
 		tmptype = "TYP";
-	} else if(type == "type body") { 
+	} else if(type == "type body") {
 		tmptype = "TYB";
-	} else if(type == "trigger") { 
+	} else if(type == "trigger") {
 		tmptype = "TRI";
-	} else if(type == "java_source") { 
+	} else if(type == "java_source") {
 		tmptype = "JAV";
-	} else if(type == "view") { 
+	} else if(type == "view") {
 		tmptype = "VIE";
-	} else if(type == "materialized_view") { 
+	} else if(type == "materialized_view") {
 		tmptype = "VIM";
-	} else if(type == "table") { 
+	} else if(type == "table") {
 		tmptype = "TAB";
 	}
 	parent.editorToolFrame.nodeType = field;
@@ -2127,31 +2195,31 @@ function recompile(objectType, objectName, debugFlag) {
 
 	//真正通过dwr调用相应的Bean
 	parent.editorToolFrame.BaisWorkBean.execObjectCompile(objectType, objectName, debugFlag, callexecobjectback);
-	
+
 	function callexecobjectback(intdata){
-	
+
 	var oracleTitle = "";
 	var insertordel = "";
 	var rows="";
 	var tcell = intdata[0].length;
-	
+
 	if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = intdata[0][1];
     	alert(intdata[0][1]);
 	} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 		rows = intdata[0][1];
-	} 
-	
+	}
+
 	if ( errOracleMsg != "") {
 	 	oracleTitle = errOracleMsg;
 	 	//出错处理
-	 	
+
 	 	//重新设置为空
 	 	errOracleMsg = "";
 	} else  {
 			oracleTitle = objectName + " " + rows ;	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
 	}
-	
+
 	//左边树的选中节点重新加载，只有执行成功才重新加载
 	if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 			alert(oracleTitle);
@@ -2170,13 +2238,13 @@ function changeHtml(str) {
 
 //创建windowlist工具条，通用新创建工具条方法
 function createWindowList(windowType, str) {
-	
+
 	var initStr = "";
 	var newStr = "";
 	var endStr = "";
 	var img = "../images/no_saved.gif";
 	var maxAltLength = 30 //字符串最大长度
-	
+
 	//此处为接口，不同的窗口类型，定义不同的windowType即可，如果新增不同窗口类型，此处需添加针对该窗口类型的方法
 	if(windowType == "SQL") {
 		initStr = "SQL Window - ";
@@ -2214,24 +2282,25 @@ function createWindowList(windowType, str) {
 	} else if (windowType == "TAB") {
 		initStr = "View table ";
 		newStr = "NEW";
-	} 
-	
+	}
+
 	endStr = initStr + newStr;
-	
-	
+
+
 	//得到已有表格对象
 	var tableObject=document.getElementById("windowListBar");
 
 	//判断已经存在的行的最大值
 	var introws = tableObject.rows.length;
-	
+
+
 	if (introws > 8) {
 		//超过9个弹出提示
 		alert("Has exceeded the maximum window can be created!");
 	} else {
 		var newTr = tableObject.insertRow(introws);
 		var newTd = newTr.insertCell(0);
-	
+
 		if (str == "initnew") {
 			newTd.setAttribute("class","coolButtonActive");
 		} else {
@@ -2239,6 +2308,7 @@ function createWindowList(windowType, str) {
 		}
 		var sType = windowType;
 		var TdId = sType + "NewTd" + introws;
+		GTDID = "n" + introws;
 		newTd.setAttribute("id",TdId);
 		newTd.setAttribute("width","98%");
 		newTd.setAttribute("align","left");
@@ -2249,9 +2319,9 @@ function createWindowList(windowType, str) {
 			//alert(introws);
 			//alert(parent.leftFrameList.$('windowListBar').get('html'));
 			windowListTdOnclick(windowType,introws);
-		};	
+		};
 		//alert(newTd.onclick);
-		
+
 		var spanId = "WindowListValue" + introws;
 		var imgId = "columnButton" + introws;
 		var htmlTemp = "<img id=" + imgId + " src='" + img + "' align='absmiddle'>" +
@@ -2262,26 +2332,28 @@ function createWindowList(windowType, str) {
 			endStr = endStr.substr(0, maxAltLength) + " ... ";
 		}
 		//alert(spanId);
-	
+
 		//为新列增加HTML
 		newTd.innerHTML = htmlTemp;
 		divname = spanId;
 		$(divname).set('text',endStr);
-	
-	
+
+
 		if (windowType == "SQL") {
 			//如果为初始登录，则不创建按钮
 			if (str != "initnew") {
-			
+
 				//新建一个新窗口时再保存当前已被按下的窗口的内容
 				var i = getWindowTr();
 				var SQLWindowString = "SQLWindow" + i;
-				saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i); 
+				saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
 				initWindwoListButton(introws);
-				
+
+
 			} else {
 				initWindwoListButton(introws);
-			}
+
+            }
 		} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
@@ -2290,17 +2362,17 @@ function createWindowList(windowType, str) {
 				var SQLWindowString = "SQLWindow" + i;
 				//alert(getWindowType());
 				//alert(SQLWindowString);
-				saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i); 
+				saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
 				initWindwoListButton(introws);
 		}  else if (windowType == "JAVA") {
 				var i = getWindowTr();
 				var SQLWindowString = "SQLWindow" + i;
 				//alert(getWindowType());
 				//alert(SQLWindowString);
-				saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i); 
+				saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
 				initWindwoListButton(introws);
 		}
-		
+
 	}
 }
 
@@ -2311,7 +2383,7 @@ function getWindowTr() {
 
 	//判断已经存在的行的最大值
 	var introws = tableObject.rows.length;
-	
+
 	for (var i = 0; i < introws; i++) {
 		var windowlistcell = document.getElementById('windowListBar').rows[i].cells;
 		if (windowlistcell[0].getValue()) {
@@ -2335,7 +2407,7 @@ function getWindowType() {
 //初始化一个windowList
 function initWindwoListButton(rowid) {
 	var windowlistcell = document.getElementById('windowListBar').rows[rowid].cells;
-	
+
 	var rowlength = document.getElementById('windowListBar').rows.length;
 	for(var j = 0; j < rowlength; j++) {
 		var celltmp = document.getElementById('windowListBar').rows[j].cells;
@@ -2346,7 +2418,7 @@ function initWindwoListButton(rowid) {
 			//alert(celltmp[k]);
 		}
 	}
-							
+
 	for (var i = 0; i < windowlistcell.length; i++)
 	{
 			createButton(windowlistcell[i]);
@@ -2354,11 +2426,11 @@ function initWindwoListButton(rowid) {
 			windowlistcell[i].setToggle(true);
 	 		windowlistcell[i].setValue(true, true);
 	}
-	
-	 
-			
+
+
+
 }
-	
+
 //功能：保存旧SQL窗口内容，并新建SQL窗口，并在windowlistFrame中显示
 //创建每个SQL窗口时，会调到此函数
 function createNewSql(windowType, textareaname) {
@@ -2366,14 +2438,15 @@ function createNewSql(windowType, textareaname) {
 	//得到输入框中的所有文本，以下div的name都已写固定
 	//var getText = parent.editorFrame.$('myTextarea').get('html');
 	//var getExecValue = parent.editorFrame.$('outResultDiv').get('html');
-	//var getChangeExecValue = parent.editorFrame.$('changeOutResultDiv').get('html'); 
+	//var getChangeExecValue = parent.editorFrame.$('changeOutResultDiv').get('html');
+	console.log("click.this.createNewSql");
 	var prevWindowType = getWindowType();
 	setIsNotCreate(false);
-	
+
 	if (windowType == "SQL" ) {
 		//创建windowlist工具条
 		createWindowList(windowType, "new");
-	
+
 		//更改右边工作区的内容
 		if (prevWindowType == windowType) {
 			//如果上一个窗口与当前窗口类型一致，则需重置数据即可
@@ -2386,7 +2459,7 @@ function createNewSql(windowType, textareaname) {
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
 					|| windowType == "VIM" || windowType == "TAB") {
-		
+
 		//创建windowlist工具条
 		createWindowList(windowType, "new");
 		//更改右边工作区的内容
@@ -2397,15 +2470,15 @@ function createNewSql(windowType, textareaname) {
 			//如果上一个窗口与当前窗口类型不一致，则需要重新加载
 			parent.parent.editorFrame.location.replace(funURL);
 		}
-		
+
 	} else if (windowType == "JAVA" ) {
-		
+
 		//创建windowlist工具条
 		createWindowList(windowType, "new");
-		
+
 	}
-	
-	
+
+
 
 }
 
@@ -2414,10 +2487,10 @@ function doRadio(_trType, _prevTrType, _trRow) {
 		var sameWindowFlag = false;
 		//alert(_trType);
 		//得到当前已按行的trRow
-		var i = getWindowTr(); 
+		var i = getWindowTr();
 		var SQLWindowString = "SQLWindow" + i;
 		//每次都得保存原窗口内容
-		saveDivValue("SQLWindow",SQLWindowString, _prevTrType, i); 
+		saveDivValue("SQLWindow",SQLWindowString, _prevTrType, i);
 		//调用恢复窗口内容的函数,_trRow为被点击行的trRow
 		if( _trType != _prevTrType ) {
 			//不同窗口，统一置为false
@@ -2460,23 +2533,23 @@ function doRadio(_trType, _prevTrType, _trRow) {
 			//alert(celltmp[k]);
 		}
 	}
-	
+
 	for (var i = 0; i < windowlistcell.length; i++) {
 			windowlistcell[i].setAlwaysUp(true);
 			windowlistcell[i].setToggle(true);
-			windowlistcell[i].setValue(true,true);	
+			windowlistcell[i].setValue(true,true);
 		}
 	//parent.parent.editorFrame.location.replace("./editor.jsp");
-	
+
 }
 
 function windowListTdOnclick(trType, trRow) {
 	//alert(trRow);
 	var windowlistcell = parent.leftFrameList.document.getElementById('windowListBar').rows[trRow].cells;
-	
+
 	//只取窗口类型的前三位 *********
 	tmpWindowtype = $(windowlistcell[0]).get('id').trim().substr(0,3);
-	
+
 	//alert("tmpWindowtype:"+tmpWindowtype);
 	//alert("trType:"+trType);
 	//alert("getwin:"+getWindowType());
@@ -2485,7 +2558,7 @@ function windowListTdOnclick(trType, trRow) {
 	if (!windowlistcell[0].getValue()) {
 		//则执行一系列动作
 		doRadio(tmpWindowtype,getWindowType(),trRow);
-	
+
 	}
 }
 
@@ -2493,20 +2566,22 @@ function windowListTdOnclick(trType, trRow) {
 //新建SQLWindow时，调用此函数
 function clearSQLWindow(windowtype) {
 	//清空编辑输入区--SQL窗口
-	createNew('myTextarea');
+	// createNew('myTextarea');  换成 editAreaLoader.setValue("example_1", "new_value");
+	//editAreaLoader.setValue("myTextarea", "");
+
 	//清空输出结果区--SQL窗口
 	if (windowtype == "SQL") {
-		parent.editorFrame.$('outResultDiv').set('text','');
-		parent.editorFrame.$('changeOutResultDiv').set('text','');
+		//parent.editorFrame.$('outResultDiv').set('text','');   2020-09-16
+		//parent.editorFrame.$('changeOutResultDiv').set('text','');    2020-09-16
 		//按钮恢复成初始状态
 		controlbuttonReset();
 		//清除结果集后，需重新设置工作结果区的工具条状态
 		resetBaseWorkToolBar(false);
 	}
-	
+
 	//状态栏初始为空
 	setFootView(9999, '　');
-	
+
 }
 
 //保存原先的DIV内容，有bug,如果按了工具条的按钮，按钮的效果将会在新窗口中体现
@@ -2522,21 +2597,30 @@ function saveDivValue(DivSource, DivDest, windowType, trRow) {
 	//alert(divObject.get('html'));
 	//alert(windowType);
 	//alert(trRow);
-	$(DivDest).set('html',divObject.get('html'));
+
+    // clone div 2020-07-23
+	// $(DivDest).set('html',divObject.get('html'));
+
+	$(DivDest).append(divObject.clone(true));
 	//alert(divObject.get('html'));
-	
-	
+
+
 	//此处为接口，可为多个窗口类型
 	if (windowType == "SQL") {
-		var destMyTextarea = "myTextarea" + trRow;
+		// var destMyTextarea = "myTextarea" + trRow;
 		var destOutResultDiv = "outResultDiv" + trRow;
 		var destChangeOutResultDiv = "changeOutResultDiv" + trRow;
 		var destFootview = "footview" + trRow;
 		//更改一下每个DIV中的ID，不然ID会重复
-		$('myTextarea').set('id',destMyTextarea);
-		$('outResultDiv').set('id',destOutResultDiv);
-		$('changeOutResultDiv').set('id',destChangeOutResultDiv);
-		$('footview').set('id',destFootview);
+
+		// 这个地方先不要换ID
+		// $('myTextarea').set('id',destMyTextarea);
+		// $('outResultDiv').set('id',destOutResultDiv);
+		// $('changeOutResultDiv').set('id',destChangeOutResultDiv);
+		// $('footview').set('id',destFootview);
+
+
+
 		//alert($(destMyTextarea).get('id'));
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
@@ -2547,7 +2631,7 @@ function saveDivValue(DivSource, DivDest, windowType, trRow) {
 		var desttmpImg = "tmpImg" + trRow;
 		var destobjIcoId = "objIcoId" + trRow;
 		var destFootview = "footview" + trRow;
-		
+
 		//更改一下每个DIV中的ID，不然ID会重复
 		if (windowType == "TAB") {
 			destMyTextarea = "tabPanel" + trRow;
@@ -2560,8 +2644,8 @@ function saveDivValue(DivSource, DivDest, windowType, trRow) {
 			$('objIcoId').set('id',destobjIcoId);
 			$('footview').set('id',destFootview);
 		}
-		
-		
+
+
 	} else if (windowType == "JAVA") {
 		var destMyTextarea = "myTextarea" + trRow;
 		var destProTitle = "objTitle" + trRow;
@@ -2570,7 +2654,7 @@ function saveDivValue(DivSource, DivDest, windowType, trRow) {
 		$('proTitle').set('id',destProTitle);
 		//alert($(destMyTextarea).get('id'));
 	}
-	
+
 	//alert($('hiddenDiv').get('text'));
 }
 
@@ -2584,9 +2668,9 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 		var destFootview = "footview" + trRow;
 		//恢复编辑区内容--SQL窗口
 		//alert(parent.leftFrameList.$('SQLWindow0').get('html'));
-		
+
 		parent.editorFrame.$('myTextarea').set('html',$(destMyTextarea).get('html'));
-		
+
 		//恢复工具条按钮事件会失效 BUG，暂不恢复
 		//parent.editorFrame.$('foot_outputDiv1').set('html',$('foot_outputDiv1').get('html'));
 
@@ -2619,13 +2703,13 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 			parent.editorFrame.$('objIcoId').set('src',parent.leftFrameList.$(desttmpImg).get('text'));
 			parent.editorFrame.$('footview').set('text',parent.leftFrameList.$(destFootview).get('text'));
 		}
-		
+
 	} else if (windowType == "JAVA") {
 		var destMyTextarea = "myTextarea" + trRow;
 		//alert(destMyTextarea);
 		parent.editorFrame.$('myTextarea').set('html',$(destMyTextarea).get('html'));
 	}
-	
+
 }
 
 //更改windowList的提示语
@@ -2637,7 +2721,7 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 	var imgIcon = "../images/windowlist_running.gif";
 	var maxLength = 30; //设置左边工具条最大显示的字符数
 	var maxAltLength = 200; //设置鼠标放在上面提示的最大字符数
-	
+
 	if(windowType == "SQL") {
 		initStr = "SQL Window - ";
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
@@ -2665,7 +2749,7 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 			strTmp = "NEW";
 		}  else if (windowType == "TAB") {
 			strTmp = "table";
-		}  
+		}
 		if (windowType == "VIE" || windowType == "VIM") {
 			initStr = "SQL Window - " + strTmp;
 		} else if (windowType == "TAB"){
@@ -2673,35 +2757,35 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 		} else {
 			initStr = "Programe Window - Edit source of " + strTmp;
 		}
-	} 
-	
+	}
+
 	titleTmp = "";
 
 	tmpStr = initStr + titleStr;
-	
+
 	if(tmpStr.length > maxLength) {
 		tmpStr = tmpStr.substr(0, maxLength) + " ... ";
 	}
-	
+
 	tmpStrA = initStr + titleStr;
 	if(tmpStrA.length > maxAltLength) {
 		tmpStrA = tmpStr.substr(0, maxAltLength) + " ... ";
 	}
-	
+
 	$(spanListVauleId).set('text', tmpStr);
 	$(spanListVauleId).set('title', tmpStrA);
 	$(spanListVauleId).set('alt', tmpStrA);
 	$(imgListVauleId).set('src', imgIcon);
-	
+
 }
 
 //恢复当前windowList窗口的图片
 function restoreWindowListImg(trRow) {
 	var imgListVauleId = "columnButton" + trRow;
 	var imgIcon = "../images/no_saved.gif";
-	
+
 	$(imgListVauleId).set('src', imgIcon);
-	
+
 }
 
 //睡眠函数：毫秒
@@ -2722,19 +2806,26 @@ function setIsNotCreate(flag) {
 //页面载入后的初始化函数
 function initOnload() {
 	//如果不是新建的窗口，则调用恢复内容的函数
-	if (parent.leftFrameList.globalIsNotCreate) {
+
+
+    if (typeof(parent.parent.leftFrameList.globalIsNotCreate) == 'undefined') {
+        if(globalIsNotCreate) {
+            estoreDivValue(globalTrType, globalTrRow, globalSameWindowFlag);
+        }
+    }
+	else if (parent.parent.leftFrameList.globalIsNotCreate) {
 		//alert(parent.leftFrameList.globalTrType);
 		//alert(parent.leftFrameList.globalTrRow);
 		//alert(parent.leftFrameList.globalSameWindowFlag);
-		parent.leftFrameList.restoreDivValue(parent.leftFrameList.globalTrType, parent.leftFrameList.globalTrRow, parent.leftFrameList.globalSameWindowFlag);
+		parrent.parent.leftFrameList.restoreDivValue(parrent.parrent.leftFrameList.globalTrType, parrent.parrent.leftFrameList.globalTrRow, parrent.parent.leftFrameList.globalSameWindowFlag);
 	}
 }
 
 //设置全局变量，当前窗口类型及当前行
 function setGlobal(trType, trRow, WindowFlag) {
-	parent.leftFrameList.globalTrType = trType;
-	parent.leftFrameList.globalTrRow = trRow;
-	parent.leftFrameList.globalSameWindowFlag = WindowFlag;
+    parrent.parent.leftFrameList.globalTrType = trType;
+    parrent.parent.leftFrameList.globalTrRow = trRow;
+    parrent.parent.leftFrameList.globalSameWindowFlag = WindowFlag;
 }
 
 //删除一个window list
@@ -2742,39 +2833,39 @@ function deleteWindowList() {
 	//得到当前已按下的window list
 	var currTrRown = parent.leftFrameList.getWindowTr();
 	var currWindowFlag = parent.leftFrameList.getWindowType();
-	
+
 	//alert(currTrRown);
 	//alert(currWindowFlag);
-	
+
 	//得到已有表格对象
 	var tableObject=parent.leftFrameList.document.getElementById("windowListBar");
 
 	//判断已经存在的行的最大值
 	var introws = tableObject.rows.length;
-	
+
 	if (introws == 1 ) {
 		//最后一个弹出提示，不可以删除
 		alert("Do not delete last window!");
 	} else {
 		//清空leftFrameList中当前的div值
 		parent.leftFrameList.deleteWindowListDiv(currTrRown);
-		
+
 		//开始删除当前行
 		tableObject.deleteRow(currTrRown);
-		
+
 		var currRow = currTrRown;
 		//eftFrameList其他div值依次调整，并且返回最大的TrRow
 		var maxRow = parent.leftFrameList.adjustmentWindowListDiv(currRow);
-	
+
 		//如果最大行大于0，则减1
 		if (maxRow > 0)	maxRow--;
-	
+
 		//当前最大的row设为活动窗口
 		parent.leftFrameList.setRowWindowList(maxRow);
-	
+
 		//恢复右边工作区数据
 		parent.leftFrameList.recoverPage(parent.leftFrameList.getWindowType(),parent.leftFrameList.getWindowTr(),false);
-	
+
 	}
 }
 
@@ -2789,49 +2880,49 @@ function deleteWindowListDiv(currTrRown) {
 function adjustmentWindowListDiv(trRow) {
 	//首先得到当前活动窗口的trRow
 	var currTrRown = trRow;
-	
+
 	//得到已有表格对象
 	var tableObject=parent.leftFrameList.document.getElementById("windowListBar");
 
 	//判断已经存在的行的最大值
 	var maxrows = tableObject.rows.length;
-	
-	
+
+
 	for (i = currTrRown + 1; i <= maxrows ; i++) {
-		
+
 		var old = i - 1;
 		//得到前一个窗口的div的ID
 		var oldWindowDiv = "SQLWindow" + old;
 		//得到被删除窗口的下一个窗口的div的	ID
 		var windowDiv = "SQLWindow" + i;
-		
-		
+
+
 		//重新把每个tr中的ID改过来
 		var windowlistcell = document.getElementById('windowListBar').rows[old].cells;
-		
+
 		tmplength = $(windowlistcell[0]).get('id').length;
 		tmpTdId = $(windowlistcell[0]).get('id').trim().substr(0,tmplength-1);
 		tmpWindowtype = $(windowlistcell[0]).get('id').trim().substr(0,3);
-		
-		
+
+
 		//为各个不同窗口类型更改ID，可为多种窗口类型
 		if (tmpWindowtype == "SQL") {
 			var destMyTextarea = "myTextarea" + i;
 			var destOutResultDiv = "outResultDiv" + i;
 			var destChangeOutResultDiv = "changeOutResultDiv" + i;
 			var destFootview = "footview" + i;
-			
+
 			var oldMyTextarea = "myTextarea" + old;
 			var oldOutResultDiv = "outResultDiv" + old;
 			var oldChangeOutResultDiv = "changeOutResultDiv" + old;
 			var oldFootview = "footview" + old;
-			
+
 			//更改一下每个DIV中的ID，不然ID会重复
 			parent.leftFrameList.$(destMyTextarea).set('id',oldMyTextarea);
 			parent.leftFrameList.$(destOutResultDiv).set('id',oldOutResultDiv);
 			parent.leftFrameList.$(destChangeOutResultDiv).set('id',oldChangeOutResultDiv);
 			parent.leftFrameList.$(destFootview).set('id',oldFootview);
-			
+
 		} else if (tmpWindowtype == "FUN" || tmpWindowtype == "PRO" || tmpWindowtype == "PAC"
 					|| tmpWindowtype == "PAB" || tmpWindowtype == "TYP" || tmpWindowtype == "TYB"
 					|| tmpWindowtype == "TRI" || tmpWindowtype == "JAV" || tmpWindowtype == "VIE"
@@ -2840,7 +2931,7 @@ function adjustmentWindowListDiv(trRow) {
 			var destObjTitle = "objTitle" + i;
 			var destObjIcoId = "objIcoId" + i;
 			var destFootview = "footview" + i;
-			
+
 			var oldMyTextarea = "myTextarea" + old;
 			var oldObjTitle = "objTitle" + old;
 			var oldObjIcoId = "objIcoId" + old;
@@ -2850,7 +2941,7 @@ function adjustmentWindowListDiv(trRow) {
 			parent.leftFrameList.$(destObjTitle).set('id',oldObjTitle);
 			parent.leftFrameList.$(destObjIcoId).set('id',oldObjIcoId);
 			parent.leftFrameList.$(destFootview).set('id',oldFootview);
-			
+
 			//alert($(destMyTextarea).get('id'));
 		} else if (tmpWindowtype == "JAVA") {
 			var destMyTextarea = "myTextarea" + i;
@@ -2859,21 +2950,21 @@ function adjustmentWindowListDiv(trRow) {
 			parent.leftFrameList.$(destMyTextarea).set('id',oldMyTextarea);
 			//alert($(destMyTextarea).get('id'));
 		}
-	
+
 		//依次把当前窗口的内容重新赋值给上一个窗口
 		parent.leftFrameList.$(oldWindowDiv).set('html',parent.leftFrameList.$(windowDiv).get('html'));
 		parent.leftFrameList.$(windowDiv).set('html','');
-		
+
 		//alert(parent.leftFrameList.$(oldWindowDiv).get('id'));
-		
+
 		var oldTdId = tmpTdId + old;
 		var oldSpanId = "WindowListValue" + old;
 		var oldImgId = "columnButton" + old;
 		var newTdId = tmpTdId + i;
 		var newSpanId = "WindowListValue" + i;
 		var newImgId = "columnButton" + i;
-		
-	
+
+
 		parent.leftFrameList.$(newTdId).set('id',oldTdId);
 		parent.leftFrameList.$(newSpanId).set('id',oldSpanId);
 		parent.leftFrameList.$(newImgId).set('id',oldImgId);
@@ -2884,12 +2975,12 @@ function adjustmentWindowListDiv(trRow) {
 			//windowListTdOnclick函数已重写，参数tmpWindowtype已不用
 			windowListTdOnclick(tmpWindowtype,this.parentNode.rowIndex);
 		};
-		
+
 		//alert($(windowlistcell[0]).get('onclick'));
-		
+
 	}
 	return maxrows;
-	
+
 }
 //设置指定行的窗口为活动窗口
 function setRowWindowList(Row) {
@@ -2905,11 +2996,11 @@ function setRowWindowList(Row) {
 			celltmp[k].setValue(false, false);
 		}
 	}
-	
+
 	for (var i = 0; i < windowlistcell.length; i++) {
 			windowlistcell[i].setAlwaysUp(true);
 			windowlistcell[i].setToggle(true);
-			windowlistcell[i].setValue(true,true);	
+			windowlistcell[i].setValue(true,true);
 		}
 }
 
@@ -2917,13 +3008,13 @@ function setRowWindowList(Row) {
 function recoverPage(_trType, _trRow, sameWindowFlag) {
 
 	parent.editorFrame.globalOnLoadFlag = false;
-	
+
 	//alert(_trType);
 	//alert(_trRow);
 	//alert(sameWindowFlag);
-	
+
 	setGlobal(_trType, _trRow, sameWindowFlag);
-	
+
 	//如果上一个窗口与当前窗口类型不一致，则需要重新加载
 	//并且按照当前点击窗口的类型，加截不同的页面
 	//先设置一下全局变量
@@ -2945,7 +3036,7 @@ function recoverPage(_trType, _trRow, sameWindowFlag) {
 function closeWindowList() {
 
 	parent.leftFrameList.deleteWindowList();
-	
+
 }
 
 //改边关闭按钮样式，鼠标左键按下时调用此函数
@@ -2971,7 +3062,7 @@ function changeWindowListClassUp(imgId,evt) {
 
 //关闭左则Window List
 function closeWindow(imgId,evt) {
-	
+
 	//关闭当前窗口
 	closeWindowList();
 	//最后恢复按钮样式
