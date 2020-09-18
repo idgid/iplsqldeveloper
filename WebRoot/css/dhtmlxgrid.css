@@ -20,8 +20,8 @@ div.gridbox table.hdr td {
 	margin:0px;
 	padding:5px 0px 5px 0px ;
 	font-weight:normal;
-	-moz-user-select:none;    
-	-moz-user-select:-moz-none;    
+	-moz-user-select:none;
+	-moz-user-select:-moz-none;
     overflow:hidden;
     empty-cells:show;
     /*font-weight:bold;*/
@@ -36,7 +36,7 @@ div.gridbox table.obj td {
 	font-size:12px;
 	font:12px arial;
     -moz-user-select:none;
-    -moz-user-select:-moz-none;   
+    -moz-user-select:-moz-none;
     overflow:hidden;
     padding-top:0px;
     padding-bottom:0px;
@@ -51,7 +51,7 @@ div.gridbox table.obj th, div.gridbox table.hdr th{
 div.gridbox table.row20px tr  td{
     height:20px;
     white-space: nowrap;
-    padding:0px;
+    padding:1px;
 }
 div.gridbox .objbox {
 	background-color:white;
@@ -72,8 +72,8 @@ div.gridbox table.obj td.editable{
     -moz-user-select:text;
     }
 div.gridbox table.obj td.group_row{
-    vertical-align:middle; font-family:Tahoma; font-size:10pt; font-weight:bold; height:30px;  border:0px;  border-bottom: 2px solid navy; 
-    }    
+    vertical-align:middle; font-family:Tahoma; font-size:10pt; font-weight:bold; height:30px;  border:0px;  border-bottom: 2px solid navy;
+    }
 
 .dragSpanDiv{ 	font-size : 12px; 	border: 1px gray solid; background-color:white; }
 .dhx_combo_select{
@@ -171,7 +171,7 @@ div.gridbox_xp table.hdr td {
 	padding:5px 0px 5px 0px ;
 	font-weight:bold;
     -moz-user-select:none;
-    -moz-user-select:-moz-none;    
+    -moz-user-select:-moz-none;
     overflow:hidden;
 	}
 div.gridbox_xp table.hdr td div.hdrcell{
@@ -189,7 +189,7 @@ div.gridbox_xp table.obj td {
 	font-family:Arial;
 	font-size:12px;
     -moz-user-select:none;
-    -moz-user-select:-moz-none;    
+    -moz-user-select:-moz-none;
     overflow:hidden;
     padding-top:0px;
     padding-bottom:0px;
@@ -241,7 +241,7 @@ div.gridbox_mt table.hdr td {
 	background-image:url('imgs/header_bg.gif');
 	padding: 0px 0px 0px 0px;
 	-moz-user-select:none;
-	-moz-user-select:-moz-none;    
+	-moz-user-select:-moz-none;
 	overflow:hidden;
 	}
 div.gridbox_mt table.hdr td div.hdrcell{
@@ -257,7 +257,7 @@ div.gridbox_mt table.obj td {
 	font-family:Verdana;
 	font-size:12px;
     -moz-user-select:none;
-    -moz-user-select:-moz-none;    
+    -moz-user-select:-moz-none;
     overflow:hidden;
     padding-top:0px;
     padding-bottom:0px;
@@ -577,8 +577,8 @@ div.gridbox_sbdark .xhdr_last{
 	border-color : #474948 #202220 #202220 #202220;
 }
 
-div.gridbox_sbdark {      
-      background: #313131 !important; 
+div.gridbox_sbdark {
+      background: #313131 !important;
 }
 
 div.gridbox_sbdark table {
@@ -589,15 +589,15 @@ div.gridbox_sbdark table.hdr tr  {
     border-top: 1px solid #202220;
 }
 
-div.gridbox_sbdark table.hdr, 
+div.gridbox_sbdark table.hdr,
 div.gridbox_sbdark table.hdr td {
     border-right:1px solid #202220;
     border-left:1px solid #202220;
     border-top: 1px solid #474948;
     border-bottom:1px solid #202220;
     background-color: #313131;
-    
-    font-size:11px; 
+
+    font-size:11px;
     color:#8A8F84;
     vertical-align:top;
     text-align:left;
@@ -606,7 +606,7 @@ div.gridbox_sbdark table.hdr td {
 
 div.gridbox_sbdark .hdrcell {
     padding-left: 0px !important;
-    font-family: 'Lucida Sans Unicode','Tahoma'; 
+    font-family: 'Lucida Sans Unicode','Tahoma';
 }
 
 div.gridbox_sbdark table.hdr td div.hdrcell{
@@ -619,11 +619,11 @@ div.gridbox_sbdark table.obj td {
     border-left: 1px solid #202220;
     border-right: 1px solid #EDF3F0;
     font-family: 'Consolas','Lucida Sans Unicode','Tahoma';
-    font-size:11px;    
+    font-size:11px;
 }
 
 div.gridbox_sbdark table.row20px tr td {
-    padding: 0px 5px !important; 
+    padding: 0px 5px !important;
     text-indent:1px;
 }
 
@@ -632,20 +632,20 @@ div.gridbox_sbdark .dhx_combo_edit{
     font-size:11px;
 }
 
-div.gridbox_sbdark table.obj tr.rowselected td, 
-div.gridbox_sbdark table.obj tr:hover, 
+div.gridbox_sbdark table.obj tr.rowselected td,
+div.gridbox_sbdark table.obj tr:hover,
 div.gridbox_sbdark .odd_light:hover {
     background-color: #8A8F84;
     color: white !important;
 }
 
-div.gridbox_sbdark table.obj tr.rowselected td.cellselected , 
+div.gridbox_sbdark table.obj tr.rowselected td.cellselected ,
 div.gridbox_sbdark table.obj td.cellselected {
     background-color:#8A8F84;
 }
 
 div.gridbox_sbdark .cellselected {
-    background-color: #6e6f64 !important;    
+    background-color: #6e6f64 !important;
 }
 
 div.gridbox_sbdark .ev_sbdark {
@@ -654,6 +654,6 @@ div.gridbox_sbdark .ev_sbdark {
 
 div.gridbox_sbdark .odd_sbdark {
     background-color:#EDF3F0;
-} 
+}
 
 
