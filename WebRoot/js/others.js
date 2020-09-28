@@ -77,6 +77,9 @@ if (GTDID == null) var GTDID = '';
 
 if (GGETFRAME == null) var GGETFRAME = '';
 
+if (GToggleFullScreen == null) var GToggleFullScreen = true;
+
+if (GWINDOWLIST == null) var GWINDOWLIST = []; GWINDOWLIST[10] = [];
 
 //设置提示 --已改
 function setFootView(errNo, ename) {
@@ -99,8 +102,14 @@ function callBackHello(mydata) {
 
 //创建新的textarea页面，即按下new按钮 --已改
 //phanrider 2009-07-26 改成按下new按钮，不再调用此函数改成调用createNewSql， 留此函数是为了让别的函数调用
-function createNew(textareaname) {
-	parent.editorFrame.$(textareaname).set('text','');
+function createNew(e) {
+	//parent.editorFrame.$(textareaname).set('text','');
+    parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea,'');
+    execClearResults(e);
+    parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.execCommand('toggle_full_screen');
+    parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen = true;
+    GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
+
 }
 
 
@@ -330,22 +339,22 @@ function changePreviousSql(tdID) {
 }
 
 
-//改变querybyExample按钮
+//改变 querybyExample 按钮
 function changeQueryByExample(queryFlag) {
 	var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('queryByExampleTd');
-	queryByExampleObject.setEnabled(queryFlag);
+    if (queryByExampleObject != null && typeof queryByExampleObject != undefined) queryByExampleObject.setEnabled(queryFlag);
 }
 
-//改变querybyExample按钮
+//改变 singleRecordView 按钮
 function changeSingleRecordView(queryFlag) {
 	var singleRecordViewObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('singleRecordViewTd');
-	singleRecordViewObject.setEnabled(queryFlag);
+    if (singleRecordViewObject != null && typeof singleRecordViewObject != undefined) singleRecordViewObject.setEnabled(queryFlag);
 }
 
-//改变querybyExample按钮
+//改变 exportResultResults 按钮
 function changeExportResultResults(queryFlag) {
 	var exportResultResultsObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('exportResultResultsTd');
-	exportResultResultsObject.setEnabled(queryFlag);
+    if (exportResultResultsObject != null && typeof exportResultResultsObject != undefined) exportResultResultsObject.setEnabled(queryFlag);
 }
 
 
@@ -378,6 +387,7 @@ function changeRecordView() {
 	var previousRecordId = 'previousRecord';
 	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
 	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
+	globaldataFlag = parent.parent.editorFrame.globaldataFlag;
 
 	if(!getsingleRecordViewFlag() && globaldataFlag == true ) { //如果按钮外于未被按下状态，则做如下动作，本身按钮显示为按下
 
@@ -399,8 +409,11 @@ function changeRecordView() {
 function changeRecordViewInit() {
 	var nextRecordId = 'nextRecord';
 	var previousRecordId = 'previousRecord';
-	var nextRecordObject = parent.editorFrame.document.getElementById(nextRecordId);
-	var previousRecordObject = parent.editorFrame.document.getElementById(previousRecordId);
+	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
+	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
+
+	mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
 	$('outResultDiv').set('style','display:none');
 
 	setDivValueNull ('changeOutResultDiv');
@@ -437,6 +450,9 @@ function changeNextRecordView() {
 	var previousRecordId = 'previousRecord';
 	var nextRecordObject = document.getElementById(nextRecordId);
 	var previousRecordObject = document.getElementById(previousRecordId);
+
+	mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
 	if (nextRecordObject.getEnabled()) {
 		if( !mygrid.getSelectedId() ) {
 			mygrid.setSelectedRow(mygrid.getRowId(0));
@@ -460,8 +476,11 @@ function changeNextRecordView() {
 function changePreviousRecordView() {
 	var nextRecordId = 'nextRecord';
 	var previousRecordId = 'previousRecord';
-	var nextRecordObject = parent.editorFrame.document.getElementById(nextRecordId);
-	var previousRecordObject = parent.editorFrame.document.getElementById(previousRecordId);
+	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
+	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
+
+	mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
 	if (previousRecordObject.getEnabled()) {
 		if (mygrid.getSelectedId() >= 1) {
 			mygrid.selectRow(mygrid.getSelectedId()-2);
@@ -485,10 +504,11 @@ function controlbuttonReset() {
 	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
 	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
 
-	nextRecordObject.setEnabled(false);
-	previousRecordObject.setEnabled(false);
-	setFetchNext(false);
-	setFetchLast(false);
+	if (nextRecordObject != null && typeof nextRecordObject != undefined) nextRecordObject.setEnabled(false);
+    if (previousRecordObject != null && typeof previousRecordObject != undefined) previousRecordObject.setEnabled(false);
+
+    if (setFetchNext != null && typeof setFetchNext != undefined) setFetchNext(false);
+    if (setFetchLast != null && typeof setFetchLast != undefined) setFetchLast(false);
 }
 
 
@@ -641,7 +661,6 @@ function executeRun(textareaname) {
         parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(),alltmpSql);
 
 		if (currWindoType == "SQL") {
-
             parent.parent.editorFrame.executeSQL(textareaname);
 		} else if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
 					|| currWindoType == "PAB" || currWindoType == "TYP" || currWindoType == "TYB"
@@ -710,8 +729,15 @@ function executeSQL(textareaname) {
 
 		setFetchNext(false);
 		setFetchLast(false);
-		//提交给接口
 
+		// 从窗口最大化恢复，只做一次
+		if (parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen) {
+			parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.execCommand('toggle_full_screen');
+			parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen = false;
+			GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
+		}
+
+		//提交给接口
 		getResultFromSql(tempSql);
 		//alert(tempSql);
 		//breakRun(textareaname);
@@ -979,16 +1005,19 @@ function isGreatZeroFloat(str){       //是否是一个大于或等于0的实数
 //phanrider 2009-05-21
 function showDataHtml(rows,data) {
 
-   // mygrid = new dhtmlXGridObject('outResultDiv');
+   //mygrid = new dhtmlXGridObject('outResultDiv');
 
     mygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject('outResultDiv');
+    parent.parent.editorFrame.GGETFRAME.mygrid = mygrid;
 
 
     mygrid.setImagePath("../imgs/");
 
 	resultbakHead = data[0];    //得到head的备份
+    parent.parent.editorFrame.GGETFRAME.resultbakHead = resultbakHead;
 
-	tlow_flag_num = data.length; //表格展示的行数
+
+    tlow_flag_num = data.length; //表格展示的行数
 	if (data.length > 21) {
 			//tlow 表格展示的行数
 			tlow = data.length - 1;  //去掉最后一个测试标志行
@@ -1037,10 +1066,10 @@ function showDataHtml(rows,data) {
     var i = tlow;
     var leftwidth = 20;
     if ( i < 99 ) leftwidth = 20;
-    else if ( i < 999 && i >= 100 ) leftwidth = 30;
-    else if ( i < 9999 && i >= 1000 ) leftwidth = 40;
-    else if ( i < 99999 && i >= 10000 ) leftwidth = 50;
-    else if ( i < 999999 && i >= 100000 ) leftwidth = 60;
+    else if ( i < 999 && i >= 100 ) leftwidth = 36;
+    else if ( i < 9999 && i >= 1000 ) leftwidth = 52;
+    else if ( i < 99999 && i >= 10000 ) leftwidth = 68;
+    else if ( i < 999999 && i >= 100000 ) leftwidth = 84;
 
     strHeaderWidth = leftwidth + "," + strHeaderWidth;
 
@@ -1053,7 +1082,9 @@ function showDataHtml(rows,data) {
     } else {
 
     	mygrid.init();  //进行初始化
-    	globaldataFlag = true;
+		parent.parent.editorFrame.globaldataFlag = true;
+
+		globaldataFlag = parent.parent.editorFrame.globaldataFlag;
 
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
@@ -1125,9 +1156,11 @@ function showDataHtml(rows,data) {
 }
 
 function addDataHtml(rows,data) {
-	//mygrid = new dhtmlXGridObject('outResultDiv');
+	// mygrid = new dhtmlXGridObject('outResultDiv');
 
-    mygrid = parent.parent.editorFrame.mygrid;
+
+
+    mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
 
 
     tlow_flag_num = data.length; //表格展示的行数
@@ -1191,7 +1224,7 @@ function addDataHtml(rows,data) {
 function addFullDataHtml(rows,data) {
 	//mygrid = new dhtmlXGridObject('outResultDiv');
 
-    mygrid = parent.parent.editorFrame.mygrid;
+    mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
 
 
     tlow_flag_num = data.length; //表格展示的行数
@@ -1251,10 +1284,13 @@ function addFullDataHtml(rows,data) {
 
 //改变记录显示的grid
 function changeRecordShowHtml() {
-
+    mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+    resultbakHead = parent.parent.editorFrame.GGETFRAME.resultbakHead;
 	var tmprows = mygrid.getSelectedId();
 	if (mygrid.getSelectedId() == null) tmprows = "0";
-	changemygrid = new dhtmlXGridObject('changeOutResultDiv');
+
+	changemygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject('changeOutResultDiv');
+
 	changemygrid.setImagePath("../imgs/");
     changemygrid.setHeader(" ,Row " + tmprows + ",Fields");
     changemygrid.setInitWidths("20,180,300"); //定义各列的宽度
@@ -1327,8 +1363,8 @@ function getFYSql() {
 		changeExecNoRun(1, "execIsRunButton");
 		//同时更改左边工具条的状态
 		parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), parent.parent.editorFrame.GGETFRAME.getTextareaContents('myTextarea'));
-		//调用真正的分页执行方法
-		getFYSql_run();
+		//调用真正的分页执行方法 2020-09-23 换成新的方法
+        getFYSql_run_New(parent.parent.editorFrame.GGETFRAME.tempSql);
 	}
 }
 
@@ -1344,8 +1380,10 @@ function getFYQSql() {
 		changeExecNoRun(1, "execIsRunButton");
 		//同时更改左边工具条的状态
         parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(), parent.parent.leftFrameList.getWindowTr(), parent.parent.editorFrame.GGETFRAME.getTextareaContents('myTextarea'));
-		//调用真正的全部分页执行方法
-		getFYQSql_run();
+		//调用真正的全部分页执行方法 2020-09-23 换成新的方法
+		// getFYQSql_run();
+        getFYQSql_run_New(parent.parent.editorFrame.GGETFRAME.tempSql);
+
 	}
 }
 
@@ -1556,7 +1594,10 @@ function showBaisworkMenu(divName,menuname,evt) {
 	e.style.top = evt.clientY;
 	e.style.left = evt.clientX;
 	e.style.display = "inline";
-	}
+	} else {
+        hiddenBaisworkMenu(evt);
+    }
+
 }
 
 
@@ -1566,6 +1607,8 @@ function hiddenBaisworkMenu(evt) {
     if ((isie && rightnum==2) || (!isie && rightnum==3)){        //IE or firefox
     	return true;
     } else {
+        document.getElementById('BaisworkMenu').style.display = "none";
+        document.getElementById('outResultMenu').style.display = "none";
     	parent.parent.editorFrame.GGETFRAME.document.getElementById('BaisworkMenu').style.display = "none";
         parent.parent.editorFrame.GGETFRAME.document.getElementById('outResultMenu').style.display = "none";
     }
@@ -1667,7 +1710,7 @@ function execEditData(textareaname, e) {
 //工作编辑区右键Clear命令执行函数
 function execClear(textareaname, e) {
 	hiddenBaisworkMenu(e);
-	createNew(textareaname);
+	createNew(e);
 }
 
 //str: 属性或描述字符串
@@ -1675,7 +1718,7 @@ function execClear(textareaname, e) {
 //		  2 表示显示视图（view）
 //从右键菜单中显示对象的 Properties 和 Describe
 function menuShowObjPD (str, flag, strTopX, strTopY) {
-	var tmpData = parent.topFrame.UserObject;
+	var tmpData = parent.parent.topFrame.UserObject;
 	for (i=0; i<tmpData.length; i++) {
 		if (baisworkSQL.toUpperCase().trim() == tmpData[i][0]) {
 			if (flag == '1') showCommonFormRightMenu(tmpData[i][1], tmpData[i][0],'',str, strTopX, strTopY);
@@ -1729,7 +1772,7 @@ function execClearResults(e) {
 function execExportResults(oName, e) {
 	hiddenBaisworkMenu(e);
     console.log(parent.mygrid);
-    parent.mygrid.toExcel('../../excel/toExcel.action','gray');
+    parent.parent.editorFrame.GGETFRAME.mygrid.toExcel('../../excel/toExcel.action','gray');
 }
 
 //工作结果输出区右键Fetch Next Page命令执行函数
@@ -2060,7 +2103,7 @@ function showDataHtmlReal(data, divname)
 
 function showCommon(type,name,field,operate,width,height){
 	selectedNote = tree.getSelected();
-    var url = "../treeoperate/common/";
+    var url = "../../treeoperate/common/";
 	//if(field != '') url = url + field + "/";
     url = url + operate + ".jsp?name="+name+"&type="+type+"&field="+field;
     //window.showModalDialog(url,"","dialogWidth:"+width+";dialogHeight:"+height+";center:yes;resizable:yes");
@@ -2068,7 +2111,7 @@ function showCommon(type,name,field,operate,width,height){
 }
 
 function showCommonFormRightMenu(type,name,field,operate,width,height){
-	var url = "../treeoperate/common/";
+	var url = "../../treeoperate/common/";
 	url = url + operate + ".jsp?name="+name+"&type="+type+"&field="+field;
     window.open(url,"","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=auto,resizable=yes,copyhistory=no,width="+width+",height="+height+",top=360,left=500");
 }
@@ -2243,7 +2286,7 @@ function createWindowList(windowType, str) {
 	var newStr = "";
 	var endStr = "";
 	var img = "../images/no_saved.gif";
-	var maxAltLength = 30 //字符串最大长度
+	var maxAltLength = 36; //字符串最大长度
 
 	//此处为接口，不同的窗口类型，定义不同的windowType即可，如果新增不同窗口类型，此处需添加针对该窗口类型的方法
 	if(windowType == "SQL") {
@@ -2307,18 +2350,55 @@ function createWindowList(windowType, str) {
 			newTd.setAttribute("class","coolButton");
 		}
 		var sType = windowType;
-		var TdId = sType + "NewTd" + introws;
-		GTDID = "n" + introws;
-		newTd.setAttribute("id",TdId);
+		var introwstmp = introws; // 为TR计算，真正要插入的逻辑行
+		var TdId = sType + "NewTd" + introws; //后面代码中已重新赋值
+		GTDID = "n" + introws;      //后面代码中已重新赋值
+
+		for ( i=0; i<9; i++ ) {
+
+            tmptdidflag = false;
+            tmptdid = "n" + i;
+
+            for ( j=0; j<=introws; j++) {
+
+                if (GWINDOWLIST.hasOwnProperty([j])) {
+                    if (GWINDOWLIST[j][1] == tmptdid) {
+                        tmptdidflag = true;
+                        j = introws + 1;
+                        break;
+                    }
+                }
+            }
+
+            if (!tmptdidflag) {
+                GWINDOWLIST[introws] = [];
+                GWINDOWLIST[introws][0] = introws;
+                GWINDOWLIST[introws][1] = tmptdid;
+                TdId = sType + "NewTd" + tmptdid;
+                GTDID = tmptdid;
+                introws = i;
+
+                i = 9;
+                break;
+            }
+
+        }
+
+		//if (GWINDOWLIST[introws] == 0)  GWINDOWLIST[introws] = GTDID;
+
+
+        newTd.setAttribute("id",TdId);
 		newTd.setAttribute("width","98%");
 		newTd.setAttribute("align","left");
 		//newTd.setAttribute("onclick","test1()");
-		newTd.onclick= function() {
+		newTd.onclick= function(e) {
+
+
 			//alert(introws);
 			//只有这样，才可以带参数
 			//alert(introws);
 			//alert(parent.leftFrameList.$('windowListBar').get('html'));
-			windowListTdOnclick(windowType,introws);
+			windowListTdOnclick(windowType,e);
 		};
 		//alert(newTd.onclick);
 
@@ -2347,11 +2427,11 @@ function createWindowList(windowType, str) {
 				var i = getWindowTr();
 				var SQLWindowString = "SQLWindow" + i;
 				saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
-				initWindwoListButton(introws);
+				initWindwoListButton(introwstmp);
 
 
 			} else {
-				initWindwoListButton(introws);
+				initWindwoListButton(introwstmp);
 
             }
 		} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
@@ -2540,11 +2620,76 @@ function doRadio(_trType, _prevTrType, _trRow) {
 			windowlistcell[i].setValue(true,true);
 		}
 	//parent.parent.editorFrame.location.replace("./editor.jsp");
-
 }
 
-function windowListTdOnclick(trType, trRow) {
-	//alert(trRow);
+//每次实时切换窗口，实际上是切换DIV隐藏和显示  2020-09-23
+function doRadioNew(_trType, _prevTrType, _trRow) {
+    var sameWindowFlag = false;
+    //alert(_trType);
+    //得到当前已按行的trRow
+    var i = getWindowTr();
+    var SQLWindowString = "SQLWindow" + i;
+
+
+
+    parent.leftFrameList.GTDID = parent.leftFrameList.GWINDOWLIST[_trRow][1];
+
+    GTDID = parent.leftFrameList.GTDID;
+    parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+
+    GGETFRAME = parent.editorFrame.GGETFRAME;
+
+
+    //调用恢复窗口内容的函数,_trRow为被点击行的trRow
+
+        //不同窗口，统一置为false
+        parent.editorFrame.globalOnLoadFlag = false;
+        //如果上一个窗口与当前窗口类型不一致，则需要重新加载
+        //并且按照当前点击窗口的类型，加截不同的页面
+        //先设置一下全局变量
+        setGlobal(_trType, _trRow, sameWindowFlag);
+        //不是从新建窗口进入的
+        setIsNotCreate(true);
+
+        sameWindowFlag = false;
+        restoreDivValue(_trType, _trRow, sameWindowFlag);
+
+        //如果窗口类型相同，则直接赋值
+        // restoreDivValue(_trType, _trRow, sameWindowFlag);
+
+
+    //得到当前行的所有列
+    var windowlistcell = document.getElementById('windowListBar').rows[_trRow].cells;
+    //设置除了本行外所有行的列为按钮按起状态
+    var rowlength = document.getElementById('windowListBar').rows.length;
+    for(var j = 0; j < rowlength; j++) {
+        var celltmp = document.getElementById('windowListBar').rows[j].cells;
+        for( var k = 0; k < celltmp.length; k++) {
+            createButton(celltmp[k]);
+            celltmp[k].setAlwaysUp(true);
+            celltmp[k].setValue(false, false);
+            //alert(celltmp[k]);
+        }
+    }
+
+    for (var i = 0; i < windowlistcell.length; i++) {
+        windowlistcell[i].setAlwaysUp(true);
+        windowlistcell[i].setToggle(true);
+        windowlistcell[i].setValue(true,true);
+    }
+    //parent.parent.editorFrame.location.replace("./editor.jsp");
+}
+
+
+function windowListTdOnclick(trType, e) {
+    var e = e || window.event;
+    var target = e.target || e.srcElement;
+
+    var trRow = target.parentNode.rowIndex;
+    if (trRow == undefined) {
+        trRow = target.parentNode.parentNode.rowIndex;
+    }
+	// alert(trRow);
 	var windowlistcell = parent.leftFrameList.document.getElementById('windowListBar').rows[trRow].cells;
 
 	//只取窗口类型的前三位 *********
@@ -2557,9 +2702,11 @@ function windowListTdOnclick(trType, trRow) {
 	//如果按钮是未按下状态
 	if (!windowlistcell[0].getValue()) {
 		//则执行一系列动作
-		doRadio(tmpWindowtype,getWindowType(),trRow);
+		//doRadio(tmpWindowtype,getWindowType(),trRow);
+		//采用新的切换功能
+        doRadioNew(tmpWindowtype,getWindowType(),trRow);
 
-	}
+    }
 }
 
 
@@ -2573,14 +2720,20 @@ function clearSQLWindow(windowtype) {
 	if (windowtype == "SQL") {
 		//parent.editorFrame.$('outResultDiv').set('text','');   2020-09-16
 		//parent.editorFrame.$('changeOutResultDiv').set('text','');    2020-09-16
-		//按钮恢复成初始状态
-		controlbuttonReset();
+        parent.editorFrame.createSqlForColorText(parent.leftFrameList.GTDID);
+
+        parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+
+        GGETFRAME = parent.editorFrame.GGETFRAME;
+
+        //按钮恢复成初始状态
+		// controlbuttonReset();
 		//清除结果集后，需重新设置工作结果区的工具条状态
 		resetBaseWorkToolBar(false);
 	}
 
 	//状态栏初始为空
-	setFootView(9999, '　');
+	//setFootView(9999, '　');
 
 }
 
@@ -2662,24 +2815,35 @@ function saveDivValue(DivSource, DivDest, windowType, trRow) {
 //恢复对应窗口的内容
 function restoreDivValue(windowType, trRow, sameWindow) {
 	if (windowType == "SQL") {
-		var destMyTextarea = "myTextarea" + trRow;
+
+        var destMyTextarea = "myTextarea" + trRow;
 		var destOutResultDiv = "outResultDiv" + trRow;
 		var destChangeOutResultDiv = "changeOutResultDiv" + trRow;
 		var destFootview = "footview" + trRow;
 		//恢复编辑区内容--SQL窗口
 		//alert(parent.leftFrameList.$('SQLWindow0').get('html'));
 
-		parent.editorFrame.$('myTextarea').set('html',$(destMyTextarea).get('html'));
+		//parent.editorFrame.$('myTextarea').set('html',$(destMyTextarea).get('html'));
 
-		//恢复工具条按钮事件会失效 BUG，暂不恢复
+        for ( i=0; i<=8; i++ ) {
+                parent.parent.editorFrame.$('#SQLWindow_'+ 'n' + i ).css("display","none");
+        }
+        parent.parent.editorFrame.$('#SQLWindow_'+ parent.parent.leftFrameList.GWINDOWLIST[trRow][1] ).css("display","inline");
+
+
+        //恢复工具条按钮事件会失效 BUG，暂不恢复
 		//parent.editorFrame.$('foot_outputDiv1').set('html',$('foot_outputDiv1').get('html'));
 
 		//不采用new的方法，IE会报错
-		new parent.editorFrame.dhtmlXGridObject('outResultDiv');
+		//new parent.editorFrame.dhtmlXGridObject('outResultDiv');
+
 		//恢复输出结果区--SQL窗口
-		parent.editorFrame.$('outResultDiv').set('html',parent.leftFrameList.$(destOutResultDiv).get('html'));
-		parent.editorFrame.$('changeOutResultDiv').set('html',parent.leftFrameList.$(destChangeOutResultDiv).get('html'));
-		parent.editorFrame.$('footview').set('text',parent.leftFrameList.$(destFootview).get('text'));
+		//parent.editorFrame.$('outResultDiv').set('html',parent.leftFrameList.$(destOutResultDiv).get('html'));
+		//parent.editorFrame.$('changeOutResultDiv').set('html',parent.leftFrameList.$(destChangeOutResultDiv).get('html'));
+		//parent.editorFrame.$('footview').set('text',parent.leftFrameList.$(destFootview).get('text'));
+
+
+
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
@@ -2714,12 +2878,13 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 
 //更改windowList的提示语
 function changeWindowListTitle(windowType,trRow,titleStr) {
+    trRow = parent.parent.leftFrameList.GWINDOWLIST[trRow][1].substring(1,2)
 	var spanListVauleId = "WindowListValue" + trRow;
 	var imgListVauleId = "columnButton" + trRow;
 	var initStr = "";
 	var tmpStr = "";
 	var imgIcon = "../images/windowlist_running.gif";
-	var maxLength = 30; //设置左边工具条最大显示的字符数
+	var maxLength = 36; //设置左边工具条最大显示的字符数
 	var maxAltLength = 200; //设置鼠标放在上面提示的最大字符数
 
 	if(windowType == "SQL") {
@@ -2781,7 +2946,9 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 
 //恢复当前windowList窗口的图片
 function restoreWindowListImg(trRow) {
-	var imgListVauleId = "columnButton" + trRow;
+    trRow = parent.parent.leftFrameList.GWINDOWLIST[trRow][1].substring(1,2)
+
+    var imgListVauleId = "columnButton" + trRow;
 	var imgIcon = "../images/no_saved.gif";
 
 	$(imgListVauleId).set('src', imgIcon);
@@ -2810,22 +2977,22 @@ function initOnload() {
 
     if (typeof(parent.parent.leftFrameList.globalIsNotCreate) == 'undefined') {
         if(globalIsNotCreate) {
-            estoreDivValue(globalTrType, globalTrRow, globalSameWindowFlag);
+            restoreDivValue(globalTrType, globalTrRow, globalSameWindowFlag);
         }
     }
 	else if (parent.parent.leftFrameList.globalIsNotCreate) {
 		//alert(parent.leftFrameList.globalTrType);
 		//alert(parent.leftFrameList.globalTrRow);
 		//alert(parent.leftFrameList.globalSameWindowFlag);
-		parrent.parent.leftFrameList.restoreDivValue(parrent.parrent.leftFrameList.globalTrType, parrent.parrent.leftFrameList.globalTrRow, parrent.parent.leftFrameList.globalSameWindowFlag);
+		parent.parent.leftFrameList.restoreDivValue(parent.parent.leftFrameList.globalTrType, parent.parent.leftFrameList.globalTrRow, parent.parent.leftFrameList.globalSameWindowFlag);
 	}
 }
 
 //设置全局变量，当前窗口类型及当前行
 function setGlobal(trType, trRow, WindowFlag) {
-    parrent.parent.leftFrameList.globalTrType = trType;
-    parrent.parent.leftFrameList.globalTrRow = trRow;
-    parrent.parent.leftFrameList.globalSameWindowFlag = WindowFlag;
+    parent.parent.leftFrameList.globalTrType = trType;
+    parent.parent.leftFrameList.globalTrRow = trRow;
+    parent.parent.leftFrameList.globalSameWindowFlag = WindowFlag;
 }
 
 //删除一个window list
@@ -2864,7 +3031,32 @@ function deleteWindowList() {
 		parent.leftFrameList.setRowWindowList(maxRow);
 
 		//恢复右边工作区数据
-		parent.leftFrameList.recoverPage(parent.leftFrameList.getWindowType(),parent.leftFrameList.getWindowTr(),false);
+		parent.leftFrameList.recoverPage_New(parent.leftFrameList.getWindowType(), currRow, false);
+
+
+		//当前窗口内容清空
+        parent.parent.editorFrame.$('#SQLWindow_'+ parent.leftFrameList.GWINDOWLIST[currRow][1] ).html('');
+
+        // 隐藏右边编辑区
+        parent.parent.editorFrame.$('#SQLWindow_'+ parent.leftFrameList.GWINDOWLIST[currRow][1] ).css("display","none");
+        //从全局数组变量中删除当前对应数据
+        parent.parent.leftFrameList.GWINDOWLIST.splice(currRow,1);
+
+
+
+        // 当前Tr最大值设为活动窗口
+        parent.leftFrameList.GTDID = parent.leftFrameList.GWINDOWLIST[maxRow][1];
+        // 显示右边编辑区
+        parent.parent.editorFrame.$('#SQLWindow_'+ parent.leftFrameList.GWINDOWLIST[maxRow][1] ).css("display","inline");
+
+
+        GTDID = parent.leftFrameList.GTDID;
+        parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+
+        GGETFRAME = parent.editorFrame.GGETFRAME;
+
+
+
 
 	}
 }
@@ -2886,9 +3078,18 @@ function adjustmentWindowListDiv(trRow) {
 
 	//判断已经存在的行的最大值
 	var maxrows = tableObject.rows.length;
+	var maxRow = maxrows;
+
+    //当前窗口设置为不可见
+    //parent.parent.editorFrame.$('#SQLWindow_'+ parent.leftFrameList.GWINDOWLIST[currTrRown][1] ).css("display","none");
+
+    //已存在行的最大值对应的窗口设置为可见
+    //if (maxRow > 0)	maxRow--;
+    //parent.parent.editorFrame.$('#SQLWindow_'+ parent.leftFrameList.GWINDOWLIST[maxRow][1] ).css("display","inline");
 
 
-	for (i = currTrRown + 1; i <= maxrows ; i++) {
+
+    for (i = currTrRown + 1; i <= maxrows ; i++) {
 
 		var old = i - 1;
 		//得到前一个窗口的div的ID
@@ -2917,11 +3118,11 @@ function adjustmentWindowListDiv(trRow) {
 			var oldChangeOutResultDiv = "changeOutResultDiv" + old;
 			var oldFootview = "footview" + old;
 
-			//更改一下每个DIV中的ID，不然ID会重复
-			parent.leftFrameList.$(destMyTextarea).set('id',oldMyTextarea);
-			parent.leftFrameList.$(destOutResultDiv).set('id',oldOutResultDiv);
-			parent.leftFrameList.$(destChangeOutResultDiv).set('id',oldChangeOutResultDiv);
-			parent.leftFrameList.$(destFootview).set('id',oldFootview);
+			//更改一下每个DIV中的ID，不然ID会重复  于 2020-09-24 被注释
+			// parent.leftFrameList.$(destMyTextarea).set('id',oldMyTextarea);
+			// parent.leftFrameList.$(destOutResultDiv).set('id',oldOutResultDiv);
+			// parent.leftFrameList.$(destChangeOutResultDiv).set('id',oldChangeOutResultDiv);
+			// parent.leftFrameList.$(destFootview).set('id',oldFootview);
 
 		} else if (tmpWindowtype == "FUN" || tmpWindowtype == "PRO" || tmpWindowtype == "PAC"
 					|| tmpWindowtype == "PAB" || tmpWindowtype == "TYP" || tmpWindowtype == "TYB"
@@ -2937,10 +3138,10 @@ function adjustmentWindowListDiv(trRow) {
 			var oldObjIcoId = "objIcoId" + old;
 			var oldFootview = "footview" + old;
 			//更改一下每个DIV中的ID，不然ID会重复
-			parent.leftFrameList.$(destMyTextarea).set('id',oldMyTextarea);
-			parent.leftFrameList.$(destObjTitle).set('id',oldObjTitle);
-			parent.leftFrameList.$(destObjIcoId).set('id',oldObjIcoId);
-			parent.leftFrameList.$(destFootview).set('id',oldFootview);
+			// parent.leftFrameList.$(destMyTextarea).set('id',oldMyTextarea);
+			// parent.leftFrameList.$(destObjTitle).set('id',oldObjTitle);
+			// parent.leftFrameList.$(destObjIcoId).set('id',oldObjIcoId);
+			// parent.leftFrameList.$(destFootview).set('id',oldFootview);
 
 			//alert($(destMyTextarea).get('id'));
 		} else if (tmpWindowtype == "JAVA") {
@@ -2952,8 +3153,8 @@ function adjustmentWindowListDiv(trRow) {
 		}
 
 		//依次把当前窗口的内容重新赋值给上一个窗口
-		parent.leftFrameList.$(oldWindowDiv).set('html',parent.leftFrameList.$(windowDiv).get('html'));
-		parent.leftFrameList.$(windowDiv).set('html','');
+		// parent.leftFrameList.$(oldWindowDiv).set('html',parent.leftFrameList.$(windowDiv).get('html'));
+		// parent.leftFrameList.$(windowDiv).set('html','');
 
 		//alert(parent.leftFrameList.$(oldWindowDiv).get('id'));
 
@@ -2964,19 +3165,21 @@ function adjustmentWindowListDiv(trRow) {
 		var newSpanId = "WindowListValue" + i;
 		var newImgId = "columnButton" + i;
 
+		// 2020-09-27 start
+		// parent.leftFrameList.$(newTdId).set('id',oldTdId);
+		// parent.leftFrameList.$(newSpanId).set('id',oldSpanId);
+		// parent.leftFrameList.$(newImgId).set('id',oldImgId);
+		// windowlistcell[0].onclick = '';
+		// windowlistcell[0].onclick = function () {
+		// 	//alert(tmpWindowtype);
+		// 	//不同Frame的onclick事件，参数tmpWindowtype此处没有被实时转换，估
+		// 	//windowListTdOnclick函数已重写，参数tmpWindowtype已不用
+		// windowListTdOnclick(tmpWindowtype,this.parentNode.rowIndex);
+		// };
+        // 2020-09-27 end
 
-		parent.leftFrameList.$(newTdId).set('id',oldTdId);
-		parent.leftFrameList.$(newSpanId).set('id',oldSpanId);
-		parent.leftFrameList.$(newImgId).set('id',oldImgId);
-		windowlistcell[0].onclick = '';
-		windowlistcell[0].onclick = function () {
-			//alert(tmpWindowtype);
-			//不同Frame的onclick事件，参数tmpWindowtype此处没有被实时转换，估
-			//windowListTdOnclick函数已重写，参数tmpWindowtype已不用
-			windowListTdOnclick(tmpWindowtype,this.parentNode.rowIndex);
-		};
 
-		//alert($(windowlistcell[0]).get('onclick'));
+        //alert($(windowlistcell[0]).get('onclick'));
 
 	}
 	return maxrows;
@@ -3031,6 +3234,37 @@ function recoverPage(_trType, _trRow, sameWindowFlag) {
 	}
 	parent.leftFrameList.sameWindowFlag = false;
 }
+
+function recoverPage_New(_trType, _trRow, sameWindowFlag) {
+
+    parent.editorFrame.globalOnLoadFlag = false;
+
+    //alert(_trType);
+    //alert(_trRow);
+    //alert(sameWindowFlag);
+
+    setGlobal(_trType, _trRow, sameWindowFlag);
+
+    //如果上一个窗口与当前窗口类型不一致，则需要重新加载
+    //并且按照当前点击窗口的类型，加截不同的页面
+    //先设置一下全局变量
+    setIsNotCreate(true);
+
+    // if(_trType == "SQL") {
+    //     parent.parent.editorFrame.location.replace(sqlURL);
+    // } else if (_trType == "FUN" || _trType == "PRO" || _trType == "PAC"
+    //     || _trType == "PAB" || _trType == "TYP" || _trType == "TYB"
+    //     || _trType == "TRI" || _trType == "JAV" || _trType == "VIE"
+    //     || _trType == "VIM" || _trType == "TAB") {
+    //     parent.parent.editorFrame.location.replace(funURL);
+    // } else if (_trType == "JAVA") {
+    //     parent.parent.editorFrame.location.replace(funURL);
+    // }
+
+
+    parent.leftFrameList.sameWindowFlag = false;
+}
+
 
 //关闭窗口
 function closeWindowList() {
