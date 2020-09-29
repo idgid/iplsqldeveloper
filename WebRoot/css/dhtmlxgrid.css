@@ -6,14 +6,14 @@ div.gridbox{
 	background-color:white;
 }
 div.gridbox .xhdr{
-	background-color:#D4D0C8;
+	background-color:#F0F0F0;
 }
 
 div.gridbox table.hdr td {
 	font-family:MS Sans Serif,arial;
 	font-size:12px;
 	font:12px arial;
-	background-Color:#D4D0C8;
+	background-Color:#F0F0F0;
 	border: 1px solid;
 	border-color : white Gray Gray white;
 	text-align: center;
@@ -212,7 +212,7 @@ div.gridbox_xp table.row20px tr  td{
 
 div.gridbox_gray {
 	border:1px solid gray;
-	background-color:#D4D0C8;
+	background-color:#F0F0F0;
 }
 
 /* mt skin ------------------------------------------------------*/
@@ -302,18 +302,18 @@ div.gridbox div.ftr td {
 
 div.gridbox table.hdr td.columnTargetR div.hdrcell{
 	border-right:3px double #FF6600;
-	border-left:3px solid #D4D0C8;
+	border-left:3px solid #F0F0F0;
 }
 
 div.gridbox table.hdr td.columnTargetL div.hdrcell{
-	border-right:3px solid #D4D0C8;
+	border-right:3px solid #F0F0F0;
 	border-left:3px double #FF6600;
 }
 
 .dhx_dragColDiv{
 	font-family:Arial;
 	font-size:12px;
-	background-color:#D4D0C8;
+	background-color:#F0F0F0;
 	border: 1px solid;
 	border-color : white Gray Gray white;
 	text-align: center;
