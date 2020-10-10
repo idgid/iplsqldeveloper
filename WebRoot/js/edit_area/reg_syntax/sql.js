@@ -8,7 +8,8 @@ editAreaLoader.load_syntax["sql"] = {
 		'statements' : [
 			'select', 'SELECT', 'where', 'order', 'by',
 			'insert', 'from', 'update', 'grant', 'left join', 'right join',
-            'union', 'group', 'having', 'limit', 'alter', 'LIKE','IN','CASE'
+            'union', 'group', 'having', 'limit', 'alter', 'LIKE','IN','CASE',
+			'and', 'AND'
 		]
 		,'reserved' : [
 			'null', 'enum', 'int', 'boolean', 'add', 'varchar'
@@ -25,7 +26,7 @@ editAreaLoader.load_syntax["sql"] = {
 		]
 	}
 	,'OPERATORS' :[
-     'AND','&&','BETWEEN','BINARY','&','|','^','/','DIV','<=>','=','>=','>','<<','>>','IS','NULL','<=','<','-','%','!=','<>','!','||','OR','+','REGEXP','RLIKE','XOR','~'
+     '&&','BETWEEN','BINARY','&','|','^','/','DIV','<=>','=','>=','>','<<','>>','IS','NULL','<=','<','-','%','!=','<>','!','||','OR','+','REGEXP','RLIKE','XOR','~'
 	]
 	,'DELIMITERS' :[
 		'(', ')', '[', ']', '{', '}'
