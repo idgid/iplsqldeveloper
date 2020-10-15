@@ -4,7 +4,7 @@ public abstract class DbBean {
 	
 	public abstract String getTreeXml();
 
-	//public abstract String getTreeXmlN();
+	public abstract String getTreeXmlN();
 	
 	public abstract String getFieldTreeXml(String fieldName);
 	

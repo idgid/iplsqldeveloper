@@ -41,6 +41,41 @@ public class DbBeanManager {
 		if(field.trim().equals("")) return dbbean.getTreeXml();
 		else return dbbean.getFieldTreeXml(field);
 	}
+
+	public static String getTreeXmlN(String type,String name,String field){
+		if(type == null) type = "";
+		if(name == null) name = "";
+		if(field == null) field = "";
+		DbBean dbbean = null;
+		if(type.toLowerCase().equals(DbRootBean.TYPE))dbbean = new DbRootBean(name);
+		else if(type.toLowerCase().equals(DbFunctionBean.TYPE)) dbbean = new DbFunctionBean(name);
+		else if(type.toLowerCase().equals(DbProcedureBean.TYPE)) dbbean = new DbProcedureBean(name);
+		else if(type.toLowerCase().equals(DbPackageBean.TYPE)) dbbean = new DbPackageBean(name);
+		else if(type.toLowerCase().equals(DbPackagebodyBean.TYPE)) dbbean = new DbPackagebodyBean(name);
+		else if(type.toLowerCase().equals(DbTypeBean.TYPE)) dbbean = new DbTypeBean(name);
+		else if(type.toLowerCase().equals(DbTypebodyBean.TYPE)) dbbean = new DbTypebodyBean(name);
+		else if(type.toLowerCase().equals(DbTriggerBean.TYPE)) dbbean = new DbTriggerBean(name);
+		else if(type.toLowerCase().equals(DbJavaSourceBean.TYPE)) dbbean = new DbJavaSourceBean(name);
+		else if(type.toLowerCase().equals(DbJobBean.TYPE)) dbbean = new DbJobBean(name);
+		else if(type.toLowerCase().equals(DbQueueBean.TYPE)) dbbean = new DbQueueBean(name);
+		else if(type.toLowerCase().equals(DbQueueTableBean.TYPE)) dbbean = new DbQueueTableBean(name);
+		else if(type.toLowerCase().equals(DbLibraryBean.TYPE)) dbbean = new DbLibraryBean(name);
+		else if(type.toLowerCase().equals(DbDirectoryBean.TYPE)) dbbean = new DbDirectoryBean(name);
+		else if(type.toLowerCase().equals(DbTableBean.TYPE)) dbbean = new DbTableBean(name);
+		else if(type.toLowerCase().equals(DbViewBean.TYPE)) dbbean = new DbViewBean(name);
+		else if(type.toLowerCase().equals(DbMaterializedViewBean.TYPE)) dbbean = new DbMaterializedViewBean(name);
+		else if(type.toLowerCase().equals(DbSequenceBean.TYPE)) dbbean = new DbSequenceBean(name);
+		else if(type.toLowerCase().equals(DbUserBean.TYPE)) dbbean = new DbUserBean(name);
+		else if(type.toLowerCase().equals(DbProfileBean.TYPE)) dbbean = new DbProfileBean(name);
+		else if(type.toLowerCase().equals(DbRoleBean.TYPE)) dbbean = new DbRoleBean(name);
+		else if(type.toLowerCase().equals(DbSynonymBean.TYPE)) dbbean = new DbSynonymBean(name);
+		else if(type.toLowerCase().equals(DbDatabaseLinkBean.TYPE)) dbbean = new DbDatabaseLinkBean(name);
+		else if(type.toLowerCase().equals(DbTablespaceBean.TYPE)) dbbean = new DbTablespaceBean(name);
+		else if(type.toLowerCase().equals(DbClusterBean.TYPE)) dbbean = new DbClusterBean(name);
+		if(dbbean == null) return "<?xml version=\"1.0\" encoding=\"utf-8\"?><tree><tree text=\"Nodata\" /></tree>";
+		if(field.trim().equals("")) return dbbean.getTreeXmlN();
+		else return dbbean.getFieldTreeXml(field);
+	}
 	
 	public static String getMenuScript(String type,String name,String field){
 		if(type == null) type = "";

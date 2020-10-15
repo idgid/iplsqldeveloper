@@ -34,6 +34,22 @@ public class DbRootBean extends DbBean{
 		sb.append("</tree>");
 		return sb.toString();
 	}
+
+	public String getTreeXmlN(){
+		StringBuffer sb = new StringBuffer();
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		sb.append("<tree>");
+		sb.append("<item id=\"1\" text=\""+FIELDS[0]+"\" > <userdata type=\"folder\"/></item>");
+		sb.append("<item id=\"2\" text=\""+FIELDS[1]+"\" > <userdata type=\"folder\"/></item>");
+		for(int i = 3;i < FIELDS.length;i++){
+			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
+			sb.append("<item id=\""+ i +"\" text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" kids=\"true\">");
+			//sb.append("<userdata type=\"folder\"/>");
+            sb.append("</item>");
+		}
+		sb.append("</tree>");
+		return sb.toString();
+	}
 	
 	public String getFieldTreeXml(String fieldName){
 		StringBuffer sb = new StringBuffer();

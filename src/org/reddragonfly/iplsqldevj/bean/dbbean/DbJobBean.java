@@ -23,6 +23,16 @@ public class DbJobBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
+
+	public String getTreeXmlN() {
+		// TODO Auto-generated method stub
+		StringBuffer sb = new StringBuffer();
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		sb.append("<tree>");
+		sb.append("<item id=0 text=\"Nodata\" />");
+		sb.append("</tree>");
+		return sb.toString();
+	}
 	
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub

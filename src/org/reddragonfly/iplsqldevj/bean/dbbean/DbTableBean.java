@@ -12,7 +12,7 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbTableBean extends DbBean {
-	
+
 	public static String TYPE = "table";
 	public static String ICON_INVALID = "dbimages/valid_queue_tables.png";
 	public static String ICON_VALID = "dbimages/valid_queue_tables.png";
@@ -25,19 +25,19 @@ public class DbTableBean extends DbBean {
 	public static String ICON_COLUMN_OBJ = "dbimages/obj.png";
 	public static String ICON_INDEX = "dbimages/index.png";
 	public static String PRIVILEGE_FLAG = "flag";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Columns","Primary key","Unique keys","Foreign keys","Check constraints","Triggers","Indexes","Foreign key references","Referenced by","Synonyms","Granted to users","Granted to roles"};
-	protected static String[] COLUMN_TYPE = 
+	protected static String[] COLUMN_TYPE =
 		{"binary_double","binary_float","blob","clob","char","date","interval day to second","interval year to month","long","long raw","nclob","number","nvarchar2","raw","timestamp","timestamp with local time zone","timestamp with time zone","varchar2"};
 	protected static String FIELDS_PRI = "Primary Key";
 	protected static String INDEX_PRI = "Indexes";
-	
+
 	protected String name = "";
 	public DbTableBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -50,7 +50,20 @@ public class DbTableBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
+	public String getTreeXmlN() {
+		// TODO Auto-generated method stub
+		StringBuffer sb = new StringBuffer();
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		sb.append("<tree>");
+		for(int i = 0;i < FIELDS.length;i++){
+			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
+			sb.append("<item id=\""+ i +"\" text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+		}
+		sb.append("</tree>");
+		return sb.toString();
+	}
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		String[] field = fieldName.split("\\.",4);
@@ -115,7 +128,7 @@ public class DbTableBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
 		returnVal.append("myMenu.width = 200;");
@@ -151,7 +164,7 @@ public class DbTableBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -238,9 +251,9 @@ public class DbTableBean extends DbBean {
 			while(rs.next()){
 				i = 1;
 				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
-				if (CharSet.nullToEmpty(rs.getString(1)).equals("")) sb.append("<tree text=\"(RESULT)\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />"); 
-				else sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))+"\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />"); 
-			}	
+				if (CharSet.nullToEmpty(rs.getString(1)).equals("")) sb.append("<tree text=\"(RESULT)\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />");
+				else sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))+"\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />");
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -249,7 +262,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getPrimaryKey(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -275,7 +288,7 @@ public class DbTableBean extends DbBean {
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -284,7 +297,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getUniqueKey(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -310,7 +323,7 @@ public class DbTableBean extends DbBean {
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -319,7 +332,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getForeignKey(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -345,7 +358,7 @@ public class DbTableBean extends DbBean {
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -354,7 +367,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getCheckConstraintsKey(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -380,7 +393,7 @@ public class DbTableBean extends DbBean {
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -389,7 +402,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getPrimaryKeyID(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -398,7 +411,7 @@ public class DbTableBean extends DbBean {
 		UserBean ub = (UserBean)session.getAttribute("user");
 		String sql = null;
 		ResultSet rs = null;
-		
+
 		try{
 			String obj = null;
 			String columnIcon = ICON_COLUMN_CHAR;
@@ -420,8 +433,8 @@ public class DbTableBean extends DbBean {
 				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
 				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
 				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
-				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />"); 
-			}	
+				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />");
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -430,7 +443,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getTrigger(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -457,7 +470,7 @@ public class DbTableBean extends DbBean {
 				//String field = FIELDS_PRI + "." + objectName;
 				//String field = objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -466,7 +479,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getIndex(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -494,7 +507,7 @@ public class DbTableBean extends DbBean {
 				String field = INDEX_PRI + "." + objectName;
 				//String field = objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ INDEX_PRI +"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -503,7 +516,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getIndexID(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -512,7 +525,7 @@ public class DbTableBean extends DbBean {
 		UserBean ub = (UserBean)session.getAttribute("user");
 		String sql = null;
 		ResultSet rs = null;
-		
+
 		try{
 			String obj = null;
 			String columnIcon = ICON_COLUMN_CHAR;
@@ -534,8 +547,8 @@ public class DbTableBean extends DbBean {
 				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
 				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
 				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
-				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />"); 
-			}	
+				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />");
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -544,7 +557,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getForeignKeyReference(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -575,8 +588,8 @@ public class DbTableBean extends DbBean {
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
 				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
-				sb.append("<tree text=\"" + objectName + foreignTable + "\" icon=\""+ icon +"\"  openIcon=\""+ icon +"\" />"); 
-			}	
+				sb.append("<tree text=\"" + objectName + foreignTable + "\" icon=\""+ icon +"\"  openIcon=\""+ icon +"\" />");
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -585,7 +598,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getReferencedBy(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -596,7 +609,7 @@ public class DbTableBean extends DbBean {
 		ResultSet rs = null;
 		try{
 			String obj = null;
-			if(ub.getDbglobal()) { 
+			if(ub.getDbglobal()) {
 				obj = "all_dependencies";
 				String[] field = name.split("\\.",2);
 				if (field[0].equals(name)) {
@@ -629,13 +642,13 @@ public class DbTableBean extends DbBean {
 				String objectName = "";
 				String subType = CharSet.nullToEmpty(rs.getString(3));
 				String icon= ICON_PARAMTER;
-				
+
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
-						
+
 				icon = DbBeanManager.getChildMenuIcon(subType,CharSet.nullToEmpty(rs.getString(4)));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -644,7 +657,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getSynonym(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -668,7 +681,7 @@ public class DbTableBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -677,7 +690,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getGrantedToUser(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -707,7 +720,7 @@ public class DbTableBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -716,7 +729,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getGrantedToRole(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -746,7 +759,7 @@ public class DbTableBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -755,7 +768,7 @@ public class DbTableBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String getColumnTypeIcon(String columnDataType) {
 		String columnIcon=ICON_COLUMN_CHAR;
 		if (columnDataType.equals(COLUMN_TYPE[0].toUpperCase()) || columnDataType.equals(COLUMN_TYPE[1].toUpperCase())
@@ -775,6 +788,6 @@ public class DbTableBean extends DbBean {
 		}
 		return columnIcon;
 	}
-	
-	
+
+
 }

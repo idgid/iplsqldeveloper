@@ -49,7 +49,20 @@ public class DbViewBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
+	public String getTreeXmlN() {
+		// TODO Auto-generated method stub
+		StringBuffer sb = new StringBuffer();
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		sb.append("<tree>");
+		for(int i = 0;i < FIELDS.length;i++){
+			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
+			sb.append("<item id=\""+ i +"\" text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+		}
+		sb.append("</tree>");
+		return sb.toString();
+	}
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		String[] field = fieldName.split("\\.",4);
