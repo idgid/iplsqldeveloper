@@ -16,6 +16,7 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import dm.jdbc.util.StringUtil;
 import org.apache.struts2.ServletActionContext;
 import org.directwebremoting.WebContextFactory;
 
@@ -31,6 +32,8 @@ public class BaisWorkBean {
 
 	// 执行SQL
 	String sql = null;
+
+	Boolean sqlForUpdate = false;
 
 	// 总页数
 	int pageCount = 0;
@@ -54,14 +57,15 @@ public class BaisWorkBean {
 	// 返回插入数据操作的结果
 	String insertResult = "0505";
 
-	// phanrider 2009-05-15 add
+
+    // phanrider 2009-05-15 add
 	private List list = new ArrayList();
 	private List errList = new ArrayList();
 	private List insertDeleteList = new ArrayList();
 	private List execObjectList = new ArrayList();
 
 	/**
-	 * 
+	 *
 	 * @param startPage
 	 * @param endPage
 	 * @param countPage
@@ -165,40 +169,61 @@ public class BaisWorkBean {
 		String[] sqlnum = new String[sqlNum.length];
 		sqlnum = sqlNum;// 得到插入数据的数组
 		this.sql = sqlnum[0];
-		int rows = Integer.valueOf(sqlnum[1]).intValue();
-		// System.out.println("111="+rows);
-		// 判断sql去掉for update 并且给个标记readonly=1
-		Database db = null;
-		ResultSet rs = null;
-		pageNo = 20 * (rows - 1) ;
-		countPage = 20 * rows + 1;
+		this.sqlForUpdate = false;
+		String st = " for update";
 		String sqlCount = "select count(*) from (" + this.sql + ")";
-		if (sqlnum.length >= 3 && sqlnum[2].equals("Q")) {
-//			sql = "SELECT A.* FROM (" + this.sql + " ) A" + " minus "
-//					+ "SELECT A.* FROM (" + this.sql + " ) A	WHERE ROWNUM <= "
-//					+ pageNo;
-			sql = "SELECT * FROM (" + "SELECT A.*, ROWNUM RN FROM (" + this.sql
-			+ ") A	)	WHERE RN >"
-			+ pageNo;
+
+        int rows = Integer.valueOf(sqlnum[1]).intValue();
+        // System.out.println("111="+rows);
+        // 判断sql去掉for update 并且给个标记readonly=1
+        Database db = null;
+        ResultSet rs = null;
+        pageNo = 20 * (rows - 1) ;
+        countPage = 20 * rows + 1;
+
+		if (this.sql.trim().toLowerCase().endsWith(st)) {
+		    //  for update
+            this.sqlForUpdate = true;
+			//this.sql = replaceLast(this.sql.trim().toLowerCase(), st, "");
+			//sqlCount = "select count(*) from (" + this.sql + ")";
+            sql = this.sql;
 		} else {
-//			sql = "SELECT A.* FROM (" + this.sql + " ) A WHERE ROWNUM <= "
-//					+ countPage + " minus " + "SELECT A.* FROM (" + this.sql
-//					+ " ) A	WHERE ROWNUM <= " + pageNo;
-			sql = "SELECT * FROM (" + "SELECT A.*, ROWNUM RN FROM (" + this.sql
-			+ ") A	WHERE ROWNUM <= " + countPage + ")	WHERE RN >"
-			+   pageNo;
-		}
-		
+		    // 一般的 select
+            if (sqlnum.length >= 3 && sqlnum[2].equals("Q")) {
+                sql = "SELECT * FROM (" + "SELECT A.*, ROWNUM RN FROM (" + this.sql
+                        + ") A	)	WHERE RN >"
+                        + pageNo;
+            } else {
+                sql = "SELECT * FROM (" + "SELECT A.*, ROWNUM RN FROM (" + this.sql
+                        + ") A	WHERE ROWNUM <= " + countPage + ")	WHERE RN >"
+                        + pageNo;
+            }
+        }
+
+
 		try {
 			HttpServletRequest request = WebContextFactory.get()
 					.getHttpServletRequest();
 			HttpSession session = request.getSession();
 			UserBean ub = (UserBean) session.getAttribute("user");
 			db = ub.getDb();
-			rs = db.getRS(sql);
+
+			if (this.sqlForUpdate) {
+			    rs = db.execSqlForUpdate(sql);
+			    ub.setgRs(rs);
+            } else {
+                rs = db.getRS(sql);
+
+            }
+
 			this.columnNameCn = null;
 			ResultSetMetaData rsNb = rs.getMetaData();// 得到列表显示的列数
-			this.getColumnCount = rsNb.getColumnCount()-1;// 得到列表显示的列数
+            if (this.sqlForUpdate) {
+                this.getColumnCount = rsNb.getColumnCount();    // 得到列表显示的列数
+            } else {
+                this.getColumnCount = rsNb.getColumnCount()-1;  // 得到列表显示的列数
+            }
+
 			String[] columnName = new String[getColumnCount];
 			for (int j = 0; j < getColumnCount; j++) {
 				columnName[j] = rsNb.getColumnName(j + 1);
@@ -206,7 +231,7 @@ public class BaisWorkBean {
 
 			Vector vColumn = new Vector();
 			if (rows == 1) {
-				
+
 				//this.getResultHtml += "<tr>";
 				//this.getResultHtml += "<td class='c'>&nbsp;&nbsp;</td><td class='c'>&nbsp;&nbsp;</td>";
 				for (int i = 0; i < columnName.length; i++) {
@@ -227,23 +252,23 @@ public class BaisWorkBean {
 					//this.getResultHtml += "<td>" + rs.getString(j) + "</td>";
 					String value = null;
 					//this.columnNameCn[j] = rs.getString(j);
-					
+
 					//2007-11-4由phanrider加入对"BLOB"或者"CLOB"类型的过滤
 					//如果字段类型是"BLOB"或者"CLOB"类型，则打出"<long>"
-					if ("BLOB".equals(rs.getMetaData().getCatalogName(j)) || 
-							"CLOB".equals( rs.getMetaData().getColumnTypeName(j))) 
+					if ("BLOB".equals(rs.getMetaData().getCatalogName(j)) ||
+							"CLOB".equals( rs.getMetaData().getColumnTypeName(j)))
 						  value = "&lt;long&gt;";
 					else  value = CharSet.nullToEmpty(rs
 							.getString(j));
 
 					//value = CharSet.nullToEmpty(rs
 					//getString(columnName[i]));
-					 
+
 					int index = value.indexOf("00:00:00");
 					if (index != -1) {
 						value = value.substring(0, index);
 					}
-					
+
 					v.add(value);
 				}
 				//this.getResultHtml += "</tr>";
@@ -260,7 +285,9 @@ public class BaisWorkBean {
 			errList.add(v);
 		} finally {
 			if (rs != null) {
-				db.close(rs);
+                if (!this.sqlForUpdate) {
+                    db.close(rs);
+                }
 			}
 			if (db != null) {
 				// db.cleanup();
@@ -272,6 +299,81 @@ public class BaisWorkBean {
 			return errList;
 		}
 	}
+
+    public String forUpdateNumber(String[] addvalues[]) {
+        ResultSet rs = null;
+        String[] addValues[] = new String[addvalues.length][];
+        addValues = addvalues;
+
+        HttpServletRequest request = WebContextFactory.get()
+                .getHttpServletRequest();
+        HttpSession session = request.getSession();
+        UserBean ub = (UserBean) session.getAttribute("user");
+        rs = ub.getgRs();
+
+        try {
+            rs.last();
+
+            int rowCount = rs.getRow();         // 原先结果集 rows
+            int nRowCount = addValues.length;   // 浏览器传过来的新的结果集 rows
+            int colNum = addValues[0].length;   // 列数
+
+            // 1, 先更新数据集
+            for( int i = 0; i < nRowCount; i++ ) {
+                for ( int j = 1; j <= rowCount; j ++ ) {
+                    if ( addValues[i][0].equals(Integer.toString(j))) {
+                        rs.absolute(j);
+                        // 更新该行的所有列
+                        for( int k = 1; k < colNum; k++ )
+                            rs.updateString(k, addValues[i][k]);
+                        rs.updateRow();
+                    }
+                }
+            }
+
+            // 2, 删除旧结果集中的数据
+            for( int i = 1; i <= rowCount; i++ ) {
+                boolean dFlag = true;
+                for ( int j = 0; j < nRowCount; j++) {
+                   if (addValues[j][0].equals(Integer.toString(i))) {
+                       j = nRowCount;
+                       dFlag = false;
+                       break;
+                   }
+                }
+                if (dFlag) {
+                    rs.absolute(i);
+                    rs.deleteRow();
+                }
+            }
+
+            // 3, 插入新数据
+            for( int i = 0; i < nRowCount; i++ ) {
+                for ( int j = 1; j <= rowCount; j ++ ) {
+                    if ( addValues[i][0].equals(Integer.toString(j))) {
+                       break;
+                    } else {
+                        if ( j == rowCount ) {
+                            rs.moveToInsertRow();
+                            for( int k = 1; k < colNum; k++ )
+                                rs.updateString(k, addValues[i][k]);
+                            rs.insertRow();
+                        }
+                    }
+                }
+            }
+
+
+
+            insertResult = Integer.toString(nRowCount);
+
+        } catch (Exception e) {
+            insertResult = e.toString();
+        }
+
+        return insertResult;
+    }
+
 
 	public String insertNumber(String[] addvalues) {
 		try {
@@ -314,15 +416,15 @@ public class BaisWorkBean {
 		// String[] addValues=
 		return insertResult;
 	}
-	
-	
+
+
 	//phanrider 2009-06-04
 	//新增insert、delete是否成功方法
 	public List intOfInsertDelete(String sqlNum) {
 		this.sql = sqlNum;
 		Database db = null;
 		int rs = 0;
-		
+
 		try {
 			HttpServletRequest request = WebContextFactory.get()
 			.getHttpServletRequest();
@@ -354,7 +456,7 @@ public class BaisWorkBean {
 			return errList;
 		}
 	}
-	
+
 	//phanrider 2009-11-25
 	//新增统一执行OBJECT是否成功方法
 	public List execObject(String sqlNum) {
@@ -400,21 +502,21 @@ public class BaisWorkBean {
 			return errList;
 		}
 	}
-	
+
 	public List execObjectCompile(String objectType, String objectName, int debugFlag) {
 		String success = "";
 		if (debugFlag == 1) {
 			this.sql = "ALTER " + objectType + " " + objectName + " COMPILE DEBUG";
-			if (objectType.equals("package body")) 
+			if (objectType.equals("package body"))
 				this.sql = "ALTER PACKAGE " + objectName + " COMPILE DEBUG BODY";
-			if (objectType.equals("type body")) 
+			if (objectType.equals("type body"))
 				this.sql = "ALTER TYPE " + objectName + " COMPILE DEBUG BODY";
 			success = "Debug information added";
 		} else {
 			this.sql = "ALTER " + objectType + " " + objectName + " COMPILE";
-			if (objectType.equals("package body")) 
+			if (objectType.equals("package body"))
 				this.sql = "ALTER PACKAGE " + objectName + " COMPILE BODY";
-			if (objectType.equals("type body")) 
+			if (objectType.equals("type body"))
 				this.sql = "ALTER TYPE " + objectName + " COMPILE BODY";
 			success = "Compiled succesfully";
 		}
@@ -458,7 +560,7 @@ public class BaisWorkBean {
 			return errList;
 		}
 	}
-	
+
 	public List getInstanceUser() {
 		Database db = null;
 		ResultSet rs = null;
@@ -475,7 +577,7 @@ public class BaisWorkBean {
 			while (rs.next()) {
 				Vector v = new Vector();
 				if (CharSet.nullToEmpty(rs.getString("username")).equals(ub.getUsername().toUpperCase())) {
-					str = "selected"; 
+					str = "selected";
 				} else {
 					str = "";
 				}
@@ -484,7 +586,7 @@ public class BaisWorkBean {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 		} finally {
 			if (rs != null) {
 				//db.close(rs);
@@ -494,9 +596,9 @@ public class BaisWorkBean {
 			}
 		}
 		return list;
-		
+
 	}
-	
+
 	public List getInstanceTableAndView() {
 		Database db = null;
 		ResultSet rs = null;
@@ -513,7 +615,7 @@ public class BaisWorkBean {
 			while (rs.next()) {
 				Vector v = new Vector();
 				if (CharSet.nullToEmpty(rs.getString("tname")).equals(ub.getUsername().toUpperCase())) {
-					str = "selected"; 
+					str = "selected";
 				} else {
 					str = "";
 				}
@@ -522,7 +624,7 @@ public class BaisWorkBean {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 		} finally {
 			if (rs != null) {
 				//db.close(rs);
@@ -532,9 +634,9 @@ public class BaisWorkBean {
 			}
 		}
 		return list;
-		
+
 	}
-	
+
 	public boolean setDbCommit() {
 		Database db = null;
 		try {
@@ -557,9 +659,9 @@ public class BaisWorkBean {
 		} else {
 			return false;
 		}
-		
+
 	}
-	
+
 	public boolean setDbRollback() {
 		Database db = null;
 		try {
@@ -582,6 +684,10 @@ public class BaisWorkBean {
 		} else {
 			return false;
 		}
+	}
+
+	public static String replaceLast(String text, String strToReplace, String replaceWithThis) {
+		return text.replaceFirst("(?s)" + strToReplace + "(?!.*?" + strToReplace + ")", replaceWithThis);
 	}
 
 	public void setCountPage(int countPage) {

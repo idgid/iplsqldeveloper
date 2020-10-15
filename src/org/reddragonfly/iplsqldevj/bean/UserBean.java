@@ -2,13 +2,14 @@ package org.reddragonfly.iplsqldevj.bean;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Vector;
 
 import org.reddragonfly.iplsqldevj.bean.Database;
 
 public class UserBean {
-	
+
 	private String username;
 	private String password;
 	private String databaseip;
@@ -16,9 +17,10 @@ public class UserBean {
 	private String servername;
 	private String connecttype;
 	private Database db;
+	private ResultSet gRs;
 	private String dbversion;
 	private boolean dbglobal = false;
-	
+
 	public UserBean(String username,String password,String databaseip,String listenport,String servername,String connecttype) throws Exception{
 		Connection conn = null;
 		try{
@@ -38,7 +40,7 @@ public class UserBean {
 			//======== add end ========
 			String url = "jdbc:oracle:thin:@" +  databaseip + ":" + listenport + ":" + servername;
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			conn = DriverManager.getConnection(url, username, password);  
+			conn = DriverManager.getConnection(url, username, password);
 			db = new Database(false,conn); //2009-06-04 phanrider 从true->false 默认不自动提交
 			String sql = "select * from v$version where banner like 'Oracle%'";
 			List data = QueryManage.getResult(sql, db);
@@ -53,7 +55,7 @@ public class UserBean {
 	public String getUsername() {
 		return username;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
@@ -65,7 +67,7 @@ public class UserBean {
 	public String getListenport() {
 		return listenport;
 	}
-	
+
 	public String getServername() {
 		return servername;
 	}
@@ -73,11 +75,11 @@ public class UserBean {
 	public String getConnecttype() {
 		return connecttype;
 	}
-	
+
 	public String getDbversion(){
 		return dbversion;
 	}
-	
+
 	public boolean getDbglobal() {
 		return dbglobal;
 	}
@@ -85,7 +87,7 @@ public class UserBean {
 	public void setDbglobal(boolean dbglobal) {
 		this.dbglobal = dbglobal;
 	}
-	
+
 	/**
 	 * <p>注意，通过该方法获取的Database不需要主动关闭，它将在用户退出或超时时由监控程序关闭。主动关闭该Database将会带来意想不到的诸多错误
 	 * @return Database
@@ -93,12 +95,21 @@ public class UserBean {
 	public Database getDb() {
 		return db;
 	}
-	
+
 	/**
 	 * <p>该方法提供给监控程序在适当的时候关闭当前用户对应的Database
 	 */
 	public void closeDb(){
 		db.cleanup();
 	}
-	
+
+
+	public ResultSet getgRs() {
+		return gRs;
+	}
+
+	public void setgRs(ResultSet gRs) {
+		this.gRs = gRs;
+	}
+
 }

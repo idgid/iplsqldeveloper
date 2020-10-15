@@ -27,19 +27,19 @@ public class Database {
 	        String password = "test";
 	        Driver dbDriver = (Driver) Class.forName(driverName).newInstance();
 	        DriverManager.registerDriver(dbDriver);
-	        this.conn = DriverManager.getConnection(url, user, password);        
+	        this.conn = DriverManager.getConnection(url, user, password);
 	    }
 	    public Database(String url, String user, String password )throws Exception{
 	        String driverName = "oracle.jdbc.driver.OracleDriver";
 	        Driver dbDriver = (Driver) Class.forName(driverName).newInstance();
 	        DriverManager.registerDriver(dbDriver);
-	        this.conn = DriverManager.getConnection(url, user, password);        
+	        this.conn = DriverManager.getConnection(url, user, password);
 	    }
 
 	    public Connection getConnection() throws Exception{
-	        return this.conn;      
+	        return this.conn;
 	    }
-	    
+
 	    public Database(boolean isAutoCommit,Connection conn) throws Exception{
 	        this.conn = conn;
 	        this.conn.setAutoCommit(isAutoCommit);
@@ -86,6 +86,28 @@ public class Database {
 	        }
 	    }
 
+		/**
+		 * 执行插 for update 更新语句
+		 * @param sql - sql语句
+		 * @throws Exception
+		 * @return int
+		 */
+		public ResultSet execSqlForUpdate(String sql) throws Exception {
+            PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				int executeResult;
+				stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+				rs = stmt.executeQuery();
+			}
+			catch (Exception e) {
+				throw new Exception(e.getMessage());
+			}
+			return rs;
+		}
+
+
+
 	    /**
 	     * prepare执行插入和更新语句
 	     * @param sql - sql语句
@@ -126,9 +148,9 @@ public class Database {
 	        }
 	      }
 	    }
-	    
-	    
-	    
+
+
+
 	    public ResultSet getDesc(String sql) throws Exception {
 	        Statement stmt = null;
 	        ResultSet rs = null;
@@ -146,7 +168,7 @@ public class Database {
 	        }
 	        return rs;
 	    }
-	    
+
 	    /**
 	     * 得到Clob字段内容
 	     * @param rs
@@ -207,7 +229,7 @@ public class Database {
 	      return str;
 
 	    }
-	    
+
 	    private byte[] getBlob(BLOB blob) throws Exception {
 	        if (blob == null) {
 	          return new byte[0];
@@ -236,7 +258,7 @@ public class Database {
 	        return rtn;
 
 	      }
-	    
+
 	    /**
 	     * 得到Blob字段
 	     * @param rs
@@ -259,9 +281,9 @@ public class Database {
 	      return this.getBlob( ( (OracleResultSet) rs).getBLOB(columnName));
 	    }
 
-	    
-	    
-	    
+
+
+
 	    public void cleanup() {
 	        try {
 	            if (this.conn != null) {
@@ -322,11 +344,11 @@ public class Database {
 	        }
 	    }
 
-	    
+
 		//测试用
-		public static void main(String args[]){          	
+		public static void main(String args[]){
 		      try{
-		    	  Database db=new Database();    	  
+		    	  Database db=new Database();
 		        String sql="select * from t_dict_man --where state='A'";
 		        ResultSet rs=db.getRS(sql);
 		        while(rs.next()){
@@ -339,7 +361,7 @@ public class Database {
 		         e.printStackTrace();
 		      }
 		    }
-	    
+
 }
 
 
