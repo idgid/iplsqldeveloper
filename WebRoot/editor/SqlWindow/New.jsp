@@ -77,6 +77,20 @@
 			background: Transparent;
 		}
 
+        .footer {
+            background-color : ButtonFace;
+            overflow: no;
+            height: 26px;
+            width: 100%;
+            margin-top: -26px;
+            position: absolute;
+        }
+
+        .top{
+            /*min-height: calc(100vh - 50px);*/
+            min-height: 100%;
+        }
+
 		.editor {
 			font-family: "Courier New", Courier, mono;
 			font-size: 12px;
@@ -139,6 +153,12 @@
 			color: highlighttext;
 			font: Menu;
 		}
+        .even{
+            background-color:#FFFFFF;
+        }
+        .uneven{
+            background-color:#E5FFE5;
+        }
 
 
 	</style>
@@ -184,11 +204,11 @@
 
 </head>
 <body ondragstart="return false" oncontextmenu="return false" onload="initOnload()">
-<div id="SQLWindow" style="width: 100%; HEIGHT: 100%;">
+<div id="SQLWindow" style="width: 100%; height: 100%;">
 	<div id="BaisworkMenu" name="BaisworkMenu" class="BaisworkM"></div>
-
+    <div class="top">
 	<div id="myText"
-		 style="border: 2px; overflow: no; background-color: ButtonFace; WIDTH: 100%; HEIGHT: 35%">
+		 style="border: 2px; overflow: no; background-color: ButtonFace; width: 100%; height: 35%">
 		<div id="editortop" class="webfxGrid" style="width: 100%" >
 			<%--<div id="myTextarea" class="editor" contentEditable--%>
 			<%--onkeydown="detectCtrlKey(event)" onkeyup=""--%>
@@ -232,7 +252,7 @@
 		</div>
 	</div>
 	<div id="t_controlDiv"
-		 style="border: 1px; overflow: no; background-color: ButtonFace; height: 55%; width: 100%;">
+		 style="border: 1px; overflow: no; background-color: ButtonFace; padding-bottom:26px; height: 60%; width: 100%;">
 
 		<div id="foot_outputDiv1"
 			 style="overflow: no; background-color : ButtonFace; width: 100%">
@@ -332,8 +352,8 @@
 
 
 	</div>
-    <div id="foot_outputDiv"
-         style="position:fixed; overflow: no; background-color : ButtonFace; bottom: 0px; _bottom: -1px; height: 30px; width: 100%">
+    </div>
+    <footer id="foot_outputDiv" class="footer">
         <table border="0" id="toolBar_2" style="background: ButtonFace;"
                cellspacing="1" width="100%">
             <tr align='left'>
@@ -358,10 +378,9 @@
             </tr>
         </table>
 
-    </div>
+    </footer>
 </div>
 <div id="SQLWindow0" style="width: 100%; height: 100%; display:none;"></div>
-
 <div id="SQLWindow1" style="width: 100%; height: 100%; display:none;"></div>
 <div id="SQLWindow2" style="width: 100%; height: 100%; display:none;"></div>
 <div id="SQLWindow3" style="width: 100%; height: 100%; display:none;"></div>
