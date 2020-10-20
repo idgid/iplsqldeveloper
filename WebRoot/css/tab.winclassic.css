@@ -10,7 +10,7 @@
 	margin:			1px -2px 1px 2px;
 	float:			left;
 	padding:		2px 5px 3px 5px;
-	background:		ThreeDFace;
+	background:		#F0F0F0;
 	border:			1px solid;
 	border-color:	ThreeDHighlight ThreeDDarkShadow
 					ThreeDDarkShadow ThreeDHighlight;
@@ -26,6 +26,7 @@
 	padding:		2px 6px 5px 7px;
 	margin:			1px -3px -2px 0px;
 	top:			-2px;
+	background:		#FFF;
 }
 
 .dynamic-tab-pane-control .tab-row .tab a {
@@ -44,7 +45,7 @@
 	border:			1px solid;
 	border-color:	ThreeDHighlight ThreeDDarkShadow
 					ThreeDDarkShadow ThreeDHighlight;
-	background:		ThreeDFace;
+	background:		#FFF;
 	z-index:		2;
 	position:		relative;
 	top:			-2px;

@@ -657,3 +657,17 @@ div.gridbox_sbdark .odd_sbdark {
 }
 
 
+div.gridbox_material.gridbox table.hdr td.dhxgrid_sort_desc_col,
+div.gridbox_material.gridbox table.hdr td.dhxgrid_sort_asc_col {
+	background-image:url("../js/codebase/imgs/dhxgrid_material/sort_desc.gif");
+	background-position:3px 7px;
+	background-repeat:no-repeat;
+}
+div.gridbox_material.gridbox table.hdr td.dhxgrid_sort_desc_col div,
+div.gridbox_material.gridbox table.hdr td.dhxgrid_sort_asc_col div {
+	padding-left:18px;
+	padding-right:14px;
+}
+div.gridbox_material.gridbox table.hdr td.dhxgrid_sort_asc_col {
+	background-image:url("../js/codebase/imgs/dhxgrid_material/sort_asc.gif");
+}
