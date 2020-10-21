@@ -39,7 +39,8 @@ var sql2 = "";//记录sql
 /*传入SQL把数据从数据库里面拉出来展示--新*/
 function getResultFromSql(localsql) {
 	deletTable();//置空
-	fyNum = 1;
+	parent.parent.editorFrame.GGETFRAME.fyNum = 1;
+	fyNum = parent.parent.editorFrame.GGETFRAME.fyNum;
 	sqlNum[0] = localsql;
 	sqlNum[1] = fyNum;
 	sqlNum[2] = "";
@@ -48,38 +49,62 @@ function getResultFromSql(localsql) {
 	setFootView(1, "");
 	//这里加入执行开始的时间计算
 	//BaisWorkBean.initBean(sqlNum, callbackadd);
-	
-	//将展用新的展示方式，返回类型为list 
+
+	//将展用新的展示方式，返回类型为list
 	//phanrider 2009-05-17
 	BaisWorkBean.GetResultList(sqlNum, callbackadd);
 }
 /*传入SQL把数据从数据库里面拉出来展示--新*分页用*/
 function getFYSql_run() {
-	++fyNum;
-	sqlNum[0] = sql2;
+	fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum ;
+	sqlNum[0] = parent.parent.editorFrame.sql2;
 	sqlNum[1] = fyNum;
 	sqlNum[2] = "";
 	//BaisWorkBean.initBean(sqlNum, callbackadd);
 	BaisWorkBean.GetResultList(sqlNum, callbackadd);
 }
+
+function getFYSql_run_New(framesql) {
+    fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum ;
+    sqlNum[0] = framesql;
+    sqlNum[1] = fyNum;
+    sqlNum[2] = "";
+    //BaisWorkBean.initBean(sqlNum, callbackadd);
+    BaisWorkBean.GetResultList(sqlNum, callbackadd);
+}
+
+
 /*传入SQL把数据从数据库里面拉出来展示--新*全显示*/
 function getFYQSql_run() {
-	++fyNum;
-	sqlNum[0] = sql2; //sql
+	fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum;
+	sqlNum[0] = parent.parent.editorFrame.sql2; //sql
 	sqlNum[1] = fyNum; //全局变理，分页数
 	sqlNum[2] = "Q";  //代表全部分页
 	//BaisWorkBean.initBean(sqlNum, callbackadd);
-	
+
 	BaisWorkBean.GetResultList(sqlNum, callbackadd);
 }
+
+function getFYQSql_run_New(framesql) {
+    fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum;
+    sqlNum[0] = framesql; //sql
+    sqlNum[1] = fyNum; //全局变理，分页数
+    sqlNum[2] = "Q";  //代表全部分页
+    //BaisWorkBean.initBean(sqlNum, callbackadd);
+
+    BaisWorkBean.GetResultList(sqlNum, callbackadd);
+}
+
+
 function callbackadd(dataadd) {
-	var optionadd = parent.editorFrame.document.getElementById("outResultDiv");
+
+	var optionadd = parent.parent.editorFrame.GGETFRAME.document.getElementById("outResultDiv");
 	var oldtime = $time();
 	var rows;
 	var more = "";
 	//alert(dataadd);
 	//setDivValueNull("outResultDiv");
-	
+
 	//phanrider add 2009-05-21
 	//alert(fyNum);
 	if (fyNum > 1 && sqlNum[2] != "Q") {
@@ -101,7 +126,7 @@ function callbackadd(dataadd) {
 			setFetchNext(false);
 			setFetchLast(false);
 		} else {
-			showDataHtml(fyNum, dataadd);	//初始 Execute 调用的方法 
+			showDataHtml(fyNum, dataadd);	//初始 Execute 调用的方法
 			if (dataadd.length > 21) {
 				rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
 				more = " (more...)";
@@ -115,7 +140,7 @@ function callbackadd(dataadd) {
 		}
 	}
 	//optionadd.insertAdjacentHTML("beforeEnd", dataadd);
-	
+
 	//TrColor();
 	breakRun("myTextarea");
 	//这里加入执行的结束时间计算
@@ -133,7 +158,7 @@ function callbackadd(dataadd) {
 		oracleTitle = rows + " rows selected in " + newtime + " seconds" + more;	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
 	}
 	setFootView(9999, oracleTitle);
-	parent.leftFrameList.restoreWindowListImg(parent.leftFrameList.getWindowTr());
+	parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
 }
 /*删除已有TABLE*/
 function deletTable() {
@@ -142,12 +167,12 @@ function deletTable() {
 		//for (var i = 0; i < fyNum; i++) {
 		//	Table[0].removeNode(true);
 		//}
-	parent.editorFrame.$("outResultDiv").set("text", "");
+        parent.editorFrame.GGETFRAME.$("outResultDiv").set("text", "");
 	//}
 }
 /*设置颜色*/
 function TrColor() {
-	var TrObject = parent.editorFrame.document.getElementById("outResultDiv").getElementsByTagName("tr");
+	var TrObject = parent.editorFrame.GGETFRAME.$("outResultDiv").getElementsByTagName("tr");
 	var Tdobject;
 	for (var k = 0; k < TrObject.length; k++) {
 		if (k == 0) {
@@ -157,7 +182,7 @@ function TrColor() {
 				TrObject[k].style.background = "#FFFFFF";
 			} else {
 				TrObject[k].style.background = "#E5FFE5";
-    	//少一个空白的颜色设置 即淡黄色 #FFFFE5 
+    	//少一个空白的颜色设置 即淡黄色 #FFFFE5
 			}
 		}
 		Tdobject = TrObject[k].getElementsByTagName("td");
@@ -167,8 +192,8 @@ function TrColor() {
 }
 /*增加前面单独的两行暂不实现*/
 function IdH() {
-	var TrObject = parent.editorFrame.document.getElementById("outResultDiv").getElementsByTagName("tr");
-	var idhNum = parent.editorFrame.document.getElementById("idtu");
+	var TrObject = parent.editorFrame.GGETFRAME.$("outResultDiv").getElementsByTagName("tr");
+	var idhNum = parent.editorFrame.GGETFRAME.$("idtu");
 	var idHtml = "<table>";
 	for (var j = 0; j <= TrObject.length; j++) {
 		idHtml += "<tr><td>" + j + "</td></tr>";
@@ -182,12 +207,12 @@ var trId = -1; //记录鼠标在哪一行的ID
 function trclick(obj) {
 	var mycell = obj.cells;
 	if (trId != -1) {
-		parent.editorFrame.document.getElementById(trId).cells[0].innerHTML = "&nbsp;";
+		parent.editorFrame.GGETFRAME.$(trId).cells[0].innerHTML = "&nbsp;";
 	}
 	var trIdlast = trId;
 	trId = obj.id;
 	if (trIdlast != "" && trId != "") {
-		parent.editorFrame.document.getElementById(trIdlast).cells[0].innerHTML = "&nbsp;";
+		parent.editorFrame.GGETFRAME.$(trIdlast).cells[0].innerHTML = "&nbsp;";
 	}
 	mycell[0].innerHTML = "&nbsp;<div id='triangle1'></div>";
 	return trId;
@@ -195,7 +220,7 @@ function trclick(obj) {
 /*2009-3-26点(+)增加一行的操作*/
 var num = 0; //为了给新增加的TR标记不同的ID
 function gettrId() {
-	var trHTML = parent.editorFrame.document.createElement("tr");
+	var trHTML = parent.editorFrame.GGETFRAME.document.createElement("tr");
 	num++;
 	trHTML.setAttribute("id", "ad" + num);
   //trHTML.setAttribute('onclick','trclick(this)');//目前IE不能用
@@ -204,28 +229,28 @@ function gettrId() {
 	};
 	trHTML.setAttribute("style", "COLOR:#ffffff; background-color:#ffffff");//用于火狐
 	trHTML.style.cssText = "COLOR:#ffffff; background-color:#ffffff"; //用于IE
-	for (var i = 1; i <= (parent.editorFrame.document.getElementById(trId).cells.length); i++) {
+	for (var i = 1; i <= (parent.editorFrame.GGETFRAME.$(trId).cells.length); i++) {
 		if (i > 2) {
-			var tdHTML = parent.editorFrame.document.createElement("td");
+			var tdHTML = parent.editorFrame.GGETFRAME.document.createElement("td");
 			tdHTML.setAttribute("style", "border:solid 1px #ffffff; background:#ffffff");//用于火狐
-			tdHTML.style.cssText = "border:solid 1px #ffffff; background:#ffffff"; //用于IE 
+			tdHTML.style.cssText = "border:solid 1px #ffffff; background:#ffffff"; //用于IE
 			tdHTML.innerHTML = "<input type=text value=000>";
 		} else {
-			var tdHTML = parent.editorFrame.document.createElement("th");
+			var tdHTML = parent.editorFrame.GGETFRAME.document.createElement("th");
 			tdHTML.setAttribute("class", "c");
 			tdHTML.setAttribute("className", "c");
 			tdHTML.innerHTML = "&nbsp;";
 		}
 		trHTML.appendChild(tdHTML);
 	}
-	var trOption = parent.editorFrame.document.getElementById(trId);
+	var trOption = parent.editorFrame.GGETFRAME.document.getElementById(trId);
 	alert(trId);
 	trOption.parentNode.insertBefore(trHTML, trOption.nextSibling);//关键的一行啊！
 }
 /*(-)减一行的操作*/
 function deletHTML() {
-	var tb = parent.editorFrame.document.getElementById("tableName");
-	var tr = parent.editorFrame.document.getElementById(trId);
+	var tb = parent.editorFrame.GGETFRAME.document.getElementById("tableName");
+	var tr = parent.editorFrame.GGETFRAME.document.getElementById(trId);
 	var trIdnew = "";
 	if ((tr.previousSibling == null) && (tr.nextSibling != null) && (tr.nextSibling.id != "")) {//如果上一行不存在，下一行存在且ID不为空（排除最后一行）
 		trIdnew = tr.nextSibling.id;
@@ -248,9 +273,9 @@ function deletHTML() {
 		}
 	}
     //var trIdnewl =tr.previousSibling.id; //获取该行的上一行的ID
-    //var trIdnewn =tr.nextSibling.id; //获取该行的下一行ID  
+    //var trIdnewn =tr.nextSibling.id; //获取该行的下一行ID
 	if (trIdnew != "") {
-		parent.editorFrame.document.getElementById(trIdnew).cells[0].innerHTML = "&nbsp;<div id='triangle1'></div>";
+		parent.editorFrame.GGETFRAME.document.getElementById(trIdnew).cells[0].innerHTML = "&nbsp;<div id='triangle1'></div>";
 	}
 	tb.deleteRow(tr.rowIndex);
 	trId = trIdnew;
@@ -259,18 +284,18 @@ function deletHTML() {
 function insertNumber() {
 	var addvalues = [];
 	var valueID = 0;
-	var troption = parent.editorFrame.document.getElementById("tableName").rows;
-	var trlen = parent.editorFrame.document.getElementById("tableName").rows.length;//得到所有行数    
+	var troption = parent.editorFrame.GGETFRAME.document.getElementById("tableName").rows;
+	var trlen = parent.editorFrame.GGETFRAME.document.getElementById("tableName").rows.length;//得到所有行数
 	for (var i = 0; i < trlen; i++) {//循环取新增加的行数，得到该行的ID，根据ID取每一行的input,文本框的值
 		var values = "";
 		var trhave = false;
 		if (troption[i].id.substring(0, 2) == "ad") {//判断增加的行数
-			var trone = parent.editorFrame.document.getElementById(troption[i].id).getElementsByTagName("input");//得到该行文本框对象数组
+			var trone = parent.editorFrame.GGETFRAME.document.getElementById(troption[i].id).getElementsByTagName("input");//得到该行文本框对象数组
 			for (var j = 0; j < trone.length; j++) {//得到该行文本框的值
 				values += trone[j].value + ",";
 				trhave = true;
 			}
-			if (trhave) { //如果值存在就加到数组里面       
+			if (trhave) { //如果值存在就加到数组里面
 				addvalues[valueID] = values.substring(0, values.length - 1);//这里有问题
 				alert(valueID + "=" + addvalues[valueID]);
 				valueID++;
@@ -285,7 +310,28 @@ function insert(addvalues) {
 	BaisWorkBean.insertNumber(addvalues, backInsert);
 }
 function backInsert(dataResult) {
-	alert(dataResult);
+	var tcell = dataResult[0].length;
+	if(tcell == 2 && dataResult[0][0] == "ReddragonflyErrorFlag*") {
+		errOracleMsg = dataResult[0][1];
+		alert(intdata[0][1]);
+	} else if(tcell == 2 && dataResult[0][0] == "ReddragonflySuccessFlag*") {
+		rows = dataResult[0][1];
+		//alert(intdata[0][1]);
+		rowsA = rows.split(',');
+		foottitleu = "";
+		foottitled = "";
+		foottitlei = "";
+
+		foottileu = rowsA[0] > 1 ?  rowsA[0] + " records updated, " : rowsA[0] + " record updated, " ;
+		foottiled = rowsA[1] > 1 ?  rowsA[1] + " records deleted, " : rowsA[1] + " record deleted, " ;
+		foottilei = rowsA[2] > 1 ?  rowsA[2] + " records inserted" : rowsA[2] + " record inserted" ;
+
+		foottitle = foottileu + foottiled + foottilei;
+
+		setFootView(9999, foottitle);
+
+	}
+
 }
 /*得到删除数据，在做（-）操作的时候记录删除去的数据*/
 /*得到修改数据，在做小图标移动操作时候，对小图标经过的数据，做记录，是否修改*/
@@ -296,31 +342,31 @@ function execResultFromSql(localsql,insertordelflag) {
 	//置空
 	setFootView(1, "");
 	var oldtime = $time();
-	
+
 	BaisWorkBean.intOfInsertDelete(localsql, callinsertdelback);
-	
+
 	function callinsertdelback(intdata){
 	var newtime = ($time() - oldtime) / 1000;
 	var oracleTitle = "";
 	var insertordel = "";
 	var rows="";
 	var tcell = intdata[0].length;
-	
+
 	if (insertordelflag == 1)	insertordel = "inserted";
 	if (insertordelflag == 2)	insertordel = "deleted";
-	
+
 	if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = intdata[0][1];
     	alert(intdata[0][1]);
 	} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 		rows = intdata[0][1];
-	} 
-	
+	}
+
 	breakRun("myTextarea");
 	if ( errOracleMsg != "") {
 	 	oracleTitle = errOracleMsg;
 	 	//出错处理
-	 	
+
 	 	//重新设置为空
 	 	errOracleMsg = "";
 	} else  {
@@ -330,15 +376,15 @@ function execResultFromSql(localsql,insertordelflag) {
 				setRollback(false);
 			}
 			oracleTitle = "Done in " + newtime + " seconds";
-		} else { 
+		} else {
 			oracleTitle = rows + " rows " + insertordel + " in " + newtime + " seconds";	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
 		}
 	}
-	
+
 	setFootView(9999, oracleTitle);
-	parent.leftFrameList.restoreWindowListImg(parent.leftFrameList.getWindowTr());
+	parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
 	}
-	
+
 }
 
 //executeFUN 最终调用此函数据 by phanrider
@@ -346,49 +392,49 @@ function execObject(localsql) {
 	//置空
 	setFootView(1, "");
 	var oldtime = $time();
-	
+
 	BaisWorkBean.execObject(localsql, callexecobjectback);
-	
+
 	function callexecobjectback(intdata){
 	var newtime = ($time() - oldtime) / 1000;
 	var oracleTitle = "";
 	var insertordel = "";
 	var rows="";
 	var tcell = intdata[0].length;
-	
-	
+
+
 	if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = intdata[0][1];
     	alert(intdata[0][1]);
 	} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 		rows = intdata[0][1];
 		//alert(intdata[0][1]);
-	} 
-	
+	}
+
 	breakRun("myTextarea");
 	if ( errOracleMsg != "") {
 	 	oracleTitle = errOracleMsg;
 	 	//出错处理
-	 	
+
 	 	//重新设置为空
 	 	errOracleMsg = "";
 	} else  {
-		
+
 			oracleTitle = rows ;	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
-		
+
 	}
-	
+
 	setFootView(9999, oracleTitle);
-	parent.leftFrameList.restoreWindowListImg(parent.leftFrameList.getWindowTr());
+	parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
 	//左边树的选中节点重新加载，只有执行成功才重新加载
 	if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
-		if(parent.editorToolFrame.nodeType == "root") {
-			parent.leftFrame.tree.getSelected().reload();
+		if(parent.parent.editorToolFrame.nodeType == "root") {
+            parent.parent.leftFrame.tree.getSelected().reload();
 		} else  {
 			selectedNote = parent.leftFrame.tree.getSelected();
-			parent.leftFrame.tree.getSelected().getParent().reload();  //父节点刷新
-			parent.leftFrame.tree.setSelected(selectedNote);
-			parent.editorToolFrame.nodeType = "root";
+            parent.parent.leftFrame.tree.getSelected().getParent().reload();  //父节点刷新
+            parent.parent.leftFrame.tree.setSelected(selectedNote);
+            parent.parent.editorToolFrame.nodeType = "root";
 		}
 	}
 	}
@@ -396,29 +442,29 @@ function execObject(localsql) {
 
 //executeOtherObj 最终调用此函数据 by phanrider
 function execOtherObject(localsql) {
-	
-	
+
+
 	BaisWorkBean.execObject(localsql, callexecOtherobjectback);
-	
+
 	function callexecOtherobjectback(intdata) {
-	
+
 		var insertordel = "";
 		var rows="";
 		var tcell = intdata[0].length;
 		var errOracleMsg = "";
-		
+
 		if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 			errOracleMsg = intdata[0][1];
 	    	alert(intdata[0][1]);
 		} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 			rows = intdata[0][1];
-		} 
-		
-		
+		}
+
+
 		if ( errOracleMsg != "") {
 		 	oracleTitle = errOracleMsg;
 		 	//出错处理
-		 	
+
 		 	//重新设置为空
 		 	errOracleMsg = "";
 		} else  {
@@ -428,11 +474,11 @@ function execOtherObject(localsql) {
 }
 
 
-//getUserName 
+//getUserName
 function getUserName(selectId) {
 	var str = "";
 	BaisWorkBean.getInstanceUser(callgetUserNameback);
-	
+
 	function callgetUserNameback(intdata){
 		var rows="";
 		var tcell = intdata[0].length;
@@ -447,11 +493,11 @@ function getUserName(selectId) {
 	}
 }
 
-//getTalbeAndView 
+//getTalbeAndView
 function getTalbeAndView(selectId) {
 	var str = "";
 	BaisWorkBean.getInstanceTableAndView(callgetUserNameback);
-	
+
 	function callgetUserNameback(intdata){
 		var rows="";
 		var tcell = intdata[0].length;
