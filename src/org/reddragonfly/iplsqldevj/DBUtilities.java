@@ -18,13 +18,13 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public abstract class DBUtilities {
-	
+
 	public static String[] getReturnTypes(){
 		return new String[]{
 			"varchar2","integer","number","date","boolean","long","long raw","clob","blob","binary_integer","&lt;table.column&gt;%type","&lt;table&gt;%rowtype"
 		};
 	}
-	
+
 	//静态方法，得到新建object的标准样式
 	public static String getReturnObjContent(String name,String parameters,String returnType,
 							String objType, String userName, String tableList, String statementLevlel) {
@@ -116,7 +116,7 @@ public abstract class DBUtilities {
 		} else if (objType.equals("trigger")) {
 			String sLevel = "for each row ";
 			if ("1".equals(statementLevlel)) sLevel = "";
-			ret = "create or replace " + objType + " " + name + "<br/>"  + 
+			ret = "create or replace " + objType + " " + name + "<br/>"  +
 			"  " + parameters + " " + returnType + " on " +  tableList + "<br/>" +
 			"  " + sLevel + "<br/>" +
 			"declare" + "<br/>" +
@@ -151,8 +151,8 @@ public abstract class DBUtilities {
 		}
 		return ret;
 	}
-	
-	
+
+
 	public static StringBuffer showObjectView(HttpSession session, String type, String name) {
 		Database db = null;
 		ResultSet rs = null;
@@ -160,7 +160,7 @@ public abstract class DBUtilities {
 		String querySql = "";
 		String queryViewSql = "";
 		StringBuffer ret = new StringBuffer();
-		
+
 		type = type.replaceAll("_BODY", " DODY");
 		type = type.replaceAll("_SOURCE", " SOURCE");
 		type = type.replaceAll("_TABLE", " TABLE");
@@ -201,7 +201,7 @@ public abstract class DBUtilities {
 				" AND OWNER = upper('" + ownerName[0] +"') ";
 			}
 		}
-		
+
 		//
 		try {
 			UserBean ub = (UserBean) session.getAttribute("user");
@@ -227,7 +227,7 @@ public abstract class DBUtilities {
 			Vector v = new Vector();
 			v.add("ReddragonflyErrorFlag*");
 			v.add(e.getMessage());
-			
+
 		} finally {
 			if (rs != null) {
 				//db.close(rs);
@@ -238,6 +238,6 @@ public abstract class DBUtilities {
 		}
 		return ret;
 	}
-		
-	
+
+
 }
