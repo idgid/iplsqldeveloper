@@ -9,7 +9,8 @@ editAreaLoader.load_syntax["sql"] = {
 			'select', 'SELECT', 'where', 'order', 'by',
 			'insert', 'from', 'update', 'grant', 'left join', 'right join',
             'union', 'group', 'having', 'limit', 'alter', 'LIKE','IN','CASE',
-			'and', 'AND'
+			'and',
+			'create', 'or' , 'type', 'as', 'object', 'procedure', 'member', 'function'
 		]
 		,'reserved' : [
 			'null', 'enum', 'int', 'boolean', 'add', 'varchar'
@@ -22,7 +23,7 @@ editAreaLoader.load_syntax["sql"] = {
 'INSERT','INSTR','INTERVAL','IS_FREE_LOCK','IS_USED_LOCK','ISNULL','LAST_DAY','LAST_INSERT_ID','LCASE','LEAST','LEFT','LENGTH','LN','LOAD_FILE','LOCALTIME','LOCALTIMESTAMP','LOCATE','LOG10','LOG2','LOG','LOWER','LPAD','LTRIM','MAKE_SET','MAKEDATE','MAKETIME','MASTER_POS_WAIT','MAX','MD5','MICROSECOND',
 'MID','MIN','MINUTE','MOD','MONTH','MONTHNAME','NOW','NULLIF','OCT','OCTET_LENGTH','OLD_PASSWORD','ORD','PASSWORD','PERIOD_ADD','PERIOD_DIFF','PI','POSITION','POW','POWER','PROCEDURE ANALYSE','QUARTER','QUOTE','RADIANS','RAND','RELEASE_LOCK','REPEAT','REPLACE','REVERSE','RIGHT','ROUND',
 'RPAD','RTRIM','SEC_TO_TIME','SECOND','SESSION_USER','SHA1','SHA','SIGN','SIN','SOUNDEX','SOUNDS LIKE','SPACE','SQRT','STD','STDDEV','STR_TO_DATE','STRCMP','SUBDATE','SUBSTRING_INDEX','SUBSTRING','SUBSTR','SUBTIME','SUM','SYSDATE','SYSTEM_USER','TAN','TIME_FORMAT','TIME_TO_SEC','TIME','TIMEDIFF',
-'TIMESTAMP','TO_DAYS','TRIM','TRUNCATE','UCASE','UNCOMPRESS','UNCOMPRESSED_LENGTH','UNHEX','UNIX_TIMESTAMP','UPPER','USER','UTC_DATE','UTC_TIME','UTC_TIMESTAMP','UUID','VALUES','VARIANCE','WEEK','WEEKDAY','WEEKOFYEAR','YEAR','YEARWEEK'
+'TIMESTAMP','TO_DAYS','TRIM','TRUNCATE','UCASE','UNCOMPRESS','UNCOMPRESSED_LENGTH','UNHEX','UNIX_TIMESTAMP','UPPER','USER','UTC_DATE','UTC_TIME','UTC_TIMESTAMP','UUID','VALUES','VARIANCE','WEEK','WEEKDAY','WEEKOFYEAR','YEAR','YEARWEEK', 'NVL'
 		]
 	}
 	,'OPERATORS' :[
@@ -41,7 +42,7 @@ editAreaLoader.load_syntax["sql"] = {
 		}
 	}
 	,'STYLES' : {
-		'COMMENTS': 'color: #AAAAAA;'
+		'COMMENTS': 'color: #FF0000;'
 		,'QUOTESMARKS': 'color: #0000FF;'
 		,'KEYWORDS' : {
 			'reserved' : 'color: #48BDDF;'
