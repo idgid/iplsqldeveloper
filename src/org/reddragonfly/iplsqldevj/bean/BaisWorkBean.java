@@ -300,7 +300,7 @@ public class BaisWorkBean {
 		}
 	}
 
-    public String forUpdateNumber(String[] addvalues[]) {
+    public List forUpdateNumber(String[] addvalues[]) {
         ResultSet rs = null;
         String[] addValues[] = new String[addvalues.length][];
         addValues = addvalues;
@@ -317,6 +317,9 @@ public class BaisWorkBean {
             int rowCount = rs.getRow();         // 原先结果集 rows
             int nRowCount = addValues.length;   // 浏览器传过来的新的结果集 rows
             int colNum = addValues[0].length;   // 列数
+            int uNum = 0;
+            int iNum = 0;
+            int dNum = 0;
 
             // 1, 先更新数据集
             for( int i = 0; i < nRowCount; i++ ) {
@@ -327,6 +330,7 @@ public class BaisWorkBean {
                         for( int k = 1; k < colNum; k++ )
                             rs.updateString(k, addValues[i][k]);
                         rs.updateRow();
+                        uNum++;
                     }
                 }
             }
@@ -344,6 +348,7 @@ public class BaisWorkBean {
                 if (dFlag) {
                     rs.absolute(i);
                     rs.deleteRow();
+                    dNum++;
                 }
             }
 
@@ -358,20 +363,27 @@ public class BaisWorkBean {
                             for( int k = 1; k < colNum; k++ )
                                 rs.updateString(k, addValues[i][k]);
                             rs.insertRow();
+                            iNum++;
                         }
                     }
                 }
             }
 
+            insertResult = uNum + "," + iNum + "," + dNum;
 
-
-            insertResult = Integer.toString(nRowCount);
-
+            Vector v = new Vector();
+            v.add("ReddragonflySuccessFlag*");
+            v.add(insertResult);
+            insertDeleteList.add(v);
         } catch (Exception e) {
-            insertResult = e.toString();
+            e.printStackTrace();
+            Vector v = new Vector();
+            v.add("ReddragonflyErrorFlag*");
+            v.add(e.getMessage());
+            insertDeleteList.add(v);
         }
 
-        return insertResult;
+        return insertDeleteList;
     }
 
 
