@@ -54,41 +54,41 @@ public abstract class DBUtilities {
 			"  -- Purpose : " + parameters + "" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Public type declarations" + "<br/>" +
-			"  type &lt;TypeName&gt; is &lt;Datatype&gt;;" + "<br/>" +
+			"  type <TypeName> is <Datatype>;" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Public constant declarations" + "<br/>" +
-			"  &lt;ConstantName&gt; constant &lt;Datatype&gt; := &lt;Value&gt;;" + "<br/>" +
+			"  <ConstantName> constant <Datatype> := <Value>;" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Public variable declarations" + "<br/>" +
-			"  &lt;VariableName&gt; &lt;Datatype&gt;;" + "<br/>" +
+			"  <VariableName> <Datatype>;" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Public function and procedure declarations" + "<br/>" +
-			"  function &lt;FunctionName&gt;(&lt;Parameter&gt; &lt;Datatype&gt;) return &lt;Datatype&gt;;" + "<br/>" +
+			"  function <FunctionName>(<Parameter> <Datatype>) return <Datatype>;" + "<br/>" +
 			"  " + "<br/>" +
 			"end " + name + ";";
 		} else if (objType.equals("package body")) {
 			ret = "create or replace " + objType + " " + name + " is" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Private type declarations" + "<br/>" +
-			"  type &lt;TypeName&gt; is &lt;Datatype&gt;;" + "<br/>" +
+			"  type <TypeName> is <Datatype>;" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Private constant declarations" + "<br/>" +
-			"  &lt;ConstantName&gt; constant &lt;Datatype&gt; := &lt;Value&gt;;" + "<br/>" +
+			"  <ConstantName> constant <Datatype> := <Value>;" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Private variable declarations" + "<br/>" +
-			"  &lt;VariableName&gt; &lt;Datatype&gt;;" + "<br/>" +
+			"  <VariableName> <Datatype>;" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Function and procedure implementations" + "<br/>" +
-			"  function &lt;FunctionName>(&lt;Parameter&gt; &lt;Datatype&gt;) return &lt;Datatype&gt; is" + "<br/>" +
-			"    &lt;LocalVariable&gt; &lt;Datatype&gt;;" + "<br/>" +
+			"  function <FunctionName>(<Parameter> <Datatype>) return <Datatype> is" + "<br/>" +
+			"    <LocalVariable> <Datatype>;" + "<br/>" +
 			"  begin" + "<br/>" +
-			"    &lt;Statement&gt;;" + "<br/>" +
-			"    return(&lt;Result&gt;);" + "<br/>" +
+			"    <Statement>;" + "<br/>" +
+			"    return(<Result>);" + "<br/>" +
 			"  end;" + "<br/>" +
 			"  " + "<br/>" +
 			"begin" + "<br/>" +
 			"  -- Initialization" + "<br/>" +
-			"  &lt;Statement&gt;;" + "<br/>" +
+			"  <Statement>;" + "<br/>" +
 			"end " + name + ";";
 		} else if (objType.equals("type")) {
 			ret = "create or replace " + objType + " " + name + " as object" + "<br/>" +
@@ -98,18 +98,18 @@ public abstract class DBUtilities {
 			"  -- Purpose : " + parameters + "" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Attributes" + "<br/>" +
-			"  &lt;Attribute&gt; &lt;Datatype&gt;," + "<br/>" +
+			"  <Attribute> <Datatype>," + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Member functions and procedures" + "<br/>" +
-			"  member procedure &lt;ProcedureName&gt;(&lt;Parameter&gt; &lt;Datatype&gt;)" + "<br/>" +
+			"  member procedure <ProcedureName>(<Parameter> <Datatype>)" + "<br/>" +
 			")";
 		} else if (objType.equals("type body")) {
 			ret = "create or replace " + objType + " " + name + " is" + "<br/>" +
 			"  " + "<br/>" +
 			"  -- Member procedures and functions" + "<br/>" +
-			"  member procedure &lt;ProcedureName&gt;(&lt;Parameter&gt; &lt;Datatype&gt;) is" + "<br/>" +
+			"  member procedure <ProcedureName>(<Parameter> <Datatype>) is" + "<br/>" +
 			"  begin" + "<br/>" +
-			"    &lt;Statements&gt;;" + "<br/>" +
+			"    <Statements>;" + "<br/>" +
 			"  end;" + "<br/>" +
 			"  " + "<br/>" +
 			"end;";
