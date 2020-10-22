@@ -26,15 +26,15 @@
 		    font-size: 12px;
 		}
 		.editorout {
-		    border-left: 1px ridge #999999; 
-		    border-right: 1px ridge #999999; 
-		    border-top: 1px ridge #999999; 
+		    border-left: 1px ridge #999999;
+		    border-right: 1px ridge #999999;
+		    border-top: 1px ridge #999999;
 		    border-bottom: 1px ridge #999999;
 		}
-		.editorin { 
-		    border-left: 1px inset #999999; 
-		    border-right: 1px inset #999999; 
-		    border-top: 1px inset #999999; 
+		.editorin {
+		    border-left: 1px inset #999999;
+		    border-right: 1px inset #999999;
+		    border-top: 1px inset #999999;
 		    border-bottom: 1px inset #999999;
 		}
 	</style>
@@ -52,11 +52,11 @@
 		              <table align="center" border="0" class="editorin" width="98%" cellpadding="0" cellspacing="0">
 		                 <tr>
 		                    <td align="right" width="20%" height="25" class="smallfont">Name</td>
-		                    <td align="left" width="80%" class="smallfont">&nbsp;<input name="name" id="name" type="text" size="56"></td>
+		                    <td align="left" width="80%" class="smallfont">&nbsp;<input name="name" id="name" type="text" size="50"></td>
 		                 </tr>
 		                 <tr>
 		                    <td align="right" width="20%" height="25" class="smallfont">Parameters</td>
-		                    <td align="left" width="80%" class="smallfont">&nbsp;<input name="parameters" id="parameters" type="text" size="56" value="Name in out type, Name in out type, ..."></td>
+		                    <td align="left" width="80%" class="smallfont">&nbsp;<input name="parameters" id="parameters" type="text" size="50" value="Name in out type, Name in out type, ..."></td>
 		                 </tr>
 		                 <tr>
 		                 	<td>
