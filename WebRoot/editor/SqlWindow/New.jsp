@@ -11,7 +11,6 @@
 	<link type="text/css" rel="StyleSheet" href="../../css/grid.css" />
 	<link type="text/css" rel="StyleSheet" href="../../css/dhtmlxgrid.css" />
 	<script type="text/javascript" src="../../js/others.js"></script>
-	<script type="text/javascript" src="../../js/sqlhighlighter.js"></script>
 	<script type="text/javascript" src="../../js/mootools.js"></script>
 	<script type="text/javascript" src="../../js/dhtmlxcommon.js"></script>
 	<script type="text/javascript" src="../../js/dhtmlxgrid.js"></script>

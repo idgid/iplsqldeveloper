@@ -7,6 +7,9 @@
 <%
 	String type = CharSet.nullToEmpty(request.getParameter("type"))
 			.toUpperCase();
+	String typelow = CharSet.nullToEmpty(request.getParameter("type"))
+			.toLowerCase();
+
 	String name = CharSet.nullToEmpty(request.getParameter("name"))
 			.toUpperCase();
 	String[] ownerName = name.split("\\.", 2);
@@ -118,15 +121,16 @@
 	    <script type="text/javascript" language="JavaScript1.5"
 			src="../../js/ieemu.js"></script>
 		<script type="text/javascript" src="../../js/cb2.js"></script>
+		<script type="text/javascript" src="../../js/edit_area/edit_area_full.js"></script>
+
 	</head>
 	<style>
 		html,body {
 			background: ButtonFace;
-			margin: 2px;
-			padding: 2px;
+			margin: 0px;
+			padding: 0px;
 			font-family: 'Verdana', 'Tahoma', 'Helvetica', 'Arial';
-			overflow: auto;
-			height: 99%;
+			height: 100%;
 		}
 		.lagerfont{
 		    font-size: 12px;
@@ -186,6 +190,28 @@
 		p {
 			margin: 0px;
 		}
+		.main{
+			flex: 1 0 auto;
+		}
+		.footer {
+			background-color : ButtonFace;
+			overflow: no;
+			flex: 0 0 auto;
+		}
+
+		.top{
+			/*min-height: calc(100vh - 50px);*/
+			min-height: 100%;
+		}
+
+		#FunSQLWindowContainer{
+			display: flex;
+			flex-direction: column;
+			height: 99%;
+			overflow: no;
+			background-color: ButtonFace;
+			border: 0px;
+		}
 	</style>
 	<style disabled="disabled" id="mozGrooveCSS">
 	/* Mozilla does not understand disabled stylesheets but
@@ -197,11 +223,12 @@
 	}
 	</style>
 	<body ondragstart="return false" oncontextmenu="return false" onload="initOnload()">
+	<%
+		if (type.equals("TABLE")) {
+	%>
 		<div id="SQLWindow" style="min-height:100%; _height:100%; border: 2px; overflow: no; background-color: ButtonFace;">
 			<div class="tab-pane" id="tabPanel" style=" min-height:100%; _height:100%; ">
-				<%
-					if (type.equals("TABLE")) {
-				%>
+
 					<div class="tab-page" id="tabpage_1" style=" min-height:100%; _height:100%;">
 						<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>General</span></h2>
 						<div id='resultdiv_general' style="background-color:#FFFFFF; overflow:hidden; height:700px; width:95%">
@@ -379,20 +406,50 @@
 		                 	</script>
 		                 </div>
 					</div>
+			</div>
 				<%
 					} else {
 				%>
-				<div class="tab-page" id="tabpage_7" style=" min-height:100%; _height:100%;">
-				<h2 class="tab" id="tabTitle"><img style="border:none" id='objIcoId' src='' align='absmiddle' /><span id="tmpImg" style="display:none"></span> <span id='objTitle'><%=name.toLowerCase()%></span></h2>
-					<div id="myTextarea" class="editor" contentEditable>
-					<%=DBUtilities.showObjectView(request.getSession(),
-						type, name).toString()%>
+				<div id="FunSQLWindowContainer">
+
+					<div class="main">
+						<textarea id="myTextarea" class="editor" name="myTextarea_editor">
+
+						</textarea>
 					</div>
+					<footer id="foot_outputDiv" class="footer">
+
+						<table border="0" id="toolBar_footer" style="background: ButtonFace;"
+							   cellspacing="1" width="100%">
+							<tr align='left'>
+								<td class="coolButtonDisabled_my">
+									<img id='execIsRunButton' src="../../images/exec_fun_norun.gif"
+										 align="absmiddle">
+								</td>
+								<td tabIndex="1" onclick="changeAutorefresh('autorefreshButton')">
+									<img id='autorefreshButton' src="../../images/autorefresh.gif"
+										 title="Auto refresh timer (5 sec)"
+										 alt="Auto refresh timer (5 sec)" align="absmiddle">
+								</td>
+								<td class="coolButtonActiveHover" width="5%">
+									<div id="positionCurr" style="font-family: Arial, Courier, mono; font-size: 12px;">1:1</div>
+
+								</td>
+								<td class="coolButtonActiveHover" width="95%">
+									<div id="footview" style="font-family: Arial, Courier, mono; font-size: 12px;">
+										&nbsp;
+									</div>
+								</td>
+							</tr>
+						</table>
+
+					</footer>
 				</div>
+
 				<%
 					}
 				%>
-			</div>
+
 			<%
 				if (type.equals("TABLE")) {
 			%>
@@ -407,49 +464,107 @@
 								</td>
 							</tr>
 			</table>
-
-			<%
-							} else {
-						%>
-			<div id="foot_outputDiv"
-					style="position:relative; overflow: no; background-color : ButtonFace; bottom: 0px; _bottom: -1px; height: 30px; width: 100%">
-					<table border="0" id="toolBar_2" style="background: ButtonFace;"
-						cellspacing="1" width="100%">
-						<tr align='left'>
-							<td class="coolButtonDisabled_my">
-								<img id='execIsRunButton' src="../../images/exec_norun.gif" align="absmiddle" />
-							</td>
-							<td tabIndex="1" class="coolButtonActiveHover" onclick="">
-								&
-							</td>
-							<td class="coolButtonActiveHover" width="5%">
-								1:1
-							</td>
-							<td class="coolButtonActiveHover" width="95%">
-								<div id="footview" style="font-family: Arial, Courier, mono;">
-									&nbsp;
-								</div>
-							</td>
-						</tr>
-					</table>
-
 			</div>
 			<%
 				}
 			%>
-		</div>
+
+
+
 
 		<script>
 
-			function addMyTextAreaKeyDown() {
-							$('myTextarea').addEvent('keydown', function(event) {
-								mykeydown(event, 'myTextarea');
-							});
+			// initialisation
+			editAreaLoader.init({
+				id: "myTextarea"	// id of the textarea to transform
+				,start_highlight: true	// if start with highlight
+				,allow_resize: "both"
+				,allow_toggle: false
+				,word_wrap: false
+				,language: "en"
+				,syntax: "sql"
+				,show_line_colors: true
+				,fullscreen: false
+				,EA_load_callback: "editAreaLoaded"
+				,save_callback: "winsave"
+			});
+
+			function editAreaLoaded(id){
+
+				var trRow = parent.parent.leftFrameList.GWINDOWLIST[parent.parent.leftFrameList.getWindowTr()][1].substring(1,2);
+				var frame = parent.parent.editorFrame.GGETFRAME;
+				var editorFlag = false;
+
+				// editAreaLoader.execCommand('myTextarea', 'false', !editAreaLoader.execCommand('myTextarea', 'fullscreen'));
+				//self.setInterval(showPosition(frame, trRow),200);
+				if (!editorFlag ) {
+					editAreaLoader.execCommand('myTextarea','set_editable',editorFlag);
+				} else {
+					editAreaLoader.execCommand('myTextarea','set_editable',editorFlag);
+					self.setInterval(showPosition(frame, trRow),200);
+				}
+
+				if(id=="myTextarea")
+				{
+					open_newtabforname();
+
+					//open_file2();
+					return 0;
+				}
+
+
+
+				function open_newtabforname()
+				{
+					var texttmp = "<%=DBUtilities.showObjectView(request.getSession(), type, name).toString().replaceAll("[\\n]","")%>";
+					texttmp = texttmp.replace(/<br\/>/g,"\n");
+					titlename = '<%=name %>';
+					imgPath = "../../tree/dbimages/";
+					imgIco = "";
+					if ("<%=typelow %>" == "function") {
+						imgIco = "valid_funs.png";
+					} else if ("<%=typelow %>" == "procedure") {
+						imgIco = "valid_prcs.png";
+					} else if ("<%=typelow %>" == "package") {
+						imgIco = "valid_pkgs.png";
+					} else if ("<%=typelow %>" == "package_body") {
+						imgIco = "valid_pkgs_b.png";
+					} else if ("<%=typelow %>" == "type") {
+						imgIco = "valid_types.png";
+					} else if ("<%=typelow %>" == "type_body") {
+						imgIco = "valid_types_b.png";
+					} else if ("<%=typelow %>" == "trigger") {
+						imgIco = "ena_trigers.png";
+					} else if ("<%=typelow %>" == "java_source") {
+						imgIco = "valid_javas.png";
+					} else if ("<%=typelow %>" == "view") {
+						imgIco = "valid_views.png";
+					} else if ("<%=typelow %>" == "materialized_view") {
+						imgIco = "mat_views.png";
+					}
+
+					titlename = '<img src="'+ imgPath + imgIco + '">' + " " + titlename + "&nbsp;&nbsp;";
+
+					var new_file= {id: "funEditorId", text: texttmp, syntax: 'sql', title: titlename};
+					editAreaLoader.openFile('myTextarea', new_file);
+				}
 			}
 
+			function showPosition(f, t) {
+				return function() {
+					//self.setInterval("console.log(1)",50);
+					var imgName = 'execIsRunButton';
+
+					document.getElementById('positionCurr').innerText = document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.line_start + ":" +
+							document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.curr_pos;
+
+					document.getElementById('frame_myTextarea').contentWindow.editArea.check_file_changes() == true ? changeEditorFun(true, imgName, f, t) : changeEditorFun(false, imgName, f, t);
+
+				}
+			}
 
 			function initViewFootButton() {
-				var cells1 = document.getElementById('toolBar_2').rows[0].cells;
+				var cells1 = document.getElementById('toolBar_footer').rows[0].cells;
 				for (var i = 1; i <= 1; i++)
 				{
 					createButton(cells1[i]);
@@ -460,61 +575,47 @@
 				cells1[1].setValue(true, true);
 			}
 
-			if ("<%=type%>" == "TABLE") {
-				//暂时什么也不做
+			// 文本内容保存到本地
+			function winsave() {
+				f = "tmp_fun.sql";
+				c = document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.full_text;
+				try {
+					save_record(f, c);
+				} catch (e) {
+					console.log(e);
+				}
+
+				function save_record(f, c) {
+					if (document.getElementById("downloada")) {
+						a = document.getElementById('downloada');
+						a.setAttribute('href','data:text/paint;utf-8,'+ c);
+						a.click();
+					} else {
+						var a = document.createElement('a');
+						a.setAttribute('href','data:text/paint;utf-8,'+ c);
+						a.setAttribute('download',f);
+						a.setAttribute('id','downloada');
+						//a.setAttribute('target','_blank');
+						a.style.display="none";
+						document.body.appendChild(a);
+						a.click();
+					}
+
+
+					// var ws = window.open();
+					// ws.document.open("text/html", "utf-8");
+					// ws.document.write(c);
+					// ws.document.execCommand("saveas", true, f + ".sql");
+					// ws.close();
+				}
 			}
 
-			//setupAllTabs();
-			function changeObjIco() {
-				imgPath = "../../tree/dbimages/";
-				imgIco = "";
-				if ("<%=type%>" == "FUNCTION") {
-					imgIco = "valid_funs.png";
-				} else if ("<%=type%>" == "PROCEDURE") {
-					imgIco = "valid_prcs.png";
-				} else if ("<%=type%>" == "PACKAGE") {
-					imgIco = "valid_pkgs.png";
-				} else if ("<%=type%>" == "PACKAGE BODY") {
-					imgIco = "valid_pkgs_b.png";
-				} else if ("<%=type%>" == "TYPE") {
-					imgIco = "valid_types.png";
-				} else if ("<%=type%>" == "TYPE BODY") {
-					imgIco = "valid_types_b.png";
-				} else if ("<%=type%>" == "TRIGGER") {
-					imgIco = "ena_trigers.png";
-				} else if ("<%=type%>" == "JAVA SOURCE") {
-					imgIco = "valid_javas.png";
-				} else if ("<%=type%>" == "VIEW") {
-					imgIco = "valid_views.png";
-				} else if ("<%=type%>" == "MATERIALIZED VIEW") {
-					imgIco = "mat_views.png";
-				} else if ("<%=type%>" == "TABLE") {
-					imgIco = "general.png";
-				}
-				if ("<%=type%>" == "TABLE") {
-					columnsIco = "col.png";
-					keysIco = "key.png";
-					checksIco = keysIco;
-					indexesIco = "index.png";
-					privilegesIco = "roles.png";
-					$('tmpImg_1').set('text',imgPath + imgIco);
-					$('tmpImg_2').set('text',imgPath + columnsIco);
-					$('tmpImg_3').set('text',imgPath + keysIco);
-					$('tmpImg_4').set('text',imgPath + checksIco);
-					$('tmpImg_5').set('text',imgPath + indexesIco);
-					$('tmpImg_6').set('text',imgPath + privilegesIco);
-					$('objIcoId_1').set('src', imgPath + imgIco);
-					$('objIcoId_2').set('src', imgPath + columnsIco);
-					$('objIcoId_3').set('src', imgPath + keysIco);
-					$('objIcoId_4').set('src', imgPath + checksIco);
-					$('objIcoId_5').set('src', imgPath + indexesIco);
-					$('objIcoId_6').set('src', imgPath + privilegesIco);
-				} else {
-					$('tmpImg').set('text',imgPath + imgIco);
-					$('objIcoId').set('src', imgPath + imgIco);
-				}
-			}
-			changeObjIco();
+			function initOnload() {};
+			function detectCtrlKey(e) {};
+			function hiddenBaisworkMenu(e) {};
+			function showBaisworkMenu(t,m,e) {};
+			function addMyTextAreaKeyDown(c) {};
+
 		</script>
 	</body>
 </html>
