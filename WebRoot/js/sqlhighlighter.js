@@ -18,13 +18,13 @@ var SQLHighlighter = function() {
 					       'translation trigger true truncate uncommitted union unique update values varchar varying view when where with work';
 
 	this.operators = 'all and any between cross in join like not null or outer some';
-	
+
 	this.regexLib = [
 		{ regex: new RegExp("\\b" + this.functions.replace(/ /g, "\\b|\\b") + "\\b", 'gmi'),css: 'functions' },	     // functions
 		{ regex: new RegExp("\\b" + this.keywords.replace(/ /g, "\\b|\\b") + "\\b", 'gmi'),	css: 'keywords' },       // keywords
 		{ regex: new RegExp("\\b" + this.operators.replace(/ /g, "\\b|\\b") + "\\b", 'gmi'),css: 'operators' }	     // operators
 	];
-	
+
 	this.getMatches = function(str) {
 		var matches = new Array();
 	  for (var i = 0; i < this.regexLib.length; i++) {
@@ -37,24 +37,28 @@ var SQLHighlighter = function() {
 		}
 		return matches;
 	}
-	
+
 	this.highlight = function(divObj){
-		var pos;
-		var caretPos;
+		var pos="";
+		var caretPos=0;
+		var offset = 0;
 		var ie = /msie/i.test(navigator.userAgent);
 		if (ie) {
 			pos = document.selection.createRange();
 			pos.text = "caret_pos";   //设置光标所在位置
 			caretPos = divObj.innerText.indexOf("caret_pos");
 		} else {
-			
-			//pos = window.getSelection().toString();
-    	  	//pos = "caret_pos";
-    	  	//$(divObj).set('text',$(divObj).get('text')+'caret_pos');
-    	  	//caretPos = $(divObj).get('text').indexOf("caret_pos");
-    	  	
+            let sel = window.getSelection();
+
+            offset = sel.anchorOffset;
+
+            pos = window.getSelection().toString();
+    	  	pos = "caret_pos";
+    	  	divObj.set('text',divObj.get('text')+'caret_pos');
+    	  	caretPos = divObj.get('text').indexOf("caret_pos");
+
 		}
-		
+
 		var str = divObj.innerHTML;
 		str = str.replace(new RegExp("<p>","gmi"),"");
 		str = str.replace(new RegExp("</p>","gmi"),"<br>");
@@ -67,7 +71,7 @@ var SQLHighlighter = function() {
 			startIndex = startIndex + 4;
 		}
 		caretPos = caretPos - brcount;
-		
+
 		str = str.replace("caret_pos","");
 		str = str.replace(new RegExp("<span class=([\"\'a-z]+)>","gmi"),"");
 		str = str.replace(new RegExp("</span>","gmi"),"");
@@ -85,10 +89,16 @@ var SQLHighlighter = function() {
 			str = str.replace(new RegExp("\\b"+thismatch.value+"\\b","gm"), "<span class='"+thismatch.css+"'>"+thismatch.value+"</span>");
 		}
 		divObj.innerHTML = str;
-		
-		pos.collapse(true);
-		pos.moveStart('character',caretPos);
-		pos.select();
+
+		if (ie) {
+			pos.moveStart('character', caretPos);
+			pos.collapse(true);
+			pos.select();
+		} else {
+
+            movetocurrent(offset);
+
+        }
 	}
 }
 
@@ -96,3 +106,10 @@ function MatchObj(thisvalue,thiscss){
 	this.value = thisvalue;
 	this.css = thiscss;
 };
+
+function movetocurrent(len) {
+    if (window.getSelection) {
+        let sel = window.getSelection();
+        for(i=1; i<=len; i++ )  sel.modify('move', 'right', 'character');
+    }
+}

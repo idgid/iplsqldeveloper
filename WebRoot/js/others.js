@@ -79,7 +79,22 @@ if (GGETFRAME == null) var GGETFRAME = '';
 
 if (GToggleFullScreen == null) var GToggleFullScreen = true;
 
-if (GWINDOWLIST == null) var GWINDOWLIST = []; GWINDOWLIST[10] = [];
+if (CLIPBOARDDATA == null) var CLIPBOARDDATA = '';
+
+if (GUPDATERECORD == null) var GUPDATERECORD = [];
+
+if (GSETTIMEOUT == null) var GSETTIMEOUT = 5000;
+
+// 自动刷新
+if (GINTERSQLJOB == null) var GINTERSQLJOB = false;
+
+// 最大窗口数
+if (GMIXWINDOWS == null) var GMIXWINDOWS = 20;
+
+if (GWINDOWLIST == null) var GWINDOWLIST = []; GWINDOWLIST[GMIXWINDOWS] = [];
+
+
+
 
 //设置提示 --已改
 function setFootView(errNo, ename) {
@@ -89,6 +104,10 @@ function setFootView(errNo, ename) {
 	else if (errNo == 3) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiled succesfully');
 	else if (errNo == 4) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiled with errors');
 	else if (errNo == 5) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','File is read-only');
+	else if (errNo == 6) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Edit data unlocked');
+	else if (errNo == 7) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Edit data locked');
+	else if (errNo == 9) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Rollbacked');
+	else if (errNo == 10) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Commited');
 	else if (errNo == 9999) parent.parent.editorFrame.GGETFRAME.$('footview').set('text',ename);
 }
 
@@ -211,20 +230,28 @@ function logout() {
 
 //改变autorefresh图标 --已改
 function changeAutorefresh(imagesName) {
-	var imagesIcon = '../images/autorefresh_true.gif';
-	var oldImagesIcon = '../images/autorefresh.gif';
+	var imagesIcon = '../../images/autorefresh_true.gif';
+	var oldImagesIcon = '../../images/autorefresh.gif';
 	var oldImagesName = 'autorefresh.gif';
-	var Flag = parent.editorFrame.$(imagesName).getProperty('src').test(oldImagesName);
-	if (Flag) {
-		parent.editorFrame.$(imagesName).setProperty('src',imagesIcon);
-	} else {
-		parent.editorFrame.$(imagesName).setProperty('src',oldImagesIcon);
-	}
-	//alert($('myTextarea').getSelected());
-	//这一句加入测试用
+	var autorefreshTrueImageName = "autorefresh_true.gif";
+	var Flag = parent.parent.editorFrame.GGETFRAME.$(imagesName).getProperty('src').test(oldImagesName);
 
-	//parent.parent.leftFrameList.createNewSql("PRO", "myTextarea");
-	//parent.editorFrame.location.replace("../treeoperate/common/View.jsp");
+
+
+    if (Flag) {
+        parent.parent.editorFrame.GGETFRAME.$(imagesName).setProperty('src',imagesIcon);
+        parent.parent.editorFrame.GGETFRAME.GINTERSQLJOB = self.setInterval( innerexecuteRun, parent.parent.editorFrame.GGETFRAME.GSETTIMEOUT);
+	} else {
+        parent.parent.editorFrame.GGETFRAME.$(imagesName).setProperty('src',oldImagesIcon);
+        clearInterval(parent.parent.editorFrame.GGETFRAME.GINTERSQLJOB);
+	}
+
+    function innerexecuteRun()  {
+        // 必须是当前窗口且标识为定时刷新才有效
+        var Flag = parent.parent.editorFrame.GGETFRAME.$(imagesName).getProperty('src').test(autorefreshTrueImageName);
+        Flag == true ? parent.parent.editorFrame.GGETFRAME.executeRun(gMyTextArea) : '';
+    }
+
 }
 
 
@@ -236,7 +263,12 @@ function changeExecNoRun(runFlag,imagesName) {
 	if (parent.parent.leftFrameList.getWindowType() != "SQL") {
 			execNoRunIcon = '../../images/exec_norun.gif';
 			execRunningIcon = '../../images/exec_running.gif';
-		}
+			if (parent.parent.leftFrameList.getWindowType() == "FUN") {
+				execNoRunIcon = '../../images/exec_fun_norun.gif';
+				execRunningIcon = '../../images/exec_running.gif';
+			}
+	}
+
 
 	if (runFlag) {
 		parent.parent.editorFrame.GGETFRAME.$(imagesName).setProperty('src',execRunningIcon);
@@ -245,40 +277,99 @@ function changeExecNoRun(runFlag,imagesName) {
 	}
 }
 
+// 改变 FUN 编辑图标
+function changeEditorFun(editorFlag, imagesName, frame, trRow) {
+
+	var imgIcon ="../images/no_fun_saved.gif";
+	var imgEditorIcon ="../images/no_saved.gif";
+	var imgListVauleId = "columnButton" + trRow;
+	var execNoEditorIcon = '../../images/exec_fun_norun.gif', execEditorIcon = '../../images/exec_norun.gif';
+	var windowType = parent.parent.leftFrameList.getWindowType();
+	var currRow = parent.parent.leftFrameList.getWindowTr();
+
+	if ( windowType == "FUN" ||	windowType == "PRO" || windowType == "PAC"
+		|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
+		|| windowType == "TRI" || windowType == "JAV" ) {
+		execNoEditorIcon = '../../images/exec_fun_norun.gif';
+		execEditorIcon = '../../images/exec_no_compile.gif';
+        imgEditorIcon = '../images/no_compile.gif';
+	}
+    if (currRow == trRow) {
+        if (editorFlag) {
+            frame.$(imagesName).setProperty('src',execEditorIcon);
+            parent.parent.leftFrameList.$(imgListVauleId).setProperty('src', imgEditorIcon);
+        } else {
+            frame.$(imagesName).setProperty('src',execNoEditorIcon);
+            parent.parent.leftFrameList.$(imgListVauleId).setProperty('src', imgIcon);
+        }
+    }
+
+}
+
+
 
 //改变lock 图标 --框架内元素，不用改，正常
 function changeLock(imagesName) {
 
-	var lockIcon = '../images/lock.gif';
-	var unlockIcon = '../images/unlock.gif';
-	if (lockFlag) {
+	var lockIcon = '../../images/lock.gif';
+	var unlockIcon = '../../images/unlock.gif';
+	forUpdateFlag = parent.parent.editorFrame.GGETFRAME.forUpdateFlag;
+    mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
+    if (lockFlag) {
 		if (!setWarning(forUpdateFlag)) return;
 		$(imagesName).setProperty('src',unlockIcon);
 		setLockFlag(0);
-		var insertRecordObject = document.getElementById('insertRecordTd');
+		var insertRecordObject = parent.parent.editorFrame.GGETFRAME.$('insertRecordTd');
 			insertRecordObject.setEnabled(true);
-		var deleteRecordObject = document.getElementById('deleteRecordTd');
+		var deleteRecordObject = parent.parent.editorFrame.GGETFRAME.$('deleteRecordTd');
 			deleteRecordObject.setEnabled(true);
+        mygrid.setEditable(true);
+        setCommit(true);
+        setRollback(true);
+		setPostChangeFlag(1);	//再次锁定，置数据改变标志为1
+		changePostChange();		//使post_change按钮自动有效
+		setFootView(6, '');
 	} else {
 		$(imagesName).setProperty('src',lockIcon);
 		setLockFlag(1);
-		var insertRecordObject = document.getElementById('insertRecordTd');
+		var insertRecordObject = parent.parent.editorFrame.GGETFRAME.$('insertRecordTd');
 			insertRecordObject.setEnabled(false);
-		var deleteRecordObject = document.getElementById('deleteRecordTd');
+		var deleteRecordObject = parent.parent.editorFrame.GGETFRAME.$('deleteRecordTd');
 			deleteRecordObject.setEnabled(false);
 			setPostChangeFlag(0);	//再次锁定，置数据改变标志为0
 			changePostChange();		//使post_change按钮自动失效
-
-	}
+        mygrid.setEditable(false);
+		setFootView(7, '');
+    }
 }
 
 
-//插入数据 --已失效，需重写方法体
+//插入数据 2020-10-12 重写
 function insertRecord() {
 
-	var insertRecordObject = document.getElementById('insertRecordTd');
+    var insertRecordObject = parent.parent.editorFrame.GGETFRAME.$('insertRecordTd');
 
 	if (insertRecordObject.getEnabled() ) {
+		mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
+		mygrid.enableAlterCss("even","uneven");
+		mygrid.columnColor = ["#E3E3E3"];
+		var colid = '$ID$';
+
+		for( i=1; i < mygrid.getColumnCount(); i++) {
+			colid += ",";
+			colid += mygrid.getHeaderCol(i) ;
+		}
+
+		mygrid.setColumnIds(colid);
+
+		tpmdataarray = [];
+
+		for (i = 0; i< mygrid.getColumnCount(); i++ ) {
+			tpmdataarray[i] = '';
+		}
+		mygrid.addRow((new Date()).valueOf(), tpmdataarray, mygrid.getRowIndex(mygrid.getSelectedId()));
 		setPostChangeFlag(1);
 		changePostChange();
 	}
@@ -286,12 +377,14 @@ function insertRecord() {
 
 
 
-//删除数据 --已失效，需重写方法体
+//删除数据 2020-10-13 重写
 function deleteRecord() {
 
-	var deleteRecordObject = document.getElementById('deleteRecordTd');
+	var deleteRecordObject = parent.parent.editorFrame.GGETFRAME.$('deleteRecordTd');
 
-	if (deleteRecordObject.getEnabled() ) {
+    if (deleteRecordObject.getEnabled() ) {
+		mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+		mygrid.deleteSelectedItem();
 		setPostChangeFlag(1);
 		changePostChange();
 	}
@@ -300,10 +393,28 @@ function deleteRecord() {
 
 
 
-//提交改变数据 --暂未使用，需重写方法体
+//提交改变数据 --2020-10-15 重新实现
 function postChangeRecord() {
-	var postChangeObject = document.getElementById('postChangesTd');
-	if (postChangeObject.getEnabled()) {  //判断本身按钮是否可用，如果可用才设置成不可用
+	var postChangeObject = parent.parent.editorFrame.GGETFRAME.$('postChangesTd');
+
+    if (postChangeObject.getEnabled()) {  //判断本身按钮是否可用
+
+		mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+		updaterecordtmp = [];
+
+
+		b = mygrid.getAllRowIds().split(',');
+		for (i = 0; i < b.length; i++) {
+			c = Object.values(mygrid.getRowData(b[i]));
+			//d = [];
+			// for (j = 0; j < c.length-1; j++)  {
+			// 	d[j] = c[j+1];
+			// }
+			updaterecordtmp[i] = c;
+		}
+
+		BaisWorkBean.forUpdateNumber(updaterecordtmp, backInsert);
+
 		setPostChangeFlag(0);
 		changePostChange();
 	}
@@ -312,7 +423,7 @@ function postChangeRecord() {
 
 //改变post_change图标 --暂未使用，需重写方法体
 function changePostChange() {
-	var postChangeObject = parent.editorFrame.document.getElementById('postChangesTd');
+	var postChangeObject = parent.parent.editorFrame.GGETFRAME.$('postChangesTd');
 	if (getPostChangeFlag()) {
 		postChangeObject.setEnabled(true);
 	} else {
@@ -324,10 +435,10 @@ function changePostChange() {
 //改变previous sql按钮，使其可用  --已改
 function changePreviousSql(tdID) {
 
-	var nextSqlObject = parent.editorFrame.document.getElementById('nextSql');
+	var nextSqlObject = parent.parent.editorFrame.GGETFRAME.$('nextSql');
 
 	if (nextSqlObject.getEnabled() ) {
-		var tdObject = parent.editorFrame.document.getElementById(tdID);
+		var tdObject = parent.parent.editorFrame.GGETFRAME.$(tdID);
 		tdObject.setEnabled(true);
 
 		//执行实际操作
@@ -342,19 +453,19 @@ function changePreviousSql(tdID) {
 //改变 querybyExample 按钮
 function changeQueryByExample(queryFlag) {
 	var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('queryByExampleTd');
-    if (queryByExampleObject != null && typeof queryByExampleObject != undefined) queryByExampleObject.setEnabled(queryFlag);
+    if (queryByExampleObject != null && typeof(queryByExampleObject) != "undefined") queryByExampleObject.setEnabled(queryFlag);
 }
 
 //改变 singleRecordView 按钮
 function changeSingleRecordView(queryFlag) {
 	var singleRecordViewObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('singleRecordViewTd');
-    if (singleRecordViewObject != null && typeof singleRecordViewObject != undefined) singleRecordViewObject.setEnabled(queryFlag);
+    if (singleRecordViewObject != null && typeof(singleRecordViewObject) != "undefined") singleRecordViewObject.setEnabled(queryFlag);
 }
 
 //改变 exportResultResults 按钮
 function changeExportResultResults(queryFlag) {
 	var exportResultResultsObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('exportResultResultsTd');
-    if (exportResultResultsObject != null && typeof exportResultResultsObject != undefined) exportResultResultsObject.setEnabled(queryFlag);
+    if (exportResultResultsObject != null && typeof(exportResultResultsObject) != "undefined") exportResultResultsObject.setEnabled(queryFlag);
 }
 
 
@@ -504,8 +615,8 @@ function controlbuttonReset() {
 	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
 	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
 
-	if (nextRecordObject != null && typeof nextRecordObject != undefined) nextRecordObject.setEnabled(false);
-    if (previousRecordObject != null && typeof previousRecordObject != undefined) previousRecordObject.setEnabled(false);
+	if (nextRecordObject != null && typeof(nextRecordObject) != "undefined") nextRecordObject.setEnabled(false);
+    if (previousRecordObject != null && typeof(previousRecordObject) != "undefined") previousRecordObject.setEnabled(false);
 
     if (setFetchNext != null && typeof setFetchNext != undefined) setFetchNext(false);
     if (setFetchLast != null && typeof setFetchLast != undefined) setFetchLast(false);
@@ -562,9 +673,105 @@ function getsingleRecordViewFlag() {
 
 //执行系统命令函数 --已改
 function execSysCommand(textareaname, commandName) {
-	var commandObj = parent.editorFrame.document.getElementById(textareaname);
+	var commandObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea');
 	commandObj.focus();
-	parent.editorFrame.document.execCommand(commandName);
+	if (commandName == "open") {
+        editOnOpen();
+    } else if (commandName == "printL" || commandName == "printP" )  {
+	    commandPrint(commandName, commandObj);
+    } else if (commandName == "cut" || commandName == "copy" || commandName == "paste" || commandName == "selectComment" || commandName == "selectUncomment"
+                || commandName == "selectIndent" || commandName == "selectUnindent" )  {
+        commandTextarea(commandName, commandObj);
+    } else {
+        commandObj.contentWindow.editArea.execCommand(commandName);
+    }
+}
+
+function commandTextarea(p, o) {
+    var c = parent.parent.editorFrame.GGETFRAME;
+    var tmps = c.editAreaLoader.getSelectedText('myTextarea');
+
+    if ( p == 'cut' || p == 'copy') {
+        o.contentWindow.document.getElementById('textarea').focus();
+        o.contentWindow.document.execCommand(p,false, null);
+        parent.parent.editorToolFrame.CLIPBOARDDATA = tmps;
+    } else if ( p == 'paste') {
+        o.contentWindow.document.getElementById('textarea').focus();
+        o.contentWindow.document.execCommand(p,false, null);
+        c.editAreaLoader.setSelectedText('myTextarea', parent.parent.editorToolFrame.CLIPBOARDDATA);
+        c.editAreaLoader.setSelectionRange('myTextarea', c.editAreaLoader.getSelectionRange('myTextarea').end, c.editAreaLoader.getSelectionRange('myTextarea').end);
+    } else if ( p == 'selectComment' ) {
+        c.editAreaLoader.insertTags('myTextarea', "/*", "*/");
+    } else if ( p == 'selectUncomment' ) {
+        c.editAreaLoader.setSelectedText('myTextarea', tmps.replace('/*','').replace('*/',''));
+    } else if ( p == 'selectIndent' ) {
+        o.contentWindow.editArea.focus();
+        o.contentWindow.editArea.tab_selection();
+    } else if ( p == 'selectUnindent' ) {
+        o.contentWindow.editArea.focus();
+        o.contentWindow.editArea.invert_tab_selection();
+    }
+}
+
+function commandPrint(p, o) {
+    if (p == "printL") {
+        p = "size: landscape";
+    } else {
+        p = "size: portrait";
+    }
+    o.contentWindow.document.styleSheets[1].removeRule('@page', p, 1);
+    o.contentWindow.document.styleSheets[1].addRule('@page', p, 1);
+    o.contentWindow.print();
+    o.contentWindow.document.styleSheets[1].removeRule('@page', p, 1);
+}
+
+
+
+function editOnFileOpen(i, e) {
+    var c = parent.parent.editorFrame.GGETFRAME;
+    document.getElementById(i).innerText = e.target.result;
+    c.editAreaLoader.setValue('myTextarea', e.target.result);
+
+    // 删除刚刚创建的DOM节点
+    document.body.removeChild(document.getElementById('contents'));
+    document.body.removeChild(document.getElementById('inputtmp'));
+
+}
+
+function editOnChoseFile(e, fh) {
+
+    if (typeof(window.FileReader) !== 'function')
+        throw ("The FileReader API isn't supported on this browser.");
+    var input = e.target;
+
+    if (!input)
+        throw ("The browser does not properly implement the event object");
+    if (!input.files)
+        throw ("This browser does not support the `files` property of the file input.");
+    if (!input.files[0])
+        return undefined;
+
+    var file = input.files[0];
+    var fr = new FileReader();
+    fr.onload = fh;
+    fr.readAsText(file);
+}
+
+function editOnOpen() {
+
+
+    var i = document.createElement('input');
+    var c = document.createElement('p');
+    i.setAttribute('id','inputtmp');
+    i.setAttribute('type','file');
+    i.setAttribute('onchange','editOnChoseFile(event, editOnFileOpen.bind(this, "contents"))');
+    i.style.display="none";
+
+    c.setAttribute('id','contents');
+    c.style.display="none";
+    document.body.appendChild(i);
+    document.body.appendChild(c);
+    i.click();
 }
 
 
@@ -580,7 +787,17 @@ function setDivValueHtml (divName,htmlvalue) {
 
 //div赋值Text
 function setDivValueText (divName,textvalue) {
-	$(divName).set('text',textvalue);
+	if ( divName == gMyTextArea) {
+		setTimeout(innerSetValue, 300);
+        //parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(divName,textvalue);
+    } else {
+        $(divName).set('text',textvalue);
+    }
+
+	function innerSetValue() {
+		parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(divName,textvalue);
+		parent.parent.parent.editorFrame.GGETFRAME.executeRun(divName);
+	}
 }
 
 //监听F8/F9/F10/F12按键事件，正常
@@ -615,7 +832,7 @@ function mykeydown(myevent_key,textareaname){
 	if(myevent_key == 'f8') {
 		//'F8' 按下，和点击图标调用同一个事件处理函数
         //debugger
-        if (parent.parent.editorFrame.GGETFRAME == 'undefined') {
+        if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
             parent.parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
         } else {
             parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
@@ -682,6 +899,15 @@ function executeSQL(textareaname) {
 		setRollback(true);
 
 		//提交给接口
+        // 从窗口最大化恢复，只做一次
+        if (parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen) {
+            parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.execCommand('toggle_full_screen');
+            parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen = false;
+            GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
+        }
+
+        //提交给接口
+        getResultFromSql(tempSql);
 		//getResultFromSql(tempSql); 有问题
 		//alert("oK");
 	} else if (getIfDelete(textareaname) || getIfInsertInto(textareaname) || !getIfSelect(textareaname)) {
@@ -749,8 +975,29 @@ function executeSQL(textareaname) {
 
 //FUN执行控制
 function executeFUN(sqlString,currWindoType) {
-	execObject(sqlString);
-	parent.editorFrame.$('objTitle').set('text',getStrFunctionName(sqlString,currWindoType));  //设置TAB页面的Title
+	parent.parent.editorToolFrame.execObject(sqlString);
+	//设置TAB页面的Title, 去掉editor标记
+	var c = parent.parent.editorFrame.GGETFRAME;
+	var tmps = c.editAreaLoader.setFileEditedMode(gMyTextArea, 'funEditorId', false);
+	var tmpv = c.editAreaLoader.getValue(gMyTextArea);
+	if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
+		|| currWindoType == "PAB" || currWindoType == "TYP" || windowType == "TYB") {
+		tmpv = tmpv.split('(')[0].trim().split(' ');
+	}
+	// tmpv = tmpv.split('(')[0].trim().split(' ');
+	tmpv = tmpv[tmpv.length-1];
+	tmpv += "&nbsp;&nbsp;";
+
+	var t = c.document.getElementById('frame_myTextarea').contentWindow;
+	var thtml = t.document.getElementById('tab_file_funEditorId').innerHTML;
+	var ttext =  t.document.getElementById('tab_file_funEditorId').innerText.trim();
+	ttext += "&nbsp;&nbsp;";
+
+	thtml = thtml.replace(ttext, tmpv);
+
+	t.document.getElementById('tab_file_funEditorId').innerHTML =  thtml;
+
+	//parent.editorFrame.$('objTitle').set('text',getStrFunctionName(sqlString,currWindoType));  //设置TAB页面的Title
 }
 
 //取得SQL中的函数名
@@ -858,7 +1105,8 @@ function getTextareaContents(EditorName) {
 
         }
 	}
-	//alert(myText);
+	// 去除最后的一次或多次‘;’
+    myText = myText.trim().replace(/[;]*$/, '');
 	return myText;
 }
 
@@ -1011,7 +1259,7 @@ function showDataHtml(rows,data) {
     parent.parent.editorFrame.GGETFRAME.mygrid = mygrid;
 
 
-    mygrid.setImagePath("../imgs/");
+    mygrid.setImagePath("../../js/codebase/imgs/");
 
 	resultbakHead = data[0];    //得到head的备份
     parent.parent.editorFrame.GGETFRAME.resultbakHead = resultbakHead;
@@ -1082,6 +1330,8 @@ function showDataHtml(rows,data) {
     } else {
 
     	mygrid.init();  //进行初始化
+        mygrid.setEditable(false);
+		mygrid.enableMultiselect(true);
 		parent.parent.editorFrame.globaldataFlag = true;
 
 		globaldataFlag = parent.parent.editorFrame.globaldataFlag;
@@ -1120,7 +1370,7 @@ function showDataHtml(rows,data) {
     	//alert(strRow);
 
 
-    	trstyle="#D4D0C8"+ "," + trstyle;
+    	trstyle="#E3E3E3"+ "," + trstyle;
 
 		mygrid.setColumnColor(trstyle);
 		strRow = i + "," + strRow;
@@ -1133,7 +1383,7 @@ function showDataHtml(rows,data) {
     	//mygrid.setColumnColor(trstyle);
     	}
 
-    	//最终得到数据，呈现后的其他按钮状态和改变
+    	//最终得到数据，呈现后的其他按钮状态和改变execSysCommand
     	resetBaseWorkToolBar(true);
 
     }
@@ -1206,7 +1456,7 @@ function addDataHtml(rows,data) {
     	//alert(strRow);
 
 
-    	trstyle="#D4D0C8"+ "," + trstyle;
+    	trstyle="#E3E3E3"+ "," + trstyle;
 
 		mygrid.setColumnColor(trstyle);
 		var ii = i + 1  + (rows - 1) * countPage ;
@@ -1265,7 +1515,7 @@ function addFullDataHtml(rows,data) {
     	//alert(strRow);
 
 
-    	trstyle="#D4D0C8"+ "," + trstyle;
+    	trstyle="#E3E3E3"+ "," + trstyle;
 
 		mygrid.setColumnColor(trstyle);
 		var ii = i + 1  + (rows - 1) * countPage ;
@@ -1297,6 +1547,7 @@ function changeRecordShowHtml() {
     changemygrid.setColTypes("ro,ro,ed");
     changemygrid.setColSorting("str,str,str");
     changemygrid.init();
+    changemygrid.setEditable(false);
     //得到列的总数
     var mygridlength = mygrid.getColumnCount();
 
@@ -1390,7 +1641,8 @@ function getFYQSql() {
 
 //是否显示for update时的警告信息
 function setWarning(flag) {
-	var lockButtonObject = parent.editorFrame.document.getElementById('lockButtonTd');
+	var lockButtonObject = parent.parent.editorFrame.GGETFRAME.$('lockButtonTd');
+
 	if(flag == 0) {
 
 		errMsg="These query results are not updateable.\nInclude the ROWID to get updateable results.";
@@ -1399,6 +1651,23 @@ function setWarning(flag) {
 		//lockButtonObject.setToggle(false);
 		return false;
 	} else {
+	    // 添加 column id
+        var colid = '$ID$';
+
+        mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
+        tcount = mygrid.getRowsNum();
+
+        for( i=1; i < mygrid.getColumnCount(); i++) {
+            colid += ",";
+            colid += mygrid.getHeaderCol(i) ;
+        }
+
+        mygrid.setColumnIds(colid);
+        b = mygrid.getAllRowIds().split(',');
+        for (i = 0; i < b.length; i++) {
+            parent.parent.editorFrame.GGETFRAME.GUPDATERECORD[i] = mygrid.getRowData(b[i]);
+        }
 
 		return true;
 	}
@@ -1408,16 +1677,16 @@ function setWarning(flag) {
 //返回值： true or false
 function getIfForupdate(textareaname) {
 	var tempStr =  getTextareaContents(textareaname);
-	var lockButtonObject = parent.editorFrame.GGETFRAME.$('lockButtonTd');
+	var lockButtonObject = parent.parent.editorFrame.GGETFRAME.$('lockButtonTd');
 	if (tempStr.trim().test(" for update$","i")) {
 		//设置forupdate标志为1
-		forUpdateFlag = 1;
+        parent.parent.editorFrame.GGETFRAME.forUpdateFlag = 1;
 		//如果为真，设置为固定按钮
 		lockButtonObject.setToggle(true);
 		return true;
 	} else {
 		//设置forupdate标志为0
-		forUpdateFlag = 0;
+        parent.parent.editorFrame.GGETFRAME.forUpdateFlag = 0;
 		//否则，设置为非固定按钮
 		lockButtonObject.setToggle(false);
 		return false;
@@ -1485,7 +1754,7 @@ function getIfDDL(textareaname) {
 //false: 不可用
 function setCommit(commitFlag) {
 	var commitId = 'commitTd';
-	var commitObject = parent.editorToolFrame.document.getElementById(commitId);
+	var commitObject = parent.parent.editorToolFrame.document.getElementById(commitId);
 
 	commitObject.setEnabled(commitFlag);
 
@@ -1496,7 +1765,7 @@ function setCommit(commitFlag) {
 //false: 不可用
 function setRollback(rollbackFlag) {
 	var rollbackId = 'rollbackTd';
-	var rollbackObject = parent.editorToolFrame.document.getElementById(rollbackId);
+	var rollbackObject = parent.parent.editorToolFrame.document.getElementById(rollbackId);
 
 	rollbackObject.setEnabled(rollbackFlag);
 
@@ -1516,6 +1785,8 @@ function commit() {
 		BaisWorkBean.setDbCommit();
 		setCommit(false);
 		setRollback(false);
+		setFootView(10, '');
+
 	} else {
 		//alert("commit");
 	}
@@ -1529,6 +1800,7 @@ function rollback() {
 		BaisWorkBean.setDbRollback();
 		setCommit(false);
 		setRollback(false);
+		setFootView(9, '');
 	} else {
 		//alert("rollback");
 	}
@@ -1567,6 +1839,7 @@ function queryByExample() {
 
 function clearRecord() {
 
+	console.log('1');
 }
 
 
@@ -1693,12 +1966,8 @@ function execWorkDrop(e) {
 
 //工作编辑区右键Query data命令执行函数
 function execQueryData(textareaname, e) {
-	var texttmp = "select * from " + baisworkSQL + " t";
 	hiddenBaisworkMenu(e);
-	parent.leftFrameList.createNewSql('SQL','myTextarea');
-	//createNew(textareaname);
-	setDivValueText (textareaname,texttmp);
-	parent.editorToolFrame.executeRun(textareaname);
+	execQueryTable(baisworkSQL, textareaname);
 }
 
 //工作编辑区右键Edit data命令执行函数
@@ -1871,6 +2140,8 @@ function showDataHtmlP(data) {
     	mygrid.enableAutoHeigth(true);
 
     	mygrid.init();  //进行初始化
+        mygrid.setEditable(false);
+
 
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
@@ -1966,6 +2237,7 @@ function showDataHtmlD(data) {
     	//mygrid.enableAutoHeigth(true,380);
 
     	mygrid.init();  //进行初始化
+        mygrid.setEditable(false);
 
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
@@ -2079,6 +2351,7 @@ function showDataHtmlReal(data, divname)
     	//mygrid.enableAutoHeigth(true,380);
 
     	mygrid.init();  //进行初始化
+        mygrid.setEditable(false);
 
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
@@ -2103,7 +2376,7 @@ function showDataHtmlReal(data, divname)
 
 function showCommon(type,name,field,operate,width,height){
 	selectedNote = tree.getSelected();
-    var url = "../../treeoperate/common/";
+    var url = "../treeoperate/common/";
 	//if(field != '') url = url + field + "/";
     url = url + operate + ".jsp?name="+name+"&type="+type+"&field="+field;
     //window.showModalDialog(url,"","dialogWidth:"+width+";dialogHeight:"+height+";center:yes;resizable:yes");
@@ -2128,7 +2401,7 @@ function showRoot(type,name,field,operate,width,height){
 
 function showNewObject(type,name,parameters,returnType,operate,nodetype,tablelist,statementLevlel) {
 	selectedNote = tree.getSelected();
-	var url = "../../../treeoperate/common/";
+	var url = "../editor/CommandWindow/";
 	url = url + operate + ".jsp" + "?name=" + name + "&parameters=" + parameters + "&returnType=" + returnType + "&objType=" + type + "&tablelist=" + tablelist + "&statementLevlel=" + statementLevlel;
 	tmptype = "SQL";
 	if(type == "function") {
@@ -2156,8 +2429,9 @@ function showNewObject(type,name,parameters,returnType,operate,nodetype,tablelis
 	}
 	//alert(url);
 	parent.editorToolFrame.nodeType = nodetype;
-	parent.parent.leftFrameList.createNewSql(tmptype, "myTextarea");
-	parent.editorFrame.location.replace(url);
+
+    parent.leftFrameList.createNewSql(tmptype, url);
+
 }
 
 
@@ -2167,7 +2441,10 @@ function showNewObject(type,name,parameters,returnType,operate,nodetype,tablelis
 //operate: 用户对象的操作，即View、Edit
 function showViewObject(type,name,field,operate) {
 	if (field == '') selectedNote = tree.getSelected();
-	var url = "../treeoperate/common/";
+
+    //this.id = parent.parent.leftFrameList.GTDID
+
+	var url = "../editor/ViewWindow/";
 	url = url + operate + ".jsp" + "?name=" + name + "&type=" + type ;
 	tmptype = "SQL";
 	if(type == "function") {
@@ -2193,9 +2470,13 @@ function showViewObject(type,name,field,operate) {
 	} else if(type == "table") {
 		tmptype = "TAB";
 	}
-	parent.parent.leftFrameList.createNewSql(tmptype, "myTextarea");
-	parent.editorFrame.location.replace(url);
+
+	parent.leftFrameList.createNewSql(tmptype, url);
+
+	//parent.editorFrame.location.replace(url);
 }
+
+
 
 //type: 用户对象的类型
 //name: 用户对象的名称
@@ -2203,7 +2484,7 @@ function showViewObject(type,name,field,operate) {
 //operate: 用户对象的操作，即View、Edit
 function showEditObject(type,name,field,operate) {
 	selectedNote = tree.getSelected();
-	var url = "../treeoperate/common/";
+	var url = "../editor/CommandWindow/";
 	url = url + operate + ".jsp" + "?name=" + name + "&type=" + type ;
 	tmptype = "SQL";
 	if(type == "function") {
@@ -2230,8 +2511,7 @@ function showEditObject(type,name,field,operate) {
 		tmptype = "TAB";
 	}
 	parent.editorToolFrame.nodeType = field;
-	parent.parent.leftFrameList.createNewSql(tmptype, "myTextarea");
-	parent.editorFrame.location.replace(url);
+	parent.parent.leftFrameList.createNewSql(tmptype, url);
 }
 
 function recompile(objectType, objectName, debugFlag) {
@@ -2280,71 +2560,103 @@ function changeHtml(str) {
 
 
 //创建windowlist工具条，通用新创建工具条方法
-function createWindowList(windowType, str) {
+function createWindowList(windowType, str, eFlag) {
 
 	var initStr = "";
 	var newStr = "";
 	var endStr = "";
 	var img = "../images/no_saved.gif";
+	var sqlImg = "../images/sql_window.png";
 	var maxAltLength = 36; //字符串最大长度
+	var oname = "";
+    var sqlImage = "";
+
+
+	eFlag == true ? eFlagStr = 'Edit' : eFlagStr = 'View';
 
 	//此处为接口，不同的窗口类型，定义不同的windowType即可，如果新增不同窗口类型，此处需添加针对该窗口类型的方法
 	if(windowType == "SQL") {
 		initStr = "SQL Window - ";
 		newStr = "New";
 	} else if (windowType == "FUN") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of function ";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of function ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "PRO") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of procedure";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of procedure ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "PAC") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of package";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of package ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "PAB") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of package body";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of package body ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "TYP") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of type";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of type ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "TYB") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of type body";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of type body ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "TRI") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of trigger";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of trigger ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "JAV") {
-		initStr = "Programe Window - ";
-		newStr = "Edit source of java source";
+		initStr = "Program Window - ";
+		newStr = eFlagStr + " source of java source ";
+		oname = str.split('=')[1].split('&')[0];
+		newStr += oname;
+		img = "../images/no_fun_saved.gif";
 	} else if (windowType == "VIE") {
 		initStr = "SQL Window - ";
-		newStr = "NEW";
+		newStr = "New";
 	} else if (windowType == "VIM") {
 		initStr = "SQL Window - ";
-		newStr = "NEW";
+		newStr = "New";
 	} else if (windowType == "TAB") {
 		initStr = "View table ";
-		newStr = "NEW";
+		newStr = str.split('=')[1].split('&')[0];
 	}
 
 	endStr = initStr + newStr;
 
 
 	//得到已有表格对象
-	var tableObject=document.getElementById("windowListBar");
+	var tableObject=parent.parent.leftFrameList.$("windowListBar");
+
 
 	//判断已经存在的行的最大值
 	var introws = tableObject.rows.length;
 
 
-	if (introws > 8) {
-		//超过9个弹出提示
+	if (introws > GMIXWINDOWS - 1) {
+		//超过20个弹出提示
 		alert("Has exceeded the maximum window can be created!");
 	} else {
 		var newTr = tableObject.insertRow(introws);
 		var newTd = newTr.insertCell(0);
+        GWINDOWLIST =  parent.parent.leftFrameList.GWINDOWLIST;
 
-		if (str == "initnew") {
+        if (str == "initnew") {
 			newTd.setAttribute("class","coolButtonActive");
 		} else {
 			newTd.setAttribute("class","coolButton");
@@ -2354,7 +2666,7 @@ function createWindowList(windowType, str) {
 		var TdId = sType + "NewTd" + introws; //后面代码中已重新赋值
 		GTDID = "n" + introws;      //后面代码中已重新赋值
 
-		for ( i=0; i<9; i++ ) {
+		for ( i = 0; i < GMIXWINDOWS; i++ ) {
 
             tmptdidflag = false;
             tmptdid = "n" + i;
@@ -2378,7 +2690,7 @@ function createWindowList(windowType, str) {
                 GTDID = tmptdid;
                 introws = i;
 
-                i = 9;
+                i = GMIXWINDOWS;
                 break;
             }
 
@@ -2404,8 +2716,13 @@ function createWindowList(windowType, str) {
 
 		var spanId = "WindowListValue" + introws;
 		var imgId = "columnButton" + introws;
-		var htmlTemp = "<img id=" + imgId + " src='" + img + "' align='absmiddle'>" +
-							"<span id='" + spanId + "' style=' vertical-align: middle;position:absolute; overflow: no;'  title='" + endStr + "' alt='" + endStr + "'></span>";
+
+        var sqlImageId = "columnButtonSql" + introws;
+        if (windowType == "SQL" || windowType == "VIE" || windowType == "VIM")  sqlImage = "<img id=" + sqlImageId + " src='" + sqlImg + "' align='absmiddle'>";
+
+
+        var htmlTemp = "<img id=" + imgId + " src='" + img + "' align='absmiddle'>" + sqlImage +
+							"<span id='" + spanId + "' style=' vertical-align: middle; overflow: no;'  title='" + endStr + "' alt='" + endStr + "'></span>";
 		endStr = initStr + newStr;
 		//如果字符串超出定义长度，则截断
 		if(endStr.length > maxAltLength) {
@@ -2520,41 +2837,40 @@ function createNewSql(windowType, textareaname) {
 	//var getExecValue = parent.editorFrame.$('outResultDiv').get('html');
 	//var getChangeExecValue = parent.editorFrame.$('changeOutResultDiv').get('html');
 	console.log("click.this.createNewSql");
-	var prevWindowType = getWindowType();
+
+	var f =  false;
+	// 是否为查看
+	textareaname.search('View.jsp') > 0 ? f = false : f = false;
+	textareaname.search('Edit.jsp') > 0 ? f = true : f = false;
+	textareaname.search('New.jsp') > 0 ? f = true : f = false;
+
+
+
+	// var prevWindowType = getWindowType();
 	setIsNotCreate(false);
 
 	if (windowType == "SQL" ) {
 		//创建windowlist工具条
-		createWindowList(windowType, "new");
+		parent.parent.leftFrameList.createWindowList(windowType, "new", f);
 
-		//更改右边工作区的内容
-		if (prevWindowType == windowType) {
-			//如果上一个窗口与当前窗口类型一致，则需重置数据即可
-			clearSQLWindow(prevWindowType);
-		} else {
-			//如果上一个窗口与当前窗口类型不一致，则需要重新加载
-			parent.parent.editorFrame.location.replace(sqlURL);
-		}
+		clearSQLWindow(windowType);
+
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
 					|| windowType == "VIM" || windowType == "TAB") {
 
+	    this.url = textareaname;
 		//创建windowlist工具条
-		createWindowList(windowType, "new");
+		parent.parent.leftFrameList.createWindowList(windowType, this.url, f);
 		//更改右边工作区的内容
-		if (prevWindowType == windowType) {
-			//如果上一个窗口与当前窗口类型一致，则需重置数据即可
-			clearSQLWindow(prevWindowType);
-		} else {
-			//如果上一个窗口与当前窗口类型不一致，则需要重新加载
-			parent.parent.editorFrame.location.replace(funURL);
-		}
+        clearOtherWindow(windowType, this.url);
+
 
 	} else if (windowType == "JAVA" ) {
 
 		//创建windowlist工具条
-		createWindowList(windowType, "new");
+		parent.parent.leftFrameList.createWindowList(windowType, "new", f);
 
 	}
 
@@ -2686,7 +3002,7 @@ function windowListTdOnclick(trType, e) {
     var target = e.target || e.srcElement;
 
     var trRow = target.parentNode.rowIndex;
-    if (trRow == undefined) {
+    if (typeof (trRow) == "undefined") {
         trRow = target.parentNode.parentNode.rowIndex;
     }
 	// alert(trRow);
@@ -2720,7 +3036,8 @@ function clearSQLWindow(windowtype) {
 	if (windowtype == "SQL") {
 		//parent.editorFrame.$('outResultDiv').set('text','');   2020-09-16
 		//parent.editorFrame.$('changeOutResultDiv').set('text','');    2020-09-16
-        parent.editorFrame.createSqlForColorText(parent.leftFrameList.GTDID);
+		var url = "../editor/SqlWindow/New.jsp";
+        parent.editorFrame.createSqlForColorText(parent.leftFrameList.GTDID, url);
 
         parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
 
@@ -2730,10 +3047,51 @@ function clearSQLWindow(windowtype) {
 		// controlbuttonReset();
 		//清除结果集后，需重新设置工作结果区的工具条状态
 		resetBaseWorkToolBar(false);
-	}
+	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
+        || windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
+        || windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
+        || windowType == "VIM" || windowType == "TAB") {
+
+        parent.editorFrame.createSqlForColorText(parent.leftFrameList.GTDID, url);
+        parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+
+        GGETFRAME = parent.editorFrame.GGETFRAME;
+
+        //按钮恢复成初始状态
+        // controlbuttonReset();
+        //清除结果集后，需重新设置工作结果区的工具条状态
+        resetBaseWorkToolBar(false);
+
+    }
 
 	//状态栏初始为空
 	//setFootView(9999, '　');
+
+}
+
+
+
+
+function clearOtherWindow(windowtype,url) {
+    //清空编辑输入区--SQL窗口
+    // createNew('myTextarea');  换成 editAreaLoader.setValue("example_1", "new_value");
+    //editAreaLoader.setValue("myTextarea", "");
+
+
+        parent.editorFrame.createSqlForColorText(parent.leftFrameList.GTDID, url);
+        parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+
+        GGETFRAME = parent.editorFrame.GGETFRAME;
+
+        //按钮恢复成初始状态
+        // controlbuttonReset();
+        //清除结果集后，需重新设置工作结果区的工具条状态
+        resetBaseWorkToolBar(false);
+
+
+
+    //状态栏初始为空
+    //setFootView(9999, '　');
 
 }
 
@@ -2742,17 +3100,7 @@ function clearSQLWindow(windowtype) {
 function saveDivValue(DivSource, DivDest, windowType, trRow) {
 	//复制元素并复制下所有的事件
 	var divObject = parent.parent.editorFrame.$(DivSource);
-	//var _div1 = divObject.clone(true,true).cloneEvents(divObject);
-	//保存原先的div内容
-	//$('hiddenDiv') = _div1;
-	//$(_div1).replaces($('SQLWindow'));
-	//alert(DivSource);
-	//alert(divObject.get('html'));
-	//alert(windowType);
-	//alert(trRow);
 
-    // clone div 2020-07-23
-	// $(DivDest).set('html',divObject.get('html'));
 
 	$(DivDest).append(divObject.clone(true));
 	//alert(divObject.get('html'));
@@ -2775,30 +3123,6 @@ function saveDivValue(DivSource, DivDest, windowType, trRow) {
 
 
 		//alert($(destMyTextarea).get('id'));
-	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
-					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
-					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
-					|| windowType == "VIM" || windowType == "TAB") {
-		var destMyTextarea = "myTextarea" + trRow;
-		var destobjTitle = "objTitle" + trRow;
-		var desttmpImg = "tmpImg" + trRow;
-		var destobjIcoId = "objIcoId" + trRow;
-		var destFootview = "footview" + trRow;
-
-		//更改一下每个DIV中的ID，不然ID会重复
-		if (windowType == "TAB") {
-			destMyTextarea = "tabPanel" + trRow;
-			$('tabPanel').set('id',destMyTextarea);
-			$('footview').set('id',destFootview);
-		} else {
-			$('myTextarea').set('id',destMyTextarea);
-			$('objTitle').set('id',destobjTitle);
-			$('tmpImg').set('id',desttmpImg);
-			$('objIcoId').set('id',destobjIcoId);
-			$('footview').set('id',destFootview);
-		}
-
-
 	} else if (windowType == "JAVA") {
 		var destMyTextarea = "myTextarea" + trRow;
 		var destProTitle = "objTitle" + trRow;
@@ -2825,22 +3149,10 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 
 		//parent.editorFrame.$('myTextarea').set('html',$(destMyTextarea).get('html'));
 
-        for ( i=0; i<=8; i++ ) {
+        for ( i = 0; i < GMIXWINDOWS ; i++ ) {
                 parent.parent.editorFrame.$('#SQLWindow_'+ 'n' + i ).css("display","none");
         }
         parent.parent.editorFrame.$('#SQLWindow_'+ parent.parent.leftFrameList.GWINDOWLIST[trRow][1] ).css("display","inline");
-
-
-        //恢复工具条按钮事件会失效 BUG，暂不恢复
-		//parent.editorFrame.$('foot_outputDiv1').set('html',$('foot_outputDiv1').get('html'));
-
-		//不采用new的方法，IE会报错
-		//new parent.editorFrame.dhtmlXGridObject('outResultDiv');
-
-		//恢复输出结果区--SQL窗口
-		//parent.editorFrame.$('outResultDiv').set('html',parent.leftFrameList.$(destOutResultDiv).get('html'));
-		//parent.editorFrame.$('changeOutResultDiv').set('html',parent.leftFrameList.$(destChangeOutResultDiv).get('html'));
-		//parent.editorFrame.$('footview').set('text',parent.leftFrameList.$(destFootview).get('text'));
 
 
 
@@ -2856,17 +3168,14 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 		var SQLWindowobj = 'SQLWindow' + trRow;
 		//alert("h:" + parent.leftFrameList.$(SQLWindowobj).get('html'));
 		//alert(parent.leftFrameList.$(destobjIcoId).get('src').substr(parent.leftFrameList.$(destobjIcoId).get('src').lastIndexOf("/")));
-		if (windowType == "TAB") {
-			destMyTextarea =  "tabPanel" + trRow;
-			parent.editorFrame.$('tabPanel').set('html',parent.leftFrameList.$(destMyTextarea).get('html'));
-			parent.editorFrame.$('footview').set('text',parent.leftFrameList.$(destFootview).get('text'));
-		} else {
-			parent.editorFrame.$('myTextarea').set('html',parent.leftFrameList.$(destMyTextarea).get('html'));
-			parent.editorFrame.$('tmpImg').set('text',parent.leftFrameList.$(desttmpImg).get('text'));
-			parent.editorFrame.$('objTitle').set('text',parent.leftFrameList.$(destobjTitle).get('text'));
-			parent.editorFrame.$('objIcoId').set('src',parent.leftFrameList.$(desttmpImg).get('text'));
-			parent.editorFrame.$('footview').set('text',parent.leftFrameList.$(destFootview).get('text'));
-		}
+
+
+            for (i = 0; i < GMIXWINDOWS; i++) {
+                parent.parent.editorFrame.$('#SQLWindow_' + 'n' + i).css("display", "none");
+            }
+            parent.parent.editorFrame.$('#SQLWindow_' + parent.parent.leftFrameList.GWINDOWLIST[trRow][1]).css("display", "inline");
+
+
 
 	} else if (windowType == "JAVA") {
 		var destMyTextarea = "myTextarea" + trRow;
@@ -2878,7 +3187,7 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 
 //更改windowList的提示语
 function changeWindowListTitle(windowType,trRow,titleStr) {
-    trRow = parent.parent.leftFrameList.GWINDOWLIST[trRow][1].substring(1,2)
+    trRow = parent.parent.leftFrameList.GWINDOWLIST[trRow][1].substring(1);
 	var spanListVauleId = "WindowListValue" + trRow;
 	var imgListVauleId = "columnButton" + trRow;
 	var initStr = "";
@@ -2889,6 +3198,8 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 
 	if(windowType == "SQL") {
 		initStr = "SQL Window - ";
+		tmpStr = initStr + titleStr;
+		tmpStrA = initStr + titleStr;
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
@@ -2911,28 +3222,43 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 		} else if (windowType == "JAV") {
 			strTmp = "java source ";
 		} else if (windowType == "VIE" || windowType == "VIM") {
-			strTmp = "NEW";
+			strTmp = "New";
 		}  else if (windowType == "TAB") {
 			strTmp = "table";
 		}
 		if (windowType == "VIE" || windowType == "VIM") {
 			initStr = "SQL Window - " + strTmp;
+			tmpStr = initStr + titleStr;
+			tmpStrA = initStr + titleStr;
+
 		} else if (windowType == "TAB"){
 			initStr = "View" + strTmp;
+			tmpStr = initStr + titleStr;
+			tmpStrA = initStr + titleStr;
+
 		} else {
-			initStr = "Programe Window - Edit source of " + strTmp;
+			var tmpv = "";
+			if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
+				|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB") {
+				tmpv = titleStr.split('(')[0].trim().split(' ');
+			}
+			// tmpv = titleStr.split('(')[0].trim().split(' ');
+			tmpv = tmpv[tmpv.length-1];
+			initStr = "Program Window - Edit source of " + strTmp + tmpv;
+			tmpStr = initStr;
+			tmpStrA = initStr;
+
+
 		}
 	}
 
 	titleTmp = "";
 
-	tmpStr = initStr + titleStr;
 
 	if(tmpStr.length > maxLength) {
 		tmpStr = tmpStr.substr(0, maxLength) + " ... ";
 	}
 
-	tmpStrA = initStr + titleStr;
 	if(tmpStrA.length > maxAltLength) {
 		tmpStrA = tmpStr.substr(0, maxAltLength) + " ... ";
 	}
@@ -2946,10 +3272,18 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 
 //恢复当前windowList窗口的图片
 function restoreWindowListImg(trRow) {
-    trRow = parent.parent.leftFrameList.GWINDOWLIST[trRow][1].substring(1,2)
+    trRow = parent.parent.leftFrameList.GWINDOWLIST[trRow][1].substring(1);
 
     var imgListVauleId = "columnButton" + trRow;
 	var imgIcon = "../images/no_saved.gif";
+
+	var tmpCurrWindowType = parent.parent.leftFrameList.getWindowType();
+
+	if (tmpCurrWindowType == "FUN" ||	tmpCurrWindowType == "PRO" || tmpCurrWindowType == "PAC"
+	|| tmpCurrWindowType == "PAB" || tmpCurrWindowType == "TYP" || tmpCurrWindowType == "TYB"
+	|| tmpCurrWindowType == "TRI" || tmpCurrWindowType == "JAV" ) {
+		imgIcon = "../images/no_fun_saved.gif";
+	}
 
 	$(imgListVauleId).set('src', imgIcon);
 
@@ -3269,7 +3603,7 @@ function recoverPage_New(_trType, _trRow, sameWindowFlag) {
 //关闭窗口
 function closeWindowList() {
 
-	parent.leftFrameList.deleteWindowList();
+	parent.parent.leftFrameList.deleteWindowList();
 
 }
 
@@ -3312,9 +3646,9 @@ function execQueryObjData(textareaname,objname) {
 
 function execQueryTable(tablename, textareaname) {
 	var texttmp = "select * from " + tablename + " t";
-	parent.leftFrameList.createNewSql('SQL','myTextarea');
+	parent.parent.editorToolFrame.createNewSql('SQL','myTextarea');
 	setDivValueText (textareaname,texttmp);
-	parent.editorToolFrame.executeRun(textareaname);
+
 }
 
 function getUserObject(data) {
