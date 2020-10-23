@@ -428,8 +428,8 @@
 								</td>
 								<td tabIndex="1" onclick="">
 									<img id='autorefreshButton' src="../../images/compiler_preferences.png"
-										 title="Auto refresh timer (5 sec)"
-										 alt="Auto refresh timer (5 sec)" align="absmiddle">
+										 title="compiler preferences..."
+										 alt="compiler preferences..." align="absmiddle">
 								</td>
 								<td class="coolButtonActiveHover" width="5%">
 									<div id="positionCurr" style="font-family: Arial, Courier, mono; font-size: 12px;">1:1</div>
@@ -570,11 +570,11 @@
 					createButton(cells1[i]);
 					//cells1[i].setAlwaysUp(true)
 				}
-				cells1[1].setToggle(true);
+				cells1[1].setToggle(false);
 
-				cells1[1].setValue(true, true);
+				cells1[1].setValue(false, false);
 			}
-
+			initViewFootButton();
 			// 文本内容保存到本地
 			function winsave() {
 				f = "tmp_fun.sql";
