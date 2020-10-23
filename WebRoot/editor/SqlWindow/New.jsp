@@ -207,7 +207,7 @@
 	<div id="BaisworkMenu" name="BaisworkMenu" class="BaisworkM"></div>
     <div class="top">
 	<div id="myText"
-		 style="border: 2px; overflow: no; background-color: ButtonFace; width: 100%; height: 35%">
+		 style="border: 2px; overflow: no; background-color: ButtonFace; width: 100%; height: 41%">
 		<div id="editortop" class="webfxGrid" style="width: 100%" >
 			<%--<div id="myTextarea" class="editor" contentEditable--%>
 			<%--onkeydown="detectCtrlKey(event)" onkeyup=""--%>
@@ -251,7 +251,7 @@
 		</div>
 	</div>
 	<div id="t_controlDiv"
-		 style="border: 1px; overflow: no; background-color: ButtonFace; padding-bottom:26px; height: 60%; width: 100%;">
+		 style="border: 1px; overflow: no; background-color: ButtonFace; padding-bottom:26px; height: 59%; width: 100%;">
 
 		<div id="foot_outputDiv1"
 			 style="overflow: no; background-color : ButtonFace; width: 100%">
@@ -379,20 +379,12 @@
 
     </footer>
 </div>
-<div id="SQLWindow0" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow1" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow2" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow3" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow4" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow5" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow6" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow7" style="width: 100%; height: 100%; display:none;"></div>
-<div id="SQLWindow8" style="width: 100%; height: 100%; display:none;"></div>
+
 
 <script>
 	// 右键菜单
 	function rightToolBarButton() {
-		var rightcells = document.getElementById('rightToolBar').rows[1].cells;
+			var rightcells = document.getElementById('rightToolBar').rows[1].cells;
 		//alert(rightcells[0]);
 		for (var i = 0; i < rightcells.length; i++)
 		{
