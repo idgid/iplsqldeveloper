@@ -16,12 +16,12 @@
           if(new_name.trim().equals("")) throw new Exception("new name could not be empty");
           String execSQL = "RENAME " + name + " to " + new_name;
           db.execSqlUpdate(execSQL);
-          out.print("<script type=\"text/javascript\">opener.selectedNote.getParent().reload();window.close();</script>");
+          out.print("<script type=\"text/javascript\">window.close();opener.parent.parent.leftFrame.selectedNote.getParent().reload();</script>");
        }catch(Exception e){
           e.printStackTrace();
           String eMsg = e.getLocalizedMessage();
           if(eMsg.length() > 1 && eMsg.endsWith("\n")) eMsg = eMsg.substring(0,eMsg.length()-1);
-          out.print("<script type=\"text/javascript\">opener.selectedNote.getParent().reload();alert(\""+eMsg+"\");window.close();</script>");
+          out.print("<script type=\"text/javascript\">opener.parent.parent.leftFrame.selectedNote.getParent().reload();alert(\""+eMsg+"\");window.close();</script>");
        }
     }
 %>
@@ -36,8 +36,8 @@
 	<style>
 		body {
 			background: buttonface;
-			margin: 0px;
-			padding: 0px;
+			margin: 2px;
+			padding: 2px;
 			font-family: 'Verdana', 'Tahoma', 'Helvetica', 'Arial';
 		}
 	</style>
