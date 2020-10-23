@@ -353,7 +353,7 @@
 	</div>
     </div>
     <footer id="foot_outputDiv" class="footer">
-        <table border="0" id="toolBar_2" style="background: ButtonFace;"
+        <table border="0" id="toolBar_footer" style="background: ButtonFace;"
                cellspacing="1" width="100%">
             <tr align='left'>
                 <td class="coolButtonDisabled_my">
@@ -474,7 +474,7 @@
 		// cells1[0].setValue(true, true);
 
 
-		var cells1 = document.getElementById('toolBar_2').rows[0].cells;
+		var cells1 = document.getElementById('toolBar_footer').rows[0].cells;
 		for (var i = 1; i <= 1; i++)
 		{
 			createButton(cells1[i]);
