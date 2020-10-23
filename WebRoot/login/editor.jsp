@@ -119,9 +119,12 @@
 		}
 	}
 
-	createSqlForColorText(parent.leftFrameList.GTDID, url);
+	setTimeout(function() {
+		createSqlForColorText(parent.leftFrameList.GTDID, url)
+		GGETFRAME = document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+	}, 500);
+	//createSqlForColorText(parent.leftFrameList.GTDID, url);
 
-	GGETFRAME = document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
 
 
 	$(document).ready(function(){
