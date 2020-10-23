@@ -1,11 +1,11 @@
 package org.reddragonfly.iplsqldevj;
 
 public class Utilities {
-	
+
 	public static String getVersion(){
-		return "Version 1.3.3.0515";
+		return "Version 2.0.0.1023";
 	}
-	
+
 	public static String getTeam() {
 		String team ="	<font color=#000000"
 					+"		face=\"Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif\">Copyright"
@@ -18,7 +18,7 @@ public class Utilities {
 					+"	</a>";
 		return team;
 	}
-	
+
 	/**
 	 * <p>用newValue替换src字符串中的所有targetValue，该方法不考虑正则表达式的情况
 	 * @param src
@@ -33,5 +33,5 @@ public class Utilities {
 		}
 		return returnVal;
 	}
-	
+
 }
