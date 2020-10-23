@@ -21,13 +21,13 @@ UserBean ub = (UserBean) session.getAttribute("user");
 		<script type='text/javascript' src='../dwr/engine.js'></script>
 		<style>
 			.topSS {
-				background-repeat: repeat;background-image: url(../images/log.png)!important;background-image:url();
+				background-repeat: repeat;background-image: url(../images/log.png)!important;background-image:url('');
 			}
 			*html .topSS {filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=scale, src="../images/log.png");
 			}
 		</style>
 	</head>
-	
+
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0"
 		style="background-color: buttonface" ondragstart="return false" oncontextmenu="return false">
 		<table width="100%" border="0" cellspacing="0" cellpadding="0"
@@ -58,12 +58,12 @@ UserBean ub = (UserBean) session.getAttribute("user");
 <script language="javascript">
 
 	DbObjectBean.getUserObject(getUserObject);
-	
+
 	keepSessionValid();
  	function keepSessionValid()
   	{
   		window.document.getElementById("keepSessionValid").src="../js/keepSessionValid.js?Rand="+Math.random();
-		window.setTimeout("keepSessionValid()",1200000); //20分钟执行一次
+		window.setTimeout(keepSessionValid,1200000); //20分钟执行一次
 	}
 
 </script>

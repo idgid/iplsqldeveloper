@@ -21,6 +21,7 @@ UserBean ub = (UserBean) session.getAttribute("user");
 * {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
+	font-size: 12px;
 }
 
 html {
@@ -85,10 +86,10 @@ table {
 		</script>
 
 	</head>
-	
-	<body 
+
+	<body
 		style="background-color: buttonface" ondragstart="return false" oncontextmenu="return false">
-		<div style="border-top:3px dashed #bbbbbb;height: 1px;overflow:hidden"></div>
+		<div style="height: 1px;overflow:hidden"></div>
 		<div id="hiddenDiv" style="display:none">
 			<!-- 考虑到性能问题，暂只最大只支持9个窗口历史数据记录 -->
 			<div id="SQLWindowTemp"></div>
@@ -101,15 +102,27 @@ table {
 			<div id="SQLWindow6"></div>
 			<div id="SQLWindow7"></div>
 			<div id="SQLWindow8"></div>
+			<div id="SQLWindow9"></div>
+			<div id="SQLWindow10"></div>
+			<div id="SQLWindow11"></div>
+			<div id="SQLWindow12"></div>
+			<div id="SQLWindow13"></div>
+			<div id="SQLWindow14"></div>
+			<div id="SQLWindow15"></div>
+			<div id="SQLWindow16"></div>
+			<div id="SQLWindow17"></div>
+			<div id="SQLWindow18"></div>
+			<div id="SQLWindow19"></div>
+
 		</div>
-		<div id="windowList" style="overflow: no background-color :     ButtonFace; width: 100%">
+		<div id="windowList" style="overflow: auto; background-color : ButtonFace; width: 100%">
 			<table width="100%" id="windowListBar" border="0" cellspacing="1" cellpadding="0">
-				
+
 			</table>
 		</div>
 		<script>
 			//初始化一个按钮
-			createWindowList("SQL","initnew");
+			createWindowList("SQL","initnew", true);
 		</script>
 	</body>
 </html>

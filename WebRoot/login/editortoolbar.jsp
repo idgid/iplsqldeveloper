@@ -82,14 +82,14 @@ table {
 </style>
 		<script language="JavaScript1.5">
 			if (window.moz == true) document.getElementById("mozGrooveCSS").removeAttribute("disabled");
-			
+
 		</script>
 
 
 	</head>
 	<body ondragstart="return false" oncontextmenu="return false">
 		<div id="myTextToolbar"
-			style="overflow: no background-color :     ButtonFace; width: 100%">
+			style="overflow: no; background-color :     ButtonFace; width: 100%">
 			<table border="0" id="topToolBar" style="background: ButtonFace;"
 				cellspacing="3">
 				<tr>
@@ -99,15 +99,15 @@ table {
 					<td class="coolButton" onclick="execSysCommand('myTextarea','open');">
 						<img id='columnButton' src="../images/open.gif" title="Open" alt="Open" align="absmiddle">
 					</td>
-					<td class="coolButton" onclick="execSysCommand('myTextarea','saveas');">
+					<td class="coolButton" onclick="execSysCommand('myTextarea','save');">
 						<img id='columnButton' src="../images/save.gif" title="Save" alt="Save" align="absmiddle">
 					</td>
-					<td class="coolButton" onclick="execSysCommand('myTextarea','print');">
-						<img id='columnButton' src="../images/printpor.gif" title="Print portrait" alt="Print portrait" 
+					<td class="coolButton" onclick="execSysCommand('myTextarea','printP');">
+						<img id='columnButton' src="../images/printpor.gif" title="Print Portrait" alt="Print Portrait"
 							align="absmiddle">
 					</td>
-					<td class="coolButton" onclick="execSysCommand('myTextarea','print');">
-						<img id='columnButton' src="../images/printland.gif" title="Print landscape" alt="Print landscape" 
+					<td class="coolButton" onclick="execSysCommand('myTextarea','printL');">
+						<img id='columnButton' src="../images/printland.gif" title="Print Landscape" alt="Print Landscape"
 							align="absmiddle">
 					</td>
 					<td class="coolButton" onclick="execSysCommand('myTextarea','undo');">
@@ -125,33 +125,33 @@ table {
 					<td class="coolButton" onclick="execSysCommand('myTextarea','paste');">
 						<img id='columnButton' src="../images/paste.gif" title="Paste (Ctrl+V)" alt="Paste (Ctrl+V)" align="absmiddle">
 					</td>
-					<td class="coolButton" >
+					<td class="coolButton" onclick="execSysCommand('myTextarea','show_search');">
 						<img id='columnButton' src="../images/findorreplace.gif" title="Find & Replace (Ctrl+F)" alt="Find & Replace (Ctrl+F)"
 							align="absmiddle">
 					</td>
-					<td class="coolButton" onclick="execSysCommand('myTextarea','indent');">
-						<img id='columnButton' src="../images/indent.gif" title="Selection Indent" alt="Selection Indent" 
+					<td class="coolButton" onclick="execSysCommand('myTextarea','selectIndent');">
+						<img id='columnButton' src="../images/indent.gif" title="Selection Indent" alt="Selection Indent"
 							align="absmiddle">
 					</td>
-					<td class="coolButton" onclick="execSysCommand('myTextarea','outdent');">
-						<img id='columnButton' src="../images/unindent.gif" title="Selection Unindent" alt="Selection Unindent" 
+					<td class="coolButton" onclick="execSysCommand('myTextarea','selectUnindent');">
+						<img id='columnButton' src="../images/unindent.gif" title="Selection Unindent" alt="Selection Unindent"
 							align="absmiddle">
 					</td>
-					<td class="coolButton" onclick="addComment('myTextarea');">
-						<img id='columnButton' src="../images/comment.gif" title="Selection Comment" alt="Selection Comment" 
+					<td class="coolButton" onclick="execSysCommand('myTextarea','selectComment');">
+						<img id='columnButton' src="../images/comment.gif" title="Selection Comment" alt="Selection Comment"
 							align="absmiddle">
 					</td>
-					<td class="coolButton" onclick="addComment('myTextarea');">
-						<img id='columnButton' src="../images/uncomment.gif" title="Selection Uncomment" alt="Selection Uncomment" 
+					<td class="coolButton" onclick="execSysCommand('myTextarea','selectUncomment');">
+						<img id='columnButton' src="../images/uncomment.gif" title="Selection Uncomment" alt="Selection Uncomment"
 							align="absmiddle">
 					</td>
 					<td class="coolButton" width="95%">
 						&nbsp;
 					</td>
 					<script>
-					
+
 							var toprightcells0 = document.getElementById('topToolBar').rows[0].cells;
-							
+
 							for (var i = 0; i < 15; i++)
 							{
 								createButton(toprightcells0[i]);
@@ -163,8 +163,8 @@ table {
 							//toprightcells0[2].setEnabled(false);
 							//toprightcells0[3].setEnabled(false);
 							//toprightcells0[4].setEnabled(false);
-							
-					
+
+
 				</script>
 				</tr>
 				<tr>
@@ -172,19 +172,19 @@ table {
 						<img id='columnButton' src="../images/logon.gif" title="Log on" alt="Log on"
 						 align="absmiddle">
 					</td>
-					<td class="coolButton" id="executeTd" onclick="parent.editorToolFrame.executeRun('myTextarea');">
+					<td class="coolButton" id="executeTd" onclick="parent.editorFrame.GGETFRAME.executeRun('myTextarea');">
 						<img id='columnButton' src="../images/execute.gif" title="Execute (F8)" alt="Execute (F8)"
 							align="absmiddle">
 					</td>
-					<td class="coolButton" id="breakTd" onclick="parent.editorToolFrame.breakRun('myTextarea');">
+					<td class="coolButton" id="breakTd" onclick="parent.editorFrame.GGETFRAME.breakRun('myTextarea');">
 						<img id='columnButton' src="../images/break.gif" title="Break (F9)" alt="Break (F9)"
 						align="absmiddle">
 					</td>
-					<td class="coolButton" id="commitTd" onclick="parent.editorToolFrame.commit()">
+					<td class="coolButton" id="commitTd" onclick="parent.editorFrame.GGETFRAME.commit()">
 						<img id='columnButton' src="../images/commit.gif" title="Commit (F10)" alt="Commit (F10)"
 							align="absmiddle">
 					</td>
-					<td class="coolButton" id="rollbackTd" onclick="parent.editorToolFrame.rollback();">
+					<td class="coolButton" id="rollbackTd" onclick="parent.editorFrame.GGETFRAME.rollback();">
 						<img id='columnButton' src="../images/rollback.gif" title="Rollback (F12)" alt="Rollback (12)"
 							align="absmiddle">
 					</td>
@@ -201,9 +201,9 @@ table {
 					</td>
 				</tr>
 				<script>
-					
+
 							var toprightcells = document.getElementById('topToolBar').rows[1].cells;
-							
+
 							for (var i = 0; i < 7; i++)
 							{
 								createButton(toprightcells[i]);
@@ -214,8 +214,8 @@ table {
 							toprightcells[2].setEnabled(false);
 							toprightcells[3].setEnabled(false);
 							toprightcells[4].setEnabled(false);
-							
-					
+
+
 				</script>
 			</table>
 			<div id="closeWindowList" style="position: absolute; right: 3px; top: 3px" onmousedown="changeWindowListClassDown('windowListImg', event)" onmouseup="closeWindow('windowListImg', event)" ><img id='windowListImg' src="../images/close_window.gif" title="Close Window" alt="Close Window"

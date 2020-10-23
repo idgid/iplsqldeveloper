@@ -61,7 +61,17 @@
 <div id="SQLWindow_n6" style="width: 100%; height: 100%; display:none;"></div>
 <div id="SQLWindow_n7" style="width: 100%; height: 100%; display:none;"></div>
 <div id="SQLWindow_n8" style="width: 100%; height: 100%; display:none;"></div>
-
+<div id="SQLWindow_n9" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n10" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n11" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n12" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n13" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n14" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n15" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n16" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n17" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n18" style="width: 100%; height: 100%; display:none;"></div>
+<div id="SQLWindow_n19" style="width: 100%; height: 100%; display:none;"></div>
 
 
 
@@ -100,7 +110,7 @@
 		}
 
 		// 最后，显示当前被点击的窗口，其它隐藏
-		for ( i=0; i<=8; i++) {
+		for ( i = 0; i < GMIXWINDOWS; i++ ) {
 			if (this.id == ('n'+i)) {
 				$('#SQLWindow_'+ 'n' + i ).css("display","inline");
 			} else {

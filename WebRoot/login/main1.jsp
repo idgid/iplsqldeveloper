@@ -4,46 +4,141 @@
 <html>
 	<head>
 		<title>iPL/SQL Developer</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta content="text/html; charset=utf-8" charset="utf-8" />
+
+		<script type="text/javascript" src="../js/codebase6/suite.js?v=6.1.4"></script>
+		<link rel="stylesheet" href="../js/codebase6/suite.css?v=6.1.4">
+		<link rel="stylesheet" href="../js/codebase6/common/index.css?v=6.1.4">
+
+	<!-- custom sample head -->
+	<style>
+		.dhx_sample-container {
+			height: 600px;
+		}
+	</style>
+
 	</head>
-	
-	<frameset rows="60,*" cols="*" frameborder="yes" border="1" framespacing="1" id='indexFrame'>
-		<frame src="./top.jsp" name="topFrame" scrolling="No" noresize="noresize" id="topFrame" title="topFrame" />
-		<frameset cols="240,*" frameborder="yes" border="1" framespacing="1">
-			<frameset rows="80%,*" cols="*" frameborder="yes" border="1" framespacing="1" id='leftMainFrame'>
-				<frameset rows="25,*" cols="*" frameborder="yes" border="1" framespacing="1" id='leftMainFrameTop'>
-					<frame src="../tree/lefttop.jsp" name="LeftTopFrame" scrolling="No" id="LeftTopFrame" title="LeftTopFrame" />
-					<frame src="../tree/tree.jsp" scrolling="auto" name="leftFrame" id="leftFrame" title="leftFrame" />
-				</frameset>
-					<frame src="./windowlist.jsp" scrolling="auto" name="leftFrameList" id="leftFrameList" title="leftFrameList" />
-			</frameset>
-			<frameset rows="60,*" cols="*" frameborder="no" border="0" framespacing="0" id='mainFrame'>
-				<frame src="./editortoolbar.jsp" scrolling="no" name="editorToolFrame" id="editorToolFrame" title="editorToolFrame" />
-				<frame src="./editor.jsp" scrolling="auto" name="editorFrame" id="editorFrame" title="editorFrame" />
-			</frameset>
-		</frameset>
-		<noframes>
-			<body  ondragstart="return false" oncontextmenu="return false">
-				<table width='100%' height='85%' align='center'>
-					<tr>
-						<td valign='middle'>
-							<table align='center' cellpadding='4' class='tablefill'>
-								<tr>
-									<td width='100%' align='center' nowrap='nowrap'>
-										您的浏览器不支持框架
-										<br />
-										<br />
-										程序将带你到相关页面。
-										<br />
-										<br />
-										(如果你不想等待,<a href='./login/login.action'>请点这里。</a>)
-									</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table>
-			</body>
-		</noframes>
-	</frameset>
+
+	<body  ondragstart="return false" oncontextmenu="return false">
+
+
+		<section class="dhx_sample-container">
+			<div class="dhx_sample-container__widget" id="layout"></div>
+
+		</section>
+
+		<script>
+			var layout = new dhx.Layout("layout", {
+				css: "dhx_layout-cell--bordered",
+				width: "1220px",
+				height: "800px",
+				rows: [{
+					id: "logo",
+					html: "Logo",
+					css: "dhx_layout-cell--border_bottom",
+					gravity: false,
+					height: "60px"
+					},
+					{
+						id: "toolbar",
+						html: "Header",
+						css: "dhx_layout-cell--border_bottom",
+						gravity: false,
+						height: "60px"
+					},
+					{
+						resizable: true,
+						width: "100%",
+						cols: [{
+							resizable: true,
+							css: "dhx_layout-cell--border_right",
+
+							rows: [{
+								id: "sidebar_t",
+								html: "Sidebar_t",
+								resizable: true,
+								css: "dhx_layout-cell--border_bottom",
+								height: "300px",
+							},
+								{
+									id: "sidebar_b",
+									html: "dd",
+									css: "dhx_layout-cell--border_top"
+
+								},
+							]
+
+						},
+							{
+								resizable: true,
+								css: "",
+								width: "820px",
+								rows: [{
+
+									resizable: true,
+									css: "dhx_layout-cell--border_left",
+									height: "150px",
+
+									cols: [{
+
+										id: "content",
+										html: "<section class=\"dhx_sample-container\"> \n" +
+												"\t\t\t<div class=\"dhx_sample-container__widget\" id=\"tabbar\"></div>\n" +
+												"</section>",
+										css: "dhx_layout-cell--border_bottom",
+										width: "98%"
+									},
+
+
+										{
+											id: "rightbar",
+											html: "As",
+											css: "dhx_layout-cell--border_left",
+											width: "20px"
+										}
+									]
+
+
+								},
+									{
+										id: "content_result",
+										html: "content_result",
+										css: "dhx_layout-cell--border_top"
+									}
+								]
+
+							}
+						]
+					},
+					{
+						id: "footer",
+						html: "Footer",
+						css: "dhx_layout-cell--border_top",
+						gravity: false,
+						height: "20px"
+					}
+				]
+			});
+
+			var tabbar;
+			function createTabbar(mode) {
+				if (tabbar) {
+					tabbar.destructor();
+				}
+				tabbar = new dhx.Tabbar("tabbar", {
+					mode: mode,
+					css: "dhx_widget--bordered",
+					noTitle: true,
+					views:[
+						{ id:"content_tab_1", tab: "", html: "<div></div>"},
+						{ id:"content_tab_2", tab: "", html: "<div></div>"},
+						{ id:"content_tab_3", tab: "", html: "<div></div>"},
+						{ id:"content_tab_4", tab: "", html: "<div></div>"}
+					]
+				});
+			}
+			createTabbar("top");
+		</script>
+
+	</body>
 </html>
