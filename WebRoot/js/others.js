@@ -498,7 +498,7 @@ function changeRecordView() {
 	var previousRecordId = 'previousRecord';
 	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
 	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
-	globaldataFlag = parent.parent.editorFrame.globaldataFlag;
+	globaldataFlag = parent.parent.editorFrame.GGETFRAME.globaldataFlag;
 
 	if(!getsingleRecordViewFlag() && globaldataFlag == true ) { //如果按钮外于未被按下状态，则做如下动作，本身按钮显示为按下
 
@@ -628,6 +628,7 @@ function changeRecordViewRestore() {
 	setDivValueNull ('changeOutResultDiv');
 	$('changeOutResultDiv').set('style','display:none');
 	$('outResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
+    parent.parent.editorFrame.GGETFRAME.$('singleRecordViewTd').setValue(false,true);
 }
 
 //改变执行标志
@@ -662,11 +663,13 @@ function getPostChangeFlag() {
 }
 
 function setsingleRecordViewFlag(siFlag) {
+    parent.parent.editorFrame.GGETFRAME.singleRecordViewFlag = siFlag;
 	singleRecordViewFlag = siFlag;
 }
 
 
 function getsingleRecordViewFlag() {
+    singleRecordViewFlag = parent.parent.editorFrame.GGETFRAME.singleRecordViewFlag;
 	return singleRecordViewFlag;
 }
 
@@ -1161,6 +1164,7 @@ function resetEditor() {
 
 //对显示结果区的工具条进行重新设置
 function resetBaseWorkToolBar(baisWorkFlag) {
+    parent.parent.editorFrame.GGETFRAME.globaldataFlag = baisWorkFlag;
 	globaldataFlag = baisWorkFlag;
 	changeQueryByExample(baisWorkFlag);
     changeSingleRecordView(baisWorkFlag);
@@ -1332,9 +1336,9 @@ function showDataHtml(rows,data) {
     	mygrid.init();  //进行初始化
         mygrid.setEditable(false);
 		mygrid.enableMultiselect(true);
-		parent.parent.editorFrame.globaldataFlag = true;
+		parent.parent.editorFrame.GGETFRAME.globaldataFlag = true;
 
-		globaldataFlag = parent.parent.editorFrame.globaldataFlag;
+		globaldataFlag = parent.parent.editorFrame.GGETFRAME.globaldataFlag;
 
     for(var i = 1; i < tlow; i++) {
     	var strRow = "";
@@ -1376,9 +1380,10 @@ function showDataHtml(rows,data) {
 		strRow = i + "," + strRow;
     	mygrid.addRow(i,strRow);
 
-    	if (getsingleRecordViewFlag()) {
-    		changeRecordViewInit();
-    	}
+    	// if (getsingleRecordViewFlag()) {
+    	// 	changeRecordViewInit();
+    	// }
+
     	//mygrid.setRowColor(i,trstyle);
     	//mygrid.setColumnColor(trstyle);
     	}
@@ -2034,7 +2039,10 @@ function execClearResults(e) {
 	//状态栏初始为空
 	setFootView(9999, '　');
 	//清除结果集后，需重新设置工作结果区的工具条状态
-	resetBaseWorkToolBar(false);
+    resetBaseWorkToolBar(false);
+    setsingleRecordViewFlag(0);
+    changeRecordViewRestore();
+
 }
 
 //工作结果输出区右键Export Results命令执行函数
