@@ -465,15 +465,12 @@
 							</tr>
 			</table>
 			</div>
-			<%
-				}
-			%>
 
 
-
-
+		<%
+            } else {
+        %>
 		<script>
-
 			// initialisation
 			editAreaLoader.init({
 				id: "myTextarea"	// id of the textarea to transform
@@ -617,5 +614,14 @@
 			function addMyTextAreaKeyDown(c) {};
 
 		</script>
+
+
+		<%
+            }
+        %>
+
+
+
+
 	</body>
 </html>
