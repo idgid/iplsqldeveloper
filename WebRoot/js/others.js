@@ -1085,12 +1085,12 @@ function getTextareaContents(EditorName) {
 		}
 	} else {
 
-        //旧的数据取值方法
-        //var range = getSelectedText();
+
+        var range = "";
         // var range = getSelectedText(EditorName) ;
 
         // var range = parent.editorFrame.editAreaLoader.getSelectedText(EditorName) ;
-        var range = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getSelectedText(EditorName);
+		range = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getSelectedText(EditorName);
 
 
         //	var  range = Objname.value.substr(Objname.selectionStart,Objname.selectionEnd-Objname.selectionStart);
@@ -1103,7 +1103,7 @@ function getTextareaContents(EditorName) {
             //旧的数据取值方法
 			//myText = parent.editorFrame.$(EditorName).get('text');
             //myText =  parent.editorFrame.editAreaLoader.getValue(EditorName);
-            myText = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getValue(EditorName);
+			myText = parent.parent.editorFrame.GGETFRAME.editAreaLoader.getValue(EditorName);
             // myText =  getValue(EditorName);
 
         }
