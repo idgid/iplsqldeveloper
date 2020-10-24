@@ -525,9 +525,9 @@ function changeRecordViewInit() {
 
 	mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
 
-	$('outResultDiv').set('style','display:none');
+	parent.parent.editorFrame.GGETFRAME.$('outResultDiv').set('style','display:none');
 
-	setDivValueNull ('changeOutResultDiv');
+	parent.parent.editorFrame.GGETFRAME.setDivValueNull ('changeOutResultDiv');
 
 	//setDivValueHtml ('changeOutResultDiv','asdfasdfas');
 	//执行显示函数changeNextRecordView
@@ -551,7 +551,7 @@ function changeRecordViewInit() {
 		}
 	changeRecordShowHtml();
 
-	$('changeOutResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
+	parent.parent.editorFrame.GGETFRAME.$('changeOutResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
 	//alert($('changeOutResultDiv').get('style'));
 }
 
@@ -626,8 +626,8 @@ function controlbuttonReset() {
 function changeRecordViewRestore() {
 
 	setDivValueNull ('changeOutResultDiv');
-	$('changeOutResultDiv').set('style','display:none');
-	$('outResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
+	parent.parent.editorFrame.GGETFRAME.$('changeOutResultDiv').set('style','display:none');
+	parent.parent.editorFrame.GGETFRAME.$('outResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
     parent.parent.editorFrame.GGETFRAME.$('singleRecordViewTd').setValue(false,true);
 }
 
@@ -1380,13 +1380,14 @@ function showDataHtml(rows,data) {
 		strRow = i + "," + strRow;
     	mygrid.addRow(i,strRow);
 
-    	// if (getsingleRecordViewFlag()) {
-    	// 	changeRecordViewInit();
-    	// }
+
 
     	//mygrid.setRowColor(i,trstyle);
     	//mygrid.setColumnColor(trstyle);
     	}
+		if (getsingleRecordViewFlag()) {
+			changeRecordViewInit();
+		}
 
     	//最终得到数据，呈现后的其他按钮状态和改变execSysCommand
     	resetBaseWorkToolBar(true);
