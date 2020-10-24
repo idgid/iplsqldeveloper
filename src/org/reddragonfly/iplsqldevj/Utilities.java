@@ -3,7 +3,7 @@ package org.reddragonfly.iplsqldevj;
 public class Utilities {
 
 	public static String getVersion(){
-		return "Version 2.0.0.1023";
+		return "Version 2.0.0.1024";
 	}
 
 	public static String getTeam() {
