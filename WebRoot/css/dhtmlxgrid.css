@@ -61,12 +61,12 @@ div.gridbox table.obj td span.space, div.gridbox table.obj td img.space{
 	width:18px;
 	}
 div.gridbox table.obj tr.rowselected td.cellselected, div.gridbox table.obj td.cellselected {
-	background-color:#d8d8d8;
-	color:black;
+	background-color:#0078d7;
+	color:#FFFFFF;
 	}
 div.gridbox table.obj tr.rowselected td{
-	background-color:#e1e0d7;
-	color:black;
+	background-color:#0078d7;
+	color:#EEEEEE;
 	}
 div.gridbox table.obj td.editable{
     -moz-user-select:text;
