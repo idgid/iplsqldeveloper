@@ -91,7 +91,7 @@ table {
 		style="background-color: buttonface" ondragstart="return false" oncontextmenu="return false">
 		<div style="height: 1px;overflow:hidden"></div>
 		<div id="hiddenDiv" style="display:none">
-			<!-- 考虑到性能问题，暂只最大只支持9个窗口历史数据记录 -->
+			<!-- 考虑到性能问题，最大暂支持20个窗口历史数据记录 -->
 			<div id="SQLWindowTemp"></div>
 			<div id="SQLWindow0"></div>
 			<div id="SQLWindow1"></div>
