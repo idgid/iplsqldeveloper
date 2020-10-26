@@ -64,6 +64,8 @@ public class BaisWorkBean {
 	private List insertDeleteList = new ArrayList();
 	private List execObjectList = new ArrayList();
 
+	private String spectStr = "_$$$_";  // 分隔符
+
 	/**
 	 *
 	 * @param startPage
@@ -226,7 +228,7 @@ public class BaisWorkBean {
 
 			String[] columnName = new String[getColumnCount];
 			for (int j = 0; j < getColumnCount; j++) {
-				columnName[j] = rsNb.getColumnName(j + 1);
+				columnName[j] = rsNb.getColumnName(j + 1) + spectStr + rsNb.getColumnTypeName(j + 1) + spectStr + rsNb.getColumnDisplaySize(j + 1);
 			}
 
 			Vector vColumn = new Vector();
@@ -256,10 +258,24 @@ public class BaisWorkBean {
 					//2007-11-4由phanrider加入对"BLOB"或者"CLOB"类型的过滤
 					//如果字段类型是"BLOB"或者"CLOB"类型，则打出"<long>"
 					if ("BLOB".equals(rs.getMetaData().getCatalogName(j)) ||
-							"CLOB".equals( rs.getMetaData().getColumnTypeName(j)))
-						  value = "&lt;long&gt;";
-					else  value = CharSet.nullToEmpty(rs
-							.getString(j));
+							"CLOB".equals( rs.getMetaData().getColumnTypeName(j))
+						||"BLOB".equals( rs.getMetaData().getColumnTypeName(j)) ) {
+
+						if ("CLOB".equals( rs.getMetaData().getColumnTypeName(j)))  {
+							value = CharSet.nullToEmpty(db.getClob(rs, j));
+						}
+
+						if ( "BLOB".equals(rs.getMetaData().getCatalogName(j)) ||"BLOB".equals( rs.getMetaData().getColumnTypeName(j))  ) {
+							byte[] blobTmp = db.getBlob(rs , j );
+							value = "";
+						}
+
+
+					} else if ( "LONG".equals( rs.getMetaData().getColumnTypeName(j)) ) {
+						value = "&lt;long&gt;";
+
+					}
+					else  value = CharSet.nullToEmpty(rs.getString(j));
 
 					//value = CharSet.nullToEmpty(rs
 					//getString(columnName[i]));
