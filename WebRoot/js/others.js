@@ -93,6 +93,13 @@ if (GMIXWINDOWS == null) var GMIXWINDOWS = 20;
 
 if (GWINDOWLIST == null) var GWINDOWLIST = []; GWINDOWLIST[GMIXWINDOWS] = [];
 
+// gridcell最大长度
+if (GGRIDCELLLENGTH == null) var GGRIDCELLLENGTH = 30;
+
+// gridHeadAttr 属性
+if (GGRIDHEADATTR ==  null)  var GGRIDHEADATTR = [];
+
+
 
 
 
@@ -1068,7 +1075,7 @@ function breakRun(textareaname) {
 }
 
 
-//得到获取编辑器中选取文字内容div  --已改
+//得到获取编辑器中选取文字内容div  --已改setColTypes
 function getTextareaContents(EditorName) {
 	//var Objname = parent.parent.editorFrame.GGETFRAME.document.getElementById(EditorName);
 	var myText = "";
@@ -1261,7 +1268,7 @@ function showDataHtml(rows,data) {
 
     mygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject('outResultDiv');
     parent.parent.editorFrame.GGETFRAME.mygrid = mygrid;
-
+	GGRIDHEADATTR = parent.parent.editorFrame.GGETFRAME.GGRIDHEADATTR;
 
     mygrid.setImagePath("../../js/codebase/imgs/");
 
@@ -1280,23 +1287,35 @@ function showDataHtml(rows,data) {
     tcell = data[0].length; //表格展示的列数
     var strHeader = "";
     var strSort = "";
+    var gridRowType = "";
+    var gridRowTypeFlag = "ed";
+    var splitStr = "_$$$_";
     for(var i = 0; i < tcell; i++) {
+		GGRIDHEADATTR[i] = data[0][i].split(splitStr);
+		GGRIDHEADATTR[i][2] < GGRIDCELLLENGTH ? gridRowTypeFlag = "ed" : gridRowTypeFlag = "txt";
     	if(i == (tcell - 1)) {
-    		strHeader = strHeader + data[0][i];
+    		strHeader = strHeader + GGRIDHEADATTR[i][0];
     		strSort = strSort + "str";
+			gridRowType = gridRowType + gridRowTypeFlag;
     	} else  {
-    		strHeader = strHeader + data[0][i] + "," ;
+    		strHeader = strHeader + GGRIDHEADATTR[i][0] + "," ;
     		strSort = strSort + "str" + ",";
+			gridRowType = gridRowType + gridRowTypeFlag + ",";
     	}
     }
 
 
     strHeader = " ," + strHeader; //前面加一个空行
     strSort = "int," + strSort; //前面数字排序
+	gridRowType = "ro," + gridRowType;
     mygrid.setHeader(strHeader);
     mygrid.setColAlign("right");
-	//mygrid.setColTypes("ro,ed");
+	mygrid.setColTypes(gridRowType);
 	mygrid.setColSorting(strSort);
+	mygrid.attachEvent("onRowSelect",doOnRowSelected);
+	mygrid.attachEvent("onKeyPress",onKeyPressed);
+	mygrid.enableBlockSelection(); // 设置可选择锁定
+
 
 
 	var strHeaderWidth = "";
@@ -1406,8 +1425,23 @@ function showDataHtml(rows,data) {
   	}
 
   	function doOnRowSelected(rowID,celInd){
-  	alert("Selected row ID is "+rowID+"\nUser clicked cell with index "+celInd);
-  }
+		setFootView('9999', GGRIDHEADATTR[celInd -1][0].toLowerCase() + "," + GGRIDHEADATTR[celInd -1][1].toLowerCase() + "(" + GGRIDHEADATTR[celInd -1][2] + ")");
+  	}
+
+	function onKeyPressed(code, ctrl, shift){
+		if( code==67 && ctrl ){
+			if (!mygrid._selectionArea ) return alert("You need to select a block area first!");
+			mygrid.setCSVDelimiter("\t");
+			mygrid.copyBlockToClipboard()
+		}
+		if( code==86 && ctrl ){
+			mygrid.setCSVDelimiter("\t");
+			mygrid.pasteBlockFromClipboard()
+		}
+		return true;
+	}
+
+
 
 }
 
@@ -1542,6 +1576,7 @@ function addFullDataHtml(rows,data) {
 function changeRecordShowHtml() {
     mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
     resultbakHead = parent.parent.editorFrame.GGETFRAME.resultbakHead;
+	GGRIDHEADATTR = parent.parent.editorFrame.GGETFRAME.GGRIDHEADATTR;
 	var tmprows = mygrid.getSelectedId();
 	if (mygrid.getSelectedId() == null) tmprows = "0";
 
@@ -1567,9 +1602,11 @@ function changeRecordShowHtml() {
 		} else {
     		tmpcol = mygrid.cells(mygrid.getSelectedId(),i).getValue();
     	}
-    	strRow = " ," + resultbakHead[i-1] + ",";
+		strRow = " ," + GGRIDHEADATTR[i-1][0] + "," ;
+		// strRow = " ," + resultbakHead[i-1] + ",";
 
-    	var tmpS = changeHtml(tmpcol);
+
+		var tmpS = changeHtml(tmpcol);
 
     	strRow = strRow + tmpS ;
 
@@ -2017,7 +2054,7 @@ function createOutResultMenu(divname) {
 	'<a onclick="execFetchNextPage(event);" href="#">Fetch Next Page</a>' +
 	'<a onclick="execFetchLastPage(event);" href="#">Fetch Last Page</a>' +
 	'<ul></ul>' +
-	'<a onclick="execCopyResults(event);" ><font color="#808080">Copy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ctrl+C</font></a>' + //未实现功能的菜单先恢化
+	'<a onclick="execCopyResults(event);" href="#" >Copy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ctrl+C</a>' + //未实现功能的菜单先恢化
 	'<a onclick="execExportResults(event);" ><font color="#808080">Copy to Excel</font></a>'; //未实现功能的菜单先恢化
 
 	setDivValueHtml(divname,stemp);
@@ -2070,6 +2107,25 @@ function execFetchLastPage(e) {
 //工作结果输出区右键Copy命令执行函数
 function execCopyResults(e) {
 	hiddenBaisworkMenu(e);
+	var mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+	var cc = mygrid.cells(mygrid.getSelectedId(), mygrid.getSelectedCellIndex());
+
+	function copyToClip(content, m) {
+		var o = parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow;
+		var clip = o.document.createElement("input");
+		clip.setAttribute("value", content);
+		o.document.body.appendChild(clip);
+		clip.select();
+		o.document.execCommand("copy", false, null);
+		o.document.body.removeChild(clip);
+
+		return m;
+	}
+
+	copyToClip(cc.getValue());
+	// mygrid.setCSVDelimiter("\t");
+	// mygrid.copyBlockToClipboard();
+
 }
 
 //工作结果输出区右键Export Results命令执行函数
