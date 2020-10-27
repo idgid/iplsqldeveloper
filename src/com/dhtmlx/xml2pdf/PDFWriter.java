@@ -35,7 +35,7 @@ public class PDFWriter {
 	public double headerImgHeight = 100;
 	public double footerImgHeight = 100;
 
-	public double fontSize = 10;
+	public double fontSize = 8;
 
 	private String bgColor;
 	private String lineColor;
@@ -97,7 +97,7 @@ public class PDFWriter {
 
 	private void createPDF() throws Exception {
 		pdf = new PDF();
-		f1 = new Font(pdf, "Helvetica");
+		f1 = new Font(pdf, "AdobeSongStd", CodePage.UNICODE);
 		f1.setSize(fontSize);
 
 		pages = new ArrayList<Page>();
