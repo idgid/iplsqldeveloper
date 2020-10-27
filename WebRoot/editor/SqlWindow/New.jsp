@@ -322,7 +322,7 @@
 							 alt="Previous record" align="absmiddle">
 					</td>
 					<td class="coolButtonDisabled" id="exportResultResultsTd"
-						onclick="execExportResults('myTextarea',event);">
+						onclick="execExportResults('excel',event);">
 						<img id='exportResultResultsButton'
 							 src="../../images/export_query_results.gif"
 							 title="Export Query Results..." alt="Export Query Results..."
