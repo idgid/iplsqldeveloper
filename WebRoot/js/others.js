@@ -2049,13 +2049,15 @@ function menuShowObjPD (str, flag, strTopX, strTopY) {
 function createOutResultMenu(divname) {
 	var stemp ='<a onclick="execClearAll(\'myTextarea\',event);" href="#">Clear</a>' +
 	'<a onclick="execClearResults(event);" href="#">Clear Results</a>' +
-	'<a onclick="execExportResults(\'myTextarea\',event);"  href="#">Export Results</a>' +  //未实现功能的菜单先恢化
+	'<a onclick="execExportResults(\'pdf\',event);"  href="#">Export Results PDF</a>' +  // 当前页面结查生成 pdf
+	'<a onclick="execExportResults(\'html\',event);"  href="#">Export Results HTML</a>' +  // 当前页面结查生成 html
+	'<a onclick="execExportResults(\'csv\',event);"  href="#">Export Results CSV</a>' +  // 当前页面结查生成 csv
 	'<ul></ul>' +
 	'<a onclick="execFetchNextPage(event);" href="#">Fetch Next Page</a>' +
 	'<a onclick="execFetchLastPage(event);" href="#">Fetch Last Page</a>' +
 	'<ul></ul>' +
-	'<a onclick="execCopyResults(event);" href="#" >Copy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ctrl+C</a>' + //未实现功能的菜单先恢化
-	'<a onclick="execExportResults(event);" ><font color="#808080">Copy to Excel</font></a>'; //未实现功能的菜单先恢化
+	'<a onclick="execCopyResults(event);" href="#" >Copy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ctrl+C</a>' +
+	'<a onclick="execExportResults(\'excel\', event);"  href="#">Copy to Excel</a>'; // 当前页面结果集生成 excel
 
 	setDivValueHtml(divname,stemp);
 }
@@ -2086,8 +2088,15 @@ function execClearResults(e) {
 //工作结果输出区右键Export Results命令执行函数
 function execExportResults(oName, e) {
 	hiddenBaisworkMenu(e);
-    console.log(parent.mygrid);
-    parent.parent.editorFrame.GGETFRAME.mygrid.toExcel('../../excel/toExcel.action','gray');
+	setFootView(9999, 'Exporting. Please wait ...');
+	if ( oName == 'pdf') parent.parent.editorFrame.GGETFRAME.mygrid.toPDF('../../pdf/toPDF.action','gray');
+	if ( oName == 'excel') 	parent.parent.editorFrame.GGETFRAME.mygrid.toExcel('../../excel/toExcel.action','gray');
+	if ( oName == 'html') 	parent.parent.editorFrame.GGETFRAME.mygrid.toPDF('../../excel/toHtml.action','gray');
+	if ( oName == 'csv') 	parent.parent.editorFrame.GGETFRAME.mygrid.toExcel('../../excel/toCSV.action','gray');
+	setFootView(9999, 'Exporting, Please wait ... done'); // 修改提示语
+
+
+
 }
 
 //工作结果输出区右键Fetch Next Page命令执行函数
@@ -3467,7 +3476,7 @@ function deleteWindowListDiv(currTrRown) {
 	parent.leftFrameList.$(windowDiv).set('html','');
 }
 
-//依次调整各个DIV的值
+//依次调整各个DIV的值 2020-10-02 修改为恢复各种状态，现无须依次调整各个DIV值
 function adjustmentWindowListDiv(trRow) {
 	//首先得到当前活动窗口的trRow
 	var currTrRown = trRow;
