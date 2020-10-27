@@ -38,4 +38,8 @@
 		<action name="toExcel" class="org.reddragonfly.iplsqldevj.action.excel.ExcelGeneratorAction"></action>
 	</package>
 
+	<package name="pdf" namespace="/pdf" extends="myDefault">
+		<action name="toPDF" class="org.reddragonfly.iplsqldevj.action.pdf.PDFGeneratorAction"></action>
+	</package>
+
 </struts>
