@@ -6,6 +6,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.*;
 
 import com.dhtmlx.xml2excel.ExcelWriter;
+import com.dhtmlx.xml2excel.HTMLWriter;
 import com.opensymphony.xwork2.ActionContext;
 import org.apache.struts2.ServletActionContext;
 import org.reddragonfly.iplsqldevj.action.BaseAction;

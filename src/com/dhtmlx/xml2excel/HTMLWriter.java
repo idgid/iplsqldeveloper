@@ -13,13 +13,13 @@ public class HTMLWriter extends BaseWriter{
 
 	public void generate(String xml, HttpServletResponse resp) throws IOException {
 		CSVxml data = new CSVxml(xml);
-		
+
 		resp.setCharacterEncoding("UTF-8");
 		resp.setContentType("application/vnd.ms-excel");
 		resp.setCharacterEncoding("UTF-8");
-		resp.setHeader("Content-Disposition", "attachment;filename=grid.xls");
+		resp.setHeader("Content-Disposition", "attachment;filename=grid.html");
 		resp.setHeader("Cache-Control", "max-age=0");
-	
+
 		String[] csv;
 		int colsnum = 0;
 		PrintWriter writer = resp.getWriter();
@@ -28,11 +28,11 @@ public class HTMLWriter extends BaseWriter{
 		startHTML(writer, colors);
 		csv = data.getHeader();
 		if (csv != null)colsnum = csv.length;
-		while(csv != null){			
+		while(csv != null){
 			writer.append(dataAsString(csv, "header"));
 			csv = data.getHeader();
 		}
-		
+
 		csv = data.getRow();
 		if (csv != null){
 			colsnum = csv.length;
@@ -44,17 +44,17 @@ public class HTMLWriter extends BaseWriter{
 			csv = data.getRow();
 			rows +=1;
 		}
-		
+
 		csv = data.getFooter();
 		if (csv != null)colsnum = csv.length;
-		while(csv != null){			
+		while(csv != null){
 			writer.append(dataAsString(csv, "footer"));
 			writer.flush();
 			csv = data.getFooter();
 		}
 		drawWatermark(writer, colsnum);
 		endHTML(writer);
-		
+
 		writer.flush();
 		writer.close();
 	}
@@ -91,14 +91,14 @@ public class HTMLWriter extends BaseWriter{
 
 	private String dataAsString(String[] csv, String className) {
 		if (csv.length == 0) return "";
-		
+
 		StringBuffer buff = new StringBuffer();
 		buff.append("<tr>");
 		for ( int i=0; i<csv.length; i++){
 			buff.append("<td class=\"" + className + "\">");
 			buff.append(csv[i].replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;"));
 			buff.append("</td>");
-		}	
+		}
 		buff.append("</tr>\n");
 		return buff.toString();
 	}
@@ -110,7 +110,7 @@ public class HTMLWriter extends BaseWriter{
 	public int getRowsStat() {
 		return rows;
 	}
-	
+
 	public void setFontSize(int fontsize) {
 		this.fontSize = fontsize;
 	}
@@ -118,7 +118,7 @@ public class HTMLWriter extends BaseWriter{
 	public void setWatermark(String watermark) {
 		this.watermark = watermark;
 	}
-	
+
 	private Colors getColors(CSVxml data) {
 		String profile = data.getProfile();
 		Colors colors = new Colors();

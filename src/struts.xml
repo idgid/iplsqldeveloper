@@ -36,10 +36,13 @@
 
 	<package name="excel" namespace="/excel" extends="myDefault">
 		<action name="toExcel" class="org.reddragonfly.iplsqldevj.action.excel.ExcelGeneratorAction"></action>
+		<action name="toHtml" class="org.reddragonfly.iplsqldevj.action.excel.HTMLGeneratorAction"></action>
+		<action name="toCSV" class="org.reddragonfly.iplsqldevj.action.excel.CSVGeneratorAction"></action>
 	</package>
 
 	<package name="pdf" namespace="/pdf" extends="myDefault">
 		<action name="toPDF" class="org.reddragonfly.iplsqldevj.action.pdf.PDFGeneratorAction"></action>
 	</package>
+
 
 </struts>
