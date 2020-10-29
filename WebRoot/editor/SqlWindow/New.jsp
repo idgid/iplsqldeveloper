@@ -159,6 +159,34 @@
             background-color:#E5FFE5;
         }
 
+		#autoCompletion{
+			position: absolute;
+            background-color: #fff;
+			width: 350px;
+            height: 150px;
+			font-size: 12px;
+			font-family: "Courier New", Courier, mono;
+			left: 36px; top: 25px;
+		}
+		#autoCompletion.show{
+			border: 1px solid #004a7e;
+		}
+		#autoCompletion.hide{
+			border: none;
+		}
+
+		ul{
+			list-style: none;
+			margin: 0px; padding: 0px;
+		}
+		li.mouseOver{
+			background-color: #004a7e;
+			color: #FFFFFF;
+		}
+		li.mouseOut{
+			background-color: #FFFFFF;
+			color: #004a7e;
+		}
 
 	</style>
 
@@ -217,6 +245,7 @@
 			<%--</div>--%>
 
 			<textarea id="myTextarea" class="editor" name="myTextarea_editor"></textarea>
+				<div id="autoCompletion" name="autoCompletion"></div>
 
 			<div
 					style="border: 0px; width: 3%; height: 100%; background: ButtonFace; float: right; vertical-align: middle; display: none;">
