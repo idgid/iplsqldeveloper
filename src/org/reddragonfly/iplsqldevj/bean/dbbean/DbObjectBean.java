@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 
 public class DbObjectBean {
 
-	//by phanrider 2011-4-13 
+	//by phanrider 2011-4-13
 	//新增表的属性
 	private static String getTablespace = null;
 	private static String getInitExtent = null;
@@ -30,7 +30,7 @@ public class DbObjectBean {
 	private static String getClusterName = null;
 	private static String getClusterColumns = null;
 	private static String getComment = null;
-	
+
 	public List getObject(String sql, Vector v1) {
 		HttpServletRequest request = WebContextFactory.get()
 				.getHttpServletRequest();
@@ -158,8 +158,8 @@ public class DbObjectBean {
 			throw e;
 		}
 	}
-	
-	
+
+
 	public StringBuffer getKeyID(String sql, Database db) throws Exception {
 		StringBuffer KeyValue = new StringBuffer();
 		ResultSet rs = null;
@@ -176,7 +176,7 @@ public class DbObjectBean {
 		throw e;
 		}
 	}
-	
+
 	//得到 TABLE 的各种约束
 	public List getKeys(String sql, Vector v1) throws Exception {
 		// String[] columnName=column.split(",");
@@ -185,7 +185,7 @@ public class DbObjectBean {
 		HttpSession session = request.getSession();
 		UserBean ub = (UserBean) session.getAttribute("user");
 		Database db = ub.getDb();
-		
+
 		List list = new ArrayList();
 		list.add(v1);
 		ResultSet rs = null;
@@ -215,7 +215,7 @@ public class DbObjectBean {
 							value = "(Result)";
 						}
 						if ( i == 2) { //第二列之后补上一列
-							
+
 							v.add(value);
 							//此处只有用户态数据,没有全局DBA数据,功能需后补,无法得到全局约束所有者名称
 							String keyIdSql = "select ucc.column_name from user_cons_columns ucc " +
@@ -234,8 +234,8 @@ public class DbObjectBean {
 			throw e;
 		}
 	}
-	
-	
+
+
 	public List getIndexs(String sql, Vector v1) throws Exception {
 		// String[] columnName=column.split(",");
 		HttpServletRequest request = WebContextFactory.get()
@@ -243,7 +243,7 @@ public class DbObjectBean {
 		HttpSession session = request.getSession();
 		UserBean ub = (UserBean) session.getAttribute("user");
 		Database db = ub.getDb();
-		
+
 		List list = new ArrayList();
 		list.add(v1);
 		ResultSet rs = null;
@@ -273,7 +273,7 @@ public class DbObjectBean {
 							value = "(Result)";
 						}
 						if ( i == 3) {  //第三列之后补上一列
-							
+
 							v.add(value);
 							//此处只有用户态数据,没有全局DBA数据,功能需后补,无法得到全局索引所有者名称
 							String IndexIdSql = "select column_name from user_ind_columns where index_name='" + CharSet.nullToEmpty(rs.getString(2)) + "'";
@@ -297,13 +297,13 @@ public class DbObjectBean {
 			throw e;
 		}
 	}
-	
-	
+
+
 	/**
 	 * <p>该方法得到当前库中所有用户对象名称与类型
 	 */
 	public List getUserObject(){
-		String sql = "select object_name,object_type from user_objects";
+		String sql = "select object_name,object_type from user_objects order by object_name,object_type asc";
 		HttpServletRequest request = WebContextFactory.get()
 		.getHttpServletRequest();
 		HttpSession session = request.getSession();
@@ -312,16 +312,16 @@ public class DbObjectBean {
 
 		List list = new ArrayList();
 		try {
-			
+
 			list = QueryManage.getResult(sql, db);
-			
+
 		} catch (Exception e) {
 			//throw e;
 		}
 		return list;
 	}
-	
-	
+
+
 	/*
 	 * select tt.tablespace_name, tt.initial_extent/1024/1024 initial_extent, tt.pct_free, tt.next_extent, tt.pct_used, tt.pct_increase,
 	tt.ini_trans, tt.min_extents, tt.max_trans, tt.max_extents from user_tables tt where table_name='T_CORP'
@@ -351,9 +351,9 @@ public class DbObjectBean {
 		}
 		return null;
 	}
-	
-	
-	
+
+
+
 	public String getGetTablespace() {
 		return getTablespace;
 	}
@@ -457,5 +457,5 @@ public class DbObjectBean {
 	public void setGetComment(String getComment) {
 		this.getComment = getComment;
 	}
-	
+
 }
