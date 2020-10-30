@@ -163,17 +163,20 @@
 			position: absolute;
             background-color: #fff;
 			width: 350px;
-            height: 150px;
+			height: 100px;
+			overflow-y: auto;
 			font-size: 12px;
 			font-family: "Courier New", Courier, mono;
-			left: 36px; top: 25px;
 		}
 		#autoCompletion.show{
-			border: 1px solid #004a7e;
+			border: 2px solid #a0a0a0;
 		}
 		#autoCompletion.hide{
 			border: none;
 		}
+        #autoSelector {
+            font-size: 12px;
+        }
 
 		ul{
 			list-style: none;
