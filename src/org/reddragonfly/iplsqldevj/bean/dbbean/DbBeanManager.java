@@ -1,12 +1,13 @@
 package org.reddragonfly.iplsqldevj.bean.dbbean;
 
 public class DbBeanManager {
-	
-	protected static String[] CFIELDS = 
+
+	protected static String[] CFIELDS =
     {"Function","Procedure","Package","Package body","Type","Type body",
 	"Trigger","Java source","Job","Queue","Queue table","Library","Directory","Table","View","Materialized view",
 	"Sequence","User","Profile","Role","Synonym","Database link","Tablespace","Cluster"};
-	
+    protected static String FIELDS_PRI = "Privileges";
+
 	public static String getTreeXml(String type,String name,String field){
 		if(type == null) type = "";
 		if(name == null) name = "";
@@ -31,15 +32,20 @@ public class DbBeanManager {
 		else if(type.toLowerCase().equals(DbMaterializedViewBean.TYPE)) dbbean = new DbMaterializedViewBean(name);
 		else if(type.toLowerCase().equals(DbSequenceBean.TYPE)) dbbean = new DbSequenceBean(name);
 		else if(type.toLowerCase().equals(DbUserBean.TYPE)) dbbean = new DbUserBean(name);
-		else if(type.toLowerCase().equals(DbProfileBean.TYPE)) dbbean = new DbProfileBean(name);
+        else if(type.toLowerCase().equals(DbUserBean.TYPESUB)) dbbean = new DbUserBean(name);
+        else if(type.toLowerCase().equals(DbProfileBean.TYPE)) dbbean = new DbProfileBean(name);
 		else if(type.toLowerCase().equals(DbRoleBean.TYPE)) dbbean = new DbRoleBean(name);
 		else if(type.toLowerCase().equals(DbSynonymBean.TYPE)) dbbean = new DbSynonymBean(name);
 		else if(type.toLowerCase().equals(DbDatabaseLinkBean.TYPE)) dbbean = new DbDatabaseLinkBean(name);
 		else if(type.toLowerCase().equals(DbTablespaceBean.TYPE)) dbbean = new DbTablespaceBean(name);
 		else if(type.toLowerCase().equals(DbClusterBean.TYPE)) dbbean = new DbClusterBean(name);
 		if(dbbean == null) return "<?xml version=\"1.0\" encoding=\"utf-8\"?><tree><tree text=\"Nodata\" /></tree>";
-		if(field.trim().equals("")) return dbbean.getTreeXml();
-		else return dbbean.getFieldTreeXml(field);
+		if(field.trim().equals(""))  {
+		    if (type.toLowerCase().equals(DbUserBean.TYPESUB))  return dbbean.getTreeXmlN();
+		    else return dbbean.getTreeXml();
+        }
+		else  return dbbean.getFieldTreeXml(field);
+
 	}
 
 	public static String getTreeXmlN(String type,String name,String field){
@@ -76,7 +82,7 @@ public class DbBeanManager {
 		if(field.trim().equals("")) return dbbean.getTreeXmlN();
 		else return dbbean.getFieldTreeXml(field);
 	}
-	
+
 	public static String getMenuScript(String type,String name,String field){
 		if(type == null) type = "";
 		if(name == null) name = "";
@@ -111,7 +117,7 @@ public class DbBeanManager {
 		if(field.trim().equals("")) return dbbean.getMenuScript();
 		else return dbbean.getFieldMenuScript(field);
 	}
-	
+
 	public static String getChildMenuIcon(String subType, String status){
 		String icon = "dbimages/notype.png";
 		String inValidIcon = "";

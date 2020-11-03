@@ -14,6 +14,7 @@ import com.opensymphony.xwork2.ActionContext;
 public class DbUserBean extends DbBean {
 
 	public static String TYPE = "user";
+	public static String TYPESUB = "usersub";
 	public static String ICON_INVALID = "dbimages/users.png";
 	public static String ICON_VALID = "dbimages/users.png";
 	public static String ICON_PARAMTER = "dbimages/privilege.png";
@@ -28,6 +29,19 @@ public class DbUserBean extends DbBean {
 			"Triggers","Java sources","Queues","Libraries","Tables","Views",
 			"Sequences","Synonyms","Database links","Clusters"};
 
+	protected static String[] OBJ_TPYES =
+			{"CLUSTER","CONSUMER GROUP","CONTEXT","DATABASE LINK","DESTINATION","DIMENSION","DIRECTORY","EDITION","EVALUATION CONTEXT",
+					"FUNCTION","INDEX","INDEX PARTITION","INDEXTYPE","JAVA CLASS","JAVA DATA","JAVA RESOURCE","JAVA SOURCE","JOB","JOB CLASS",
+					"LIBRARY","LOB","LOB PARTITION","MATERIALIZED VIEW","OPERATOR","PACKAGE","PACKAGE BODY","PROCEDURE","PROGRAM","QUEUE",
+					"RESOURCE PLAN","RULE","RULE SET","SCHEDULE","SCHEDULER GROUP","SEQUENCE","SYNONYM","TABLE","TABLE PARTITION","TRIGGER",
+					"TYPE","TYPE BODY","UNDEFINED","VIEW","WINDOW","XML SCHEMA"};
+
+	protected static String[] ICON_A =
+			{"dbimages/profiles.png", "dbimages/profiles.png", "dbimages/profiles.png", "dbimages/db_links.png", "dbimages/profiles.png","dbimages/profiles.png","dbimages/valid_directories.png","dbimages/profiles.png","dbimages/profiles.png",
+					"dbimages/valid_funs.png", "dbimages/index.png","dbimages/index.png","dbimages/profiles.png","dbimages/java_class.png","dbimages/java_class.png","dbimages/java_class.png","dbimages/java_class.png","dbimages/valid_jobs.png","dbimages/job_class.png",
+					"dbimages/valid_libraries.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/valid_views.png","dbimages/profiles.png","dbimages/valid_pkgs.png","dbimages/valid_pkgs_b.png","dbimages/valid_prcs.png","dbimages/program.png","dbimages/valid_queue_tables.png",
+					"dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/valid_sequences.png","dbimages/profiles.png","dbimages/valid_queue_tables.png","dbimages/valid_queue_tables.png","dbimages/ena_trigers.png",
+					"dbimages/valid_types.png","dbimages/valid_types_b.png","dbimages/valid_funs.png","dbimages/valid_views.png","dbimages/valid_funs.png","dbimages/valid_funs.png",};
 
 	protected String name = "";
 	public DbUserBean(String name){
@@ -39,6 +53,7 @@ public class DbUserBean extends DbBean {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		sb.append("<tree>");
+
 		for(int i = 0;i < FIELDS.length;i++){
 			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
 			if( i == 0 ) {
@@ -54,15 +69,36 @@ public class DbUserBean extends DbBean {
 		return sb.toString();
 	}
 
-	public String getTreeXmlN() {
+	public String getTreeSubXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
 		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		sb.append("<tree>");
-		for(int i = 0;i < FIELDS.length;i++){
-			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-			sb.append("<item id=\""+ i +"\" text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
-		}
+
+		sb.append("<tree text=\""+ FIELDS_PRI +"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + FIELDS_PRI + "\"  />");
+
+		sb.append("</tree>");
+		return sb.toString();
+	}
+
+	public String getTreeXmlN() {
+		// TODO Auto-generated method stub
+		//StringBuffer sb = new StringBuffer();
+		//sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		//sb.append("<tree>");
+		//for(int i = 0;i < FIELDS.length;i++){
+		//	//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
+		//	sb.append("<item id=\""+ i +"\" text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+		//}
+		//sb.append("</tree>");
+		//return sb.toString();
+		// TODO Auto-generated method stub
+		StringBuffer sb = new StringBuffer();
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		sb.append("<tree>");
+
+		sb.append("<tree text=\""+ FIELDS_PRI +"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + FIELDS_PRI + "\"  />");
+
 		sb.append("</tree>");
 		return sb.toString();
 	}
@@ -78,7 +114,7 @@ public class DbUserBean extends DbBean {
 			sb.append("<tree text=\""+FIELDS[0]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[0]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[0]+"',event)\" />");
 		}
 		if(fieldName.equals(FIELDS[1])) {
-			sb.append("<tree text=\""+FIELDS[1]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[1]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[1]+"',event)\" />");
+			sb.append(getObjectPrivileges(name));
 		}
 		if(fieldName.equals(FIELDS[2])) {
 			//sb.append(getReferencedBy(name));
@@ -89,14 +125,32 @@ public class DbUserBean extends DbBean {
 			sb.append(getRoleGrant(name));
 
 		}
-		if(field[0].equals(FIELDS_PRI)) {	//单独加入privilege处理
+
+		if (field.length >= 2) {
 			if (field.length == 2) {
-				String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
-				sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+TempFieldName+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+fieldName+"',event)\" />");
-			} else {
-				if (field[2].equals(PRIVILEGE_FLAG))	sb.append(getPrivilege(field[1]));
+				String ownerName = field[0];
+				String tempFieldName = field[1];
+			}
+
+		} else if (field.length == 1) {
+			if (field[0].equals(FIELDS_PRI)) {
+				sb.append(getSubPrivileges(name));
 			}
 		}
+
+		//if(field[0].equals(FIELDS_PRI)) {	//单独加入privilege处理
+		//	if (field.length == 2) {
+		//		String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
+		//		sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+TempFieldName+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+fieldName+"',event)\" />");
+		//	} else 	if (field[2].equals(PRIVILEGE_FLAG)) {
+		//		sb.append(getPrivileges(field[1]));
+		//	} else {
+		//		//sb.append(getSubPrivileges(name));
+		//		sb.append("<item id=\""+ 0 +"\" text=\""+ FIELDS_PRI +"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + FIELDS_PRI + "\"  />");
+		//
+		//	}
+		//
+		//}
 		sb.append("</tree>");
 		return sb.toString();
 	}
@@ -184,7 +238,7 @@ public class DbUserBean extends DbBean {
 	//	return sb.toString();
 	//}
 
-	public String getPrivilege(String name) {
+	public String getPrivileges(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -208,7 +262,97 @@ public class DbUserBean extends DbBean {
 				i = 1;
 				String grantable = "";
 				if (CharSet.nullToEmpty(rs.getString(2)).equals("YES")) grantable = "(GRANTABLE)";
-				sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1)) +  grantable + "\" icon=\""+ ICON_PARAMTER +"\"  openIcon=\""+ ICON_PARAMTER +"\" />");
+				sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1)) +  grantable + "\"  icon=\""+ ICON_PARAMTER +"\"  openIcon=\""+ ICON_PARAMTER +"\" />");
+			}
+			if (i == 0) sb.append("<tree text=\"Nodata\" />");
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}finally{
+			if(rs != null) ub.getDb().close(rs);
+		}
+		return sb.toString();
+	}
+
+	public String getSubPrivileges(String name) {
+		String[] nameStr = name.split("\\.",3);
+		StringBuffer sb = new StringBuffer();
+		ActionContext ctx = ActionContext.getContext();
+		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+		HttpSession session = request.getSession();
+		UserBean ub = (UserBean)session.getAttribute("user");
+		String sql = null;
+		ResultSet rs = null;
+
+		try{
+			//String obj = null;
+			String allObj = "all_tab_privs";
+			if(ub.getDbglobal()) {
+				//obj = "all_tab_privs";
+				sql = "select privilege,grantable from " + allObj + " where table_schema='" + nameStr[0] + "' and grantee='" + nameStr[2] + "' and table_name='" + nameStr[1] + "' order by privilege asc";
+			} else {
+				sql = "select privilege,grantable from " + allObj + " where table_schema='" + nameStr[0] + "' and grantee='" + nameStr[2] + "' and table_name='" + nameStr[1] + "' order by privilege asc";
+			}
+			rs = ub.getDb().getRS(sql);
+			int i = 0;
+			while(rs.next()){
+				i = 1;
+				String grantable = "";
+				if (CharSet.nullToEmpty(rs.getString(2)).equals("YES")) grantable = " (GRANTABLE)";
+				sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1)) +  grantable + "\"  icon=\""+ ICON_PARAMTER +"\"  openIcon=\""+ ICON_PARAMTER +"\" />");
+			}
+			if (i == 0) sb.append("<tree text=\"Nodata\" />");
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}finally{
+			if(rs != null) ub.getDb().close(rs);
+		}
+		return sb.toString();
+	}
+
+	public String getObjectPrivileges(String name) {
+		StringBuffer sb = new StringBuffer();
+		ActionContext ctx = ActionContext.getContext();
+		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+		HttpSession session = request.getSession();
+		UserBean ub = (UserBean)session.getAttribute("user");
+		String sql = null;
+		ResultSet rs = null;
+
+		try{
+			//String obj = null;
+			String allObj = "dba_objects";
+			if(ub.getDbglobal()) {
+				//obj = "all_tab_privs";
+				sql = "select owner||'.'||object_name object_name,object_type from " + allObj + " where 1=1 " +
+						" and owner != '" + this.name.toUpperCase() + "' and object_type !='SYNONYM' and object_type != 'QUEUE' and object_type != 'PACKAGE BODY' and object_type != 'TYPE BODY'" +
+						" and object_name in (select table_name from ALL_TAB_PRIVS where grantee = '" + this.name.toUpperCase() + "') " +
+						" order by object_type,owner,object_name asc";
+
+				//sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+			} else {
+				sql = "select owner||'.'||object_name object_name,object_type from " + allObj + " where 1=1 " +
+						" and owner != '" + this.name.toUpperCase() + "' and object_type !='SYNONYM' and object_type != 'QUEUE' and object_type != 'PACKAGE BODY' and object_type != 'TYPE BODY'" +
+						" and object_name in (select table_name from ALL_TAB_PRIVS where grantee = '" + this.name.toUpperCase() + "') " +
+						" order by object_type,owner,object_name asc";
+				//sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+			}
+			rs = ub.getDb().getRS(sql);
+			int i = 0;
+			while(rs.next()){
+				i = 1;
+				String tmpIcon = ICON_PARAMTER;
+				String granType = "";
+				//if (CharSet.nullToEmpty(rs.getString(2)).equals("YES")) grantable = "(GRANTABLE)";
+				for (int j = 0; j < OBJ_TPYES.length; j++ ) {
+					if (CharSet.nullToEmpty(rs.getString(2)).equals(OBJ_TPYES[j])) {
+						tmpIcon = ICON_A[j];
+						granType = rs.getString(1) + "." + this.name.toUpperCase();
+						j = OBJ_TPYES.length;
+					}
+				}
+				//sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))  + "\" icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon +"\" />");
+				sb.append("<tree text=\""+ CharSet.nullToEmpty(rs.getString(1)) + "\" src=\"showTree.action?type=" + TYPESUB +"&amp;name="+ granType +"&amp;field="+ "" +"\"  icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon + "\" />");
+
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){

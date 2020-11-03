@@ -15,6 +15,10 @@ public class DbRootBean extends DbBean{
 	    {"Recent objects","Recycle bin","Functions","Procedures","Packages","Package bodies","Types","Type bodies",
 		"Triggers","Java sources","Jobs","Queues","Queue tables","Libraries","Directories","Tables","Views","Materialized views",
 		"Sequences","Users","Profiles","Roles","Synonyms","Database links","Tablespaces","Clusters"};
+	protected static String[] USERFIELDS =
+			{"Functions","Procedures","Packages","Package bodies","Types","Type bodies",
+					"Triggers","Java sources","Jobs","Queues","Queue tables","Libraries","Directories","Tables","Views","Materialized views",
+					"Sequences","Synonyms","Database links","Tablespaces","Clusters"};
 
 	protected String name = "";
 	public DbRootBean(String name){
@@ -28,11 +32,17 @@ public class DbRootBean extends DbBean{
 		if (name.equals("") || name.equals(null)) {
 			sb.append("<tree text=\""+FIELDS[0]+"\" />");
 			sb.append("<tree text=\""+FIELDS[1]+"\" />");
+			for(int i = 2;i < FIELDS.length;i++){
+				//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
+				sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+			}
+		} else {
+			for(int i = 0;i < USERFIELDS.length;i++){
+				//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
+				sb.append("<tree text=\""+USERFIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+USERFIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+USERFIELDS[i]+"',event)\" />");
+			}
 		}
-		for(int i = 2;i < FIELDS.length;i++){
-			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
-		}
+
 		sb.append("</tree>");
 		return sb.toString();
 	}
@@ -243,7 +253,11 @@ public class DbRootBean extends DbBean{
 			inValidIcon = DbSequenceBean.ICON_INVALID;
 			subType = DbSequenceBean.TYPE;
 		}else if(fieldName.equals(FIELDS[19])){  //Users
-			sql = "select username,'VALID' from all_users order by username asc";
+			sql = "select * from ( " +
+                    "select username,'VALID' VALID from all_users  " +
+                    "union  " +
+                    "select 'PUBLIC' username, 'VALID'  VALID from dual " +
+                    ") order by username asc";
 			validIcon = DbUserBean.ICON_VALID;
 			inValidIcon = DbUserBean.ICON_INVALID;
 			subType = DbUserBean.TYPE;

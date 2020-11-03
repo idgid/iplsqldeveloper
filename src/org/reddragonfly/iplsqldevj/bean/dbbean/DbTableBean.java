@@ -233,6 +233,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getParameter(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -243,9 +244,16 @@ public class DbTableBean extends DbBean {
 		try{
 			String obj = null;
 			String columnIcon = ICON_COLUMN_CHAR;
-			if(ub.getDbglobal()) obj = "all_tab_columnss";
+			if(ub.getDbglobal()) obj = "all_tab_columns";
 			else obj = "user_tab_columns";
-			sql = "select column_name,data_type from " + obj + " where table_name='" + name + "' order by column_id";
+
+			if (nameStr.length == 2) {
+				obj = "all_tab_columns";
+				sql = "select column_name,data_type from " + obj + " where owner='" + nameStr[0] + "' and table_name='" + nameStr[1] + "' order by column_id";
+			} else {
+				sql = "select column_name,data_type from " + obj + " where table_name='" + name + "' order by column_id";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -264,6 +272,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getPrimaryKey(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -277,7 +286,14 @@ public class DbTableBean extends DbBean {
 			String subType = "TABLE";
 			if(ub.getDbglobal()) obj = "all_constraints";
 			else obj = "user_constraints";
-			sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'P'";
+
+			if (nameStr.length == 2) {
+				obj = "all_constraints";
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where owner='" + nameStr[0] + "' and table_name='" + nameStr[1] + "' and constraint_type = 'P'";
+			} else {
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'P'";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -286,6 +302,9 @@ public class DbTableBean extends DbBean {
 				//icon = DbBeanManager.getChildMenuIcon(subType);
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
+
+				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(2));
+
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
 			}
@@ -299,6 +318,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getUniqueKey(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -312,7 +332,13 @@ public class DbTableBean extends DbBean {
 			String subType = "TABLE";
 			if(ub.getDbglobal()) obj = "all_constraints";
 			else obj = "user_constraints";
-			sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'U'";
+			if (nameStr.length == 2) {
+				obj = "all_constraints";
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where owner='" + nameStr[0] + "' and table_name='" + nameStr[1] + "' and constraint_type = 'U'";
+			} else {
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'U'";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -321,6 +347,9 @@ public class DbTableBean extends DbBean {
 				//icon = DbBeanManager.getChildMenuIcon(subType);
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
+
+				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(2));
+
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
 			}
@@ -334,6 +363,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getForeignKey(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -347,7 +377,13 @@ public class DbTableBean extends DbBean {
 			String subType = "TABLE";
 			if(ub.getDbglobal()) obj = "all_constraints";
 			else obj = "user_constraints";
-			sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'R'";
+			if (nameStr.length == 2) {
+				obj = "all_constraints";
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where owner='" + nameStr[0] + "' and table_name='" + nameStr[1] + "' and constraint_type = 'R'";
+			} else {
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'R'";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -356,6 +392,9 @@ public class DbTableBean extends DbBean {
 				//icon = DbBeanManager.getChildMenuIcon(subType);
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
+
+				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(2));
+
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
 			}
@@ -369,6 +408,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getCheckConstraintsKey(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -382,7 +422,14 @@ public class DbTableBean extends DbBean {
 			String subType = "TABLE";
 			if(ub.getDbglobal()) obj = "all_constraints";
 			else obj = "user_constraints";
-			sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'C'";
+
+			if (nameStr.length == 2) {
+				obj = "all_constraints";
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where owner='" + nameStr[0] + "' and table_name='" + nameStr[1] + "' and constraint_type = 'C'";
+			} else {
+				sql = "select owner,constraint_name,constraint_type from " + obj + " where table_name='" + name + "' and constraint_type = 'C'";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -391,6 +438,7 @@ public class DbTableBean extends DbBean {
 				//icon = DbBeanManager.getChildMenuIcon(subType);
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
+				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(2));
 				String field = FIELDS_PRI + "." + objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
 			}
@@ -404,6 +452,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getPrimaryKeyID(String name) {
+		String[] nameStr = this.name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -421,11 +470,23 @@ public class DbTableBean extends DbBean {
 			} else {
 				obj = "user_cons_columns";
 			}
-			sql = "select utc.column_name,utc.data_type, " +
-				"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
-				"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.owner and constraint_name=ucc.constraint_name)) foreigntable " +
-				"from " + obj + " ucc, user_tab_columns utc where utc.table_name='" + this.name + "' and ucc.constraint_name='" + name + "' " +
-				"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name";
+
+			if (nameStr.length == 2) {
+				obj = "all_cons_columns";
+				sql = "select utc.column_name,utc.data_type, " +
+						"(select ucons.table_name from all_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
+						"(select cons.r_owner,cons.r_constraint_name  from all_constraints cons where cons.owner=ucc.owner and constraint_name=ucc.constraint_name)) foreigntable " +
+						"from " + obj + " ucc, all_tab_columns utc where ucc.owner='" + nameStr[0] + "' and utc.table_name='" + nameStr[1] + "' and ucc.constraint_name='" + name + "' " +
+						"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and ucc.owner = utc.owner";
+			} else {
+				sql = "select utc.column_name,utc.data_type, " +
+						"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
+						"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.owner and constraint_name=ucc.constraint_name)) foreigntable " +
+						"from " + obj + " ucc, user_tab_columns utc where utc.table_name='" + this.name + "' and ucc.constraint_name='" + name + "' " +
+						"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name";
+			}
+
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -445,6 +506,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getTrigger(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -458,7 +520,12 @@ public class DbTableBean extends DbBean {
 			String subType = "TRIGGER";
 			if(ub.getDbglobal()) obj = "all_triggers";
 			else obj = "all_triggers";
-			sql = "select tri.owner,tri.trigger_name,obj.status from " + obj + " tri,all_objects obj where tri.table_name='" + name + "' and tri.table_owner='" + ub.getUsername().toUpperCase()+ "' and tri.owner = obj.owner and tri.trigger_name = obj.object_name";
+			if (nameStr.length == 2) {
+				obj = "all_triggers";
+				sql = "select tri.owner,tri.trigger_name,obj.status from " + obj + " tri,all_objects obj where tri.table_name='" + nameStr[1] + "' and tri.table_owner='" + nameStr[0] + "' and tri.owner = obj.owner and tri.trigger_name = obj.object_name";
+			} else {
+				sql = "select tri.owner,tri.trigger_name,obj.status from " + obj + " tri,all_objects obj where tri.table_name='" + name + "' and tri.table_owner='" + ub.getUsername().toUpperCase()+ "' and tri.owner = obj.owner and tri.trigger_name = obj.object_name";
+			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -467,6 +534,9 @@ public class DbTableBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,CharSet.nullToEmpty(rs.getString(3)));
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
+
+				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(2));
+
 				//String field = FIELDS_PRI + "." + objectName;
 				//String field = objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\" />");
@@ -481,6 +551,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getIndex(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -494,7 +565,12 @@ public class DbTableBean extends DbBean {
 			String subType = "TABLE";
 			if(ub.getDbglobal()) obj = "all_indexes";
 			else obj = "all_indexes";
-			sql = "select owner,index_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase()+ "' order by index_name";
+			if (nameStr.length == 2) {
+				obj = "all_indexes";
+				sql = "select owner,index_name from " + obj + " where table_name='" + nameStr[1] + "' and table_owner='" + nameStr[0] + "' order by index_name";
+			} else {
+				sql = "select owner,index_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "' order by index_name";
+			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -504,6 +580,10 @@ public class DbTableBean extends DbBean {
 				icon = ICON_INDEX;
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
+
+				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(2));
+
+
 				String field = INDEX_PRI + "." + objectName;
 				//String field = objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ INDEX_PRI +"',event)\" />");
@@ -518,6 +598,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getIndexID(String name) {
+		String[] nameStr = this.name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -533,13 +614,23 @@ public class DbTableBean extends DbBean {
 			if(ub.getDbglobal()) {
 				obj = "all_ind_columns";
 			} else {
-				obj = "all_ind_columns";
+				obj = "user_ind_columns";
 			}
-			sql = "select utc.column_name,utc.data_type, " +
-				"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
-				"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
-				"from " + obj + " ucc, user_tab_columns utc where utc.table_name='" + this.name + "' and ucc.index_name='" + name + "' " +
-				"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name";
+			if (nameStr.length == 2) {
+				obj = "all_ind_columns";
+				sql = "select utc.column_name,utc.data_type, " +
+						"(select ucons.table_name from all_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
+						"(select cons.r_owner,cons.r_constraint_name  from all_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
+						"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + nameStr[0] + "' and utc.table_name='" + nameStr[1] + "' and ucc.index_name='" + name + "' " +
+						"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and ucc.index_owner = utc.owner";
+			} else {
+				sql = "select utc.column_name,utc.data_type, " +
+						"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
+						"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where constraint_name=ucc.index_name)) foreigntable " +
+						"from " + obj + " ucc, user_tab_columns utc where utc.table_name='" + this.name + "' and ucc.index_name='" + name + "' " +
+						"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -559,6 +650,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getForeignKeyReference(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -575,10 +667,19 @@ public class DbTableBean extends DbBean {
 			} else {
 				obj = "all_constraints";
 			}
-			sql = "select owner,constraint_name,table_name from " + obj + " where (r_owner,r_constraint_name) in ( " +
-				"select owner,constraint_name from all_cons_columns where table_name='" + this.name + "' and owner='" + ub.getUsername().toUpperCase() + "') " +
-				"and constraint_type='R' " +
-				"order by table_name,constraint_name";
+			if (nameStr.length == 2) {
+				obj = "all_constraints";
+				sql = "select owner,constraint_name,table_name from " + obj + " where (r_owner,r_constraint_name) in ( " +
+						"select owner,constraint_name from all_cons_columns where table_name='" + this.name + "' and owner='" + nameStr[0] + "') " +
+						"and constraint_type='R' " +
+						"order by table_name,constraint_name";
+			} else {
+				sql = "select owner,constraint_name,table_name from " + obj + " where (r_owner,r_constraint_name) in ( " +
+						"select owner,constraint_name from all_cons_columns where table_name='" + this.name + "' and owner='" + ub.getUsername().toUpperCase() + "') " +
+						"and constraint_type='R' " +
+						"order by table_name,constraint_name";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -600,6 +701,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getReferencedBy(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -659,6 +761,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getSynonym(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -672,7 +775,12 @@ public class DbTableBean extends DbBean {
 			String subType = "SYNONYM";
 			if(ub.getDbglobal()) obj = "all_synonyms";
 			else obj = "user_synonyms";
-			sql = "select synonym_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
+			if (nameStr.length == 2) {
+				obj = "all_synonyms";
+				sql = "select synonym_name from " + obj + " where table_name='" + nameStr[1] + "' and table_owner='" + nameStr[0] + "'";
+			} else {
+				sql = "select synonym_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
+			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -692,6 +800,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getGrantedToUser(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -712,6 +821,16 @@ public class DbTableBean extends DbBean {
 				obj = "user_tab_privs";
 				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
 			}
+
+			if (nameStr.length == 2) {
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "'";
+			} else {
+				obj = "user_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -731,6 +850,7 @@ public class DbTableBean extends DbBean {
 	}
 
 	public String getGrantedToRole(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -747,6 +867,13 @@ public class DbTableBean extends DbBean {
 			if(ub.getDbglobal()) {
 				obj = "all_tab_privs";
 				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
+			} else {
+				obj = "user_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+			}
+			if (nameStr.length == 2) {
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "'";
 			} else {
 				obj = "user_tab_privs";
 				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";

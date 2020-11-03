@@ -12,7 +12,7 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbMaterializedViewBean extends DbBean {
-	
+
 	public static String TYPE = "materialized view";
 	public static String ICON_INVALID = "dbimages/mat_views.png";
 	public static String ICON_VALID = "dbimages/mat_views.png";
@@ -25,18 +25,18 @@ public class DbMaterializedViewBean extends DbBean {
 	public static String ICON_COLUMN_OBJ = "dbimages/obj.png";
 	public static String ICON_INDEX = "dbimages/index.png";
 	public static String PRIVILEGE_FLAG = "flag";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Columns","References","Referenced by","Synonyms","Granted to users","Granted to roles"};
-	protected static String[] COLUMN_TYPE = 
+	protected static String[] COLUMN_TYPE =
 	{"binary_double","binary_float","blob","clob","char","date","interval day to second","interval year to month","long","long raw","nclob","number","nvarchar2","raw","timestamp","timestamp with local time zone","timestamp with time zone","varchar2"};
 	protected static String FIELDS_PRI = "Primary Key";
-	
+
 	protected String name = "";
 	public DbMaterializedViewBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -62,7 +62,7 @@ public class DbMaterializedViewBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		//String[] field = fieldName.split("\\.",4);
@@ -125,7 +125,7 @@ public class DbMaterializedViewBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -155,7 +155,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return returnVal.toString();
 	}
-	
+
 	public String getParameter(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -167,7 +167,7 @@ public class DbMaterializedViewBean extends DbBean {
 		try{
 			String obj = null;
 			String columnIcon = ICON_COLUMN_CHAR;
-			if(ub.getDbglobal()) obj = "all_tab_columnss";
+			if(ub.getDbglobal()) obj = "all_tab_columns";
 			else obj = "user_tab_columns";
 			sql = "select column_name,data_type from " + obj + " where table_name='" + name + "' order by column_id";
 			rs = ub.getDb().getRS(sql);
@@ -175,9 +175,9 @@ public class DbMaterializedViewBean extends DbBean {
 			while(rs.next()){
 				i = 1;
 				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
-				if (CharSet.nullToEmpty(rs.getString(1)).equals("")) sb.append("<tree text=\"(RESULT)\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />"); 
-				else sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))+"\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />"); 
-			}	
+				if (CharSet.nullToEmpty(rs.getString(1)).equals("")) sb.append("<tree text=\"(RESULT)\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />");
+				else sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))+"\" icon=\""+ columnIcon +"\" openIcon=\""+ columnIcon +"\" />");
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -186,7 +186,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getTrigger(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -213,7 +213,7 @@ public class DbMaterializedViewBean extends DbBean {
 				//String field = FIELDS_PRI + "." + objectName;
 				//String field = objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -222,7 +222,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getReference(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -243,13 +243,13 @@ public class DbMaterializedViewBean extends DbBean {
 				String objectName = CharSet.nullToEmpty(rs.getString(1))+ "." + CharSet.nullToEmpty(rs.getString(2));
 				String subType = CharSet.nullToEmpty(rs.getString(3));
 				String icon= ICON_PARAMTER;
-				
+
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
-				
+
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -258,7 +258,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getReferencedBy(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -281,13 +281,13 @@ public class DbMaterializedViewBean extends DbBean {
 				String objectName = "";
 				String subType = CharSet.nullToEmpty(rs.getString(3));
 				String icon= ICON_PARAMTER;
-				
+
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
-						
+
 				icon = DbBeanManager.getChildMenuIcon(subType,CharSet.nullToEmpty(rs.getString(4)));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -296,7 +296,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getSynonym(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -320,7 +320,7 @@ public class DbMaterializedViewBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -329,7 +329,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getGrantedToUser(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -359,7 +359,7 @@ public class DbMaterializedViewBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -368,7 +368,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getGrantedToRole(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -398,7 +398,7 @@ public class DbMaterializedViewBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -407,7 +407,7 @@ public class DbMaterializedViewBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String getColumnTypeIcon(String columnDataType) {
 		String columnIcon=ICON_COLUMN_CHAR;
 		if (columnDataType.equals(COLUMN_TYPE[0].toUpperCase()) || columnDataType.equals(COLUMN_TYPE[1].toUpperCase())
