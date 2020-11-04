@@ -266,7 +266,7 @@ public class DbFunctionBean extends DbBean {
 				String subType = CharSet.nullToEmpty(rs.getString(3));
 				String icon= ICON_PARAMTER;
 
-				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
+				if (CharSet.nullToEmpty(rs.getString(1)).toUpperCase().equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 
 				icon = DbBeanManager.getChildMenuIcon(subType,CharSet.nullToEmpty(rs.getString(4)));
