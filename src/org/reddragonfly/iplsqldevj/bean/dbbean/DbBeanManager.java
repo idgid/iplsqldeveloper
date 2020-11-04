@@ -188,4 +188,80 @@ public class DbBeanManager {
 		if("INVALID".equals(status)) icon = inValidIcon;
 		return icon;
 	}
+
+	public static String getChildMenuIcon(String subType, String status, String iStatus){
+		String icon = "dbimages/notype.png";
+		String inValidIcon = "";
+		if (subType.equals(CFIELDS[0].toUpperCase())) {		//Functions
+			icon = DbFunctionBean.ICON_VALID;
+			inValidIcon = DbFunctionBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[1].toUpperCase())) {	//Procedures
+			icon = DbProcedureBean.ICON_VALID;
+			inValidIcon = DbProcedureBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[2].toUpperCase())) {	//Packages
+			icon = DbPackageBean.ICON_VALID;
+			inValidIcon = DbPackageBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[3].toUpperCase())) {	//Package Bodies
+			icon = DbPackagebodyBean.ICON_VALID;
+			inValidIcon = DbPackagebodyBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[4].toUpperCase())) {	//Types
+			icon = DbTypeBean.ICON_VALID;
+			inValidIcon = DbTypeBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[5].toUpperCase())) {	//Type Bodies
+			icon = DbTypebodyBean.ICON_VALID;
+			inValidIcon = DbTypebodyBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[6].toUpperCase())) {	//Triggers
+			if ("INVALID".equals(status)) {
+				if ("DISABLED".equals(iStatus)) icon = DbTriggerBean.ICON_INVALID_DISABLE;
+				else icon = DbTriggerBean.ICON_INVALID;
+			} else {
+				if ("DISABLED".equals(iStatus)) icon = DbTriggerBean.ICON_VALID_DISABLE;
+				else icon = DbTriggerBean.ICON_VALID;
+			}
+		} else if (subType.equals(CFIELDS[7].toUpperCase())) {	//Procedure
+			icon = DbJavaSourceBean.ICON_VALID;
+			inValidIcon = DbJavaSourceBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[8].toUpperCase())) {	//Jobs
+			icon = DbJobBean.ICON_VALID;
+			inValidIcon = DbJobBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[9].toUpperCase())) {	//Queues
+			icon = DbQueueBean.ICON_VALID;
+			inValidIcon = DbQueueBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[10].toUpperCase())) {	//Queue Tables
+			icon = DbQueueTableBean.ICON_VALID;
+			inValidIcon = DbQueueTableBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[11].toUpperCase())) {	//Libraries
+			icon = DbLibraryBean.ICON_VALID;
+			inValidIcon = DbLibraryBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[12].toUpperCase())) {	//Directories
+			icon = DbDirectoryBean.ICON_VALID;
+			inValidIcon = DbDirectoryBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[13].toUpperCase())) {	//Tables
+			icon = DbTableBean.ICON_VALID;
+			inValidIcon = DbTableBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[14].toUpperCase())) {	//Views
+			icon = DbViewBean.ICON_VALID;
+			inValidIcon = DbViewBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[15].toUpperCase())) {	//Materialized views
+			icon = DbMaterializedViewBean.ICON_VALID;
+			inValidIcon = DbMaterializedViewBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[16].toUpperCase())) {	//Sequences
+			icon = DbSequenceBean.ICON_VALID;
+			inValidIcon = DbSequenceBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[17].toUpperCase())) {	//Users
+			icon = DbUserBean.ICON_VALID;
+			inValidIcon = DbUserBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[19].toUpperCase())) {	//Roles
+			icon = DbRoleBean.ICON_VALID;
+			inValidIcon = DbRoleBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[20].toUpperCase())) {	//Synonyms
+			icon = DbSynonymBean.ICON_VALID;
+			inValidIcon = DbSynonymBean.ICON_INVALID;
+		} else if (subType.equals(CFIELDS[23].toUpperCase())) {	//Clusters
+			icon = DbClusterBean.ICON_VALID;
+			inValidIcon = DbClusterBean.ICON_INVALID;
+		}
+		if("INVALID".equals(status) && !subType.equals(CFIELDS[6].toUpperCase())) icon = inValidIcon;
+		return icon;
+	}
 }

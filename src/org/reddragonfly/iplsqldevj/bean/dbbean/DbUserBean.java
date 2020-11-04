@@ -40,7 +40,7 @@ public class DbUserBean extends DbBean {
 			{"dbimages/profiles.png", "dbimages/profiles.png", "dbimages/profiles.png", "dbimages/db_links.png", "dbimages/profiles.png","dbimages/profiles.png","dbimages/valid_directories.png","dbimages/profiles.png","dbimages/profiles.png",
 					"dbimages/valid_funs.png", "dbimages/index.png","dbimages/index.png","dbimages/profiles.png","dbimages/java_class.png","dbimages/java_class.png","dbimages/java_class.png","dbimages/java_class.png","dbimages/valid_jobs.png","dbimages/job_class.png",
 					"dbimages/valid_libraries.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/valid_views.png","dbimages/profiles.png","dbimages/valid_pkgs.png","dbimages/valid_pkgs_b.png","dbimages/valid_prcs.png","dbimages/program.png","dbimages/valid_queue_tables.png",
-					"dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/valid_sequences.png","dbimages/profiles.png","dbimages/valid_queue_tables.png","dbimages/valid_queue_tables.png","dbimages/ena_trigers.png",
+					"dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/profiles.png","dbimages/valid_sequences.png","dbimages/profiles.png","dbimages/valid_queue_tables.png","dbimages/valid_queue_tables.png","dbimages/ena_triggers.png",
 					"dbimages/valid_types.png","dbimages/valid_types_b.png","dbimages/valid_funs.png","dbimages/valid_views.png","dbimages/valid_funs.png","dbimages/valid_funs.png",};
 
 	protected String name = "";

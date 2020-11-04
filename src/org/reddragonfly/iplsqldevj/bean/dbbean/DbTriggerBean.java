@@ -12,20 +12,22 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbTriggerBean extends DbBean {
-	
+
 	public static String TYPE = "trigger";
-	public static String ICON_INVALID = "dbimages/err_trigers.png";
-	public static String ICON_VALID = "dbimages/ena_trigers.png";
+	public static String ICON_INVALID = "dbimages/err_triggers.png";
+	public static String ICON_VALID = "dbimages/ena_triggers.png";
+	public static String ICON_INVALID_DISABLE = "dbimages/err_disable_triggers.png";
+	public static String ICON_VALID_DISABLE = "dbimages/ena_disable_triggers.png";
 	public static String ICON_PARAMTER = "dbimages/parameter.png";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"References"};
-	
+
 	protected String name = "";
 	public DbTriggerBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -51,7 +53,7 @@ public class DbTriggerBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -64,7 +66,7 @@ public class DbTriggerBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
 		returnVal.append("myMenu.width = 200;");
@@ -96,7 +98,7 @@ public class DbTriggerBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -106,8 +108,9 @@ public class DbTriggerBean extends DbBean {
 		}
 		return returnVal.toString();
 	}
-	
+
 	public String getReference(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -119,7 +122,14 @@ public class DbTriggerBean extends DbBean {
 			String obj = null;
 			if(ub.getDbglobal()) obj = "all_dependencies";
 			else obj = "user_dependencies";
-			sql = "select referenced_owner,referenced_name,referenced_type from " + obj + " where name='" + name + "' and referenced_type != 'NON-EXISTENT' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc";
+			if (nameStr.length == 2) {
+				obj = "all_dependencies";
+				sql = "select referenced_owner,referenced_name,referenced_type from " + obj + " where owner='" + nameStr[0] + "'  and name='" + nameStr[1] + "' and referenced_type != 'NON-EXISTENT' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc";
+
+			} else {
+				sql = "select referenced_owner,referenced_name,referenced_type from " + obj + " where name='" + name + "' and referenced_type != 'NON-EXISTENT' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -127,13 +137,13 @@ public class DbTriggerBean extends DbBean {
 				String objectName = CharSet.nullToEmpty(rs.getString(1))+ "." + CharSet.nullToEmpty(rs.getString(2));
 				String subType = CharSet.nullToEmpty(rs.getString(3));
 				String icon= ICON_PARAMTER;
-				
+
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
-				
+
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);

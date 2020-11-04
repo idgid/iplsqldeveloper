@@ -522,20 +522,20 @@ public class DbTableBean extends DbBean {
 			else obj = "all_triggers";
 			if (nameStr.length == 2) {
 				obj = "all_triggers";
-				sql = "select tri.owner,tri.trigger_name,obj.status from " + obj + " tri,all_objects obj where tri.table_name='" + nameStr[1] + "' and tri.table_owner='" + nameStr[0] + "' and tri.owner = obj.owner and tri.trigger_name = obj.object_name";
+				sql = "select tri.owner,tri.trigger_name,obj.status, tri.status t_status from " + obj + " tri,all_objects obj where tri.table_name='" + nameStr[1] + "' and tri.table_owner='" + nameStr[0] + "' and tri.owner = obj.owner and tri.trigger_name = obj.object_name";
 			} else {
-				sql = "select tri.owner,tri.trigger_name,obj.status from " + obj + " tri,all_objects obj where tri.table_name='" + name + "' and tri.table_owner='" + ub.getUsername().toUpperCase()+ "' and tri.owner = obj.owner and tri.trigger_name = obj.object_name";
+				sql = "select tri.owner,tri.trigger_name,obj.status, tri.status t_status from " + obj + " tri,all_objects obj where tri.table_name='" + name + "' and tri.table_owner='" + ub.getUsername().toUpperCase()+ "' and tri.owner = obj.owner and tri.trigger_name = obj.object_name";
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
 				i = 1;
 				String objectName = "";
-				icon = DbBeanManager.getChildMenuIcon(subType,CharSet.nullToEmpty(rs.getString(3)));
+				icon = DbBeanManager.getChildMenuIcon(subType, CharSet.nullToEmpty(rs.getString(3)), CharSet.nullToEmpty(rs.getString(4)));
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 
-				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(2));
+				if (nameStr.length == 2)  objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 
 				//String field = FIELDS_PRI + "." + objectName;
 				//String field = objectName;
