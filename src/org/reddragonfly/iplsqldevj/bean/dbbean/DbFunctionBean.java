@@ -341,18 +341,18 @@ public class DbFunctionBean extends DbBean {
 			String filed = DbUserBean.FIELDS_PRI + "." + name;
 			if(ub.getDbglobal()) {
 				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			} else {
 				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
 
 			if (nameStr.length == 2) {
 				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "'";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 
 			} else {
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
 
 			rs = ub.getDb().getRS(sql);
@@ -390,18 +390,18 @@ public class DbFunctionBean extends DbBean {
 			String filed = DbUserBean.FIELDS_PRI + "." + name;
 			if(ub.getDbglobal()) {
 				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			} else {
 				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
 
 			if (nameStr.length == 2) {
 				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "'";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 
 			} else {
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
 
 			rs = ub.getDb().getRS(sql);

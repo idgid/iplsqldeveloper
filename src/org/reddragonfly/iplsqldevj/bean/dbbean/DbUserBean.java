@@ -69,18 +69,6 @@ public class DbUserBean extends DbBean {
 		return sb.toString();
 	}
 
-	public String getTreeSubXml() {
-		// TODO Auto-generated method stub
-		StringBuffer sb = new StringBuffer();
-		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-		sb.append("<tree>");
-
-		sb.append("<tree text=\""+ FIELDS_PRI +"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + FIELDS_PRI + "\"  />");
-
-		sb.append("</tree>");
-		return sb.toString();
-	}
-
 	public String getTreeXmlN() {
 		// TODO Auto-generated method stub
 		//StringBuffer sb = new StringBuffer();
@@ -97,7 +85,7 @@ public class DbUserBean extends DbBean {
 		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		sb.append("<tree>");
 
-		sb.append("<tree text=\""+ FIELDS_PRI +"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + FIELDS_PRI + "\"  />");
+		sb.append("<tree text=\""+ FIELDS_PRI +"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + FIELDS_PRI + "\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS_PRI+"',event)\"  />");
 
 		sb.append("</tree>");
 		return sb.toString();
@@ -130,6 +118,18 @@ public class DbUserBean extends DbBean {
 			if (field.length == 2) {
 				String ownerName = field[0];
 				String tempFieldName = field[1];
+				String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
+				sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + TempFieldName + "\" />");
+			}
+			if (field.length == 3) {
+				if (field[field.length-1].equals(PRIVILEGE_FLAG)) sb.append(getPrivileges(field[1]));
+				else  {
+					String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
+					sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + TempFieldName + "\" />");
+				}
+			}
+			if (field.length == 4) {
+				if (field[field.length-1].equals(PRIVILEGE_FLAG)) sb.append(getPrivileges(field[1] + "." + field[2]));
 			}
 
 		} else if (field.length == 1) {
@@ -151,6 +151,7 @@ public class DbUserBean extends DbBean {
 		//	}
 		//
 		//}
+
 		sb.append("</tree>");
 		return sb.toString();
 	}
@@ -239,6 +240,7 @@ public class DbUserBean extends DbBean {
 	//}
 
 	public String getPrivileges(String name) {
+		String[] nameStr = name.split("\\.",3);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -251,11 +253,18 @@ public class DbUserBean extends DbBean {
 			//String obj = null;
 			String allObj = "all_tab_privs";
 			if(ub.getDbglobal()) {
-				//obj = "all_tab_privs";
+				allObj = "all_tab_privs";
 				sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+			} else {
+				allObj = "user_tab_privs";
+				sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+			}
+			if (nameStr.length == 2) {
+				sql = "select privilege,grantable from " + allObj + " where table_name='" + nameStr[1] + "'and grantor='" + nameStr[0] + "'  and grantee='" + this.name.toUpperCase()  + "' order by privilege";
 			} else {
 				sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
 			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -328,13 +337,11 @@ public class DbUserBean extends DbBean {
 						" and object_name in (select table_name from ALL_TAB_PRIVS where grantee = '" + this.name.toUpperCase() + "') " +
 						" order by object_type,owner,object_name asc";
 
-				//sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
 			} else {
 				sql = "select owner||'.'||object_name object_name,object_type from " + allObj + " where 1=1 " +
 						" and owner != '" + this.name.toUpperCase() + "' and object_type !='SYNONYM' and object_type != 'QUEUE' and object_type != 'PACKAGE BODY' and object_type != 'TYPE BODY'" +
 						" and object_name in (select table_name from ALL_TAB_PRIVS where grantee = '" + this.name.toUpperCase() + "') " +
 						" order by object_type,owner,object_name asc";
-				//sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
@@ -351,7 +358,7 @@ public class DbUserBean extends DbBean {
 					}
 				}
 				//sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))  + "\" icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon +"\" />");
-				sb.append("<tree text=\""+ CharSet.nullToEmpty(rs.getString(1)) + "\" src=\"showTree.action?type=" + TYPESUB +"&amp;name="+ granType +"&amp;field="+ "" +"\"  icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon + "\" />");
+				sb.append("<tree text=\""+ CharSet.nullToEmpty(rs.getString(1)) + "\" src=\"showTree.action?type=" + TYPESUB +"&amp;name="+ granType +"&amp;field="+ "" +"\"  icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon + "\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[1]+"',event)\" />");
 
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
