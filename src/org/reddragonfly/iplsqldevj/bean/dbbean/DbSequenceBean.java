@@ -12,20 +12,20 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbSequenceBean extends DbBean {
-	
+
 	public static String TYPE = "sequence";
 	public static String ICON_INVALID = "dbimages/valid_sequences.png";
 	public static String ICON_VALID = "dbimages/valid_sequences.png";
 	public static String ICON_PARAMTER = "dbimages/parameter.png";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Referenced by","Synonyms","Granted to users","Granted to roles"};
-	
+
 	protected String name = "";
 	public DbSequenceBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -51,7 +51,7 @@ public class DbSequenceBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		//String[] field = fieldName.split("\\.",4);
@@ -74,7 +74,7 @@ public class DbSequenceBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
 		returnVal.append("myMenu.width = 200;");
@@ -105,7 +105,7 @@ public class DbSequenceBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -138,7 +138,7 @@ public class DbSequenceBean extends DbBean {
 		ResultSet rs = null;
 		try{
 			String obj = null;
-			if(ub.getDbglobal()) { 
+			if(ub.getDbglobal()) {
 				obj = "all_dependencies";
 				String[] field = name.split("\\.",2);
 				if (field[0].equals(name)) {
@@ -171,13 +171,13 @@ public class DbSequenceBean extends DbBean {
 				String objectName = "";
 				String subType = CharSet.nullToEmpty(rs.getString(3));
 				String icon= ICON_PARAMTER;
-				
+
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
-						
+
 				icon = DbBeanManager.getChildMenuIcon(subType,CharSet.nullToEmpty(rs.getString(4)));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -186,8 +186,9 @@ public class DbSequenceBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getSynonym(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -201,16 +202,24 @@ public class DbSequenceBean extends DbBean {
 			String subType = "SYNONYM";
 			if(ub.getDbglobal()) obj = "all_synonyms";
 			else obj = "user_synonyms";
-			sql = "select synonym_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
+
+			if (nameStr.length == 2) {
+				obj = "all_synonyms";
+				sql = "select owner, synonym_name from " + obj + " where  table_name='" + nameStr[1] + "' and table_owner='" + nameStr[0] + "'";
+
+			} else {
+				sql = "select table_owner owner, synonym_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
 				i = 1;
 				String objectName = "";
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
-				objectName = CharSet.nullToEmpty(rs.getString(1));
+				objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -219,8 +228,9 @@ public class DbSequenceBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getGrantedToUser(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -236,11 +246,20 @@ public class DbSequenceBean extends DbBean {
 			String filed = DbUserBean.FIELDS_PRI + "." + name;
 			if(ub.getDbglobal()) {
 				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			} else {
 				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
+
+			if (nameStr.length == 2) {
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+
+			} else {
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -249,7 +268,7 @@ public class DbSequenceBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -258,8 +277,9 @@ public class DbSequenceBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getGrantedToRole(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -275,11 +295,20 @@ public class DbSequenceBean extends DbBean {
 			String filed = DbUserBean.FIELDS_PRI + "." + name;
 			if(ub.getDbglobal()) {
 				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			} else {
 				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
+
+			if (nameStr.length == 2) {
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+
+			} else {
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+			}
+
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -288,7 +317,7 @@ public class DbSequenceBean extends DbBean {
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);

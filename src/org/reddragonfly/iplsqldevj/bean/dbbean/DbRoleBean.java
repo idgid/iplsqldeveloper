@@ -12,22 +12,22 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbRoleBean extends DbBean {
-	
+
 	public static String TYPE = "role";
 	public static String ICON_INVALID = "dbimages/roles.png";
 	public static String ICON_VALID = "dbimages/roles.png";
 	public static String ICON_PARAMTER = "dbimages/privilege.png";
 	public static String PRIVILEGE_FLAG = "flag";	//by phanrider add  2010-01-24 在不改变showTree.action传递参数及接口getFieldTreeXml情况下加此标志
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Object privileges","System privileges","Role grants","Granted to users","Granted to roles"};
 	protected static String FIELDS_PRI = "Privileges"; //by phanrider add  2010-01-24 特殊调用
-	
+
 	protected String name = "";
 	public DbRoleBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -53,7 +53,7 @@ public class DbRoleBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		String[] field = fieldName.split("\\.",4);
@@ -71,20 +71,51 @@ public class DbRoleBean extends DbBean {
 			//sb.append(getReferencedBy(name));
 		}
 		if(fieldName.equals(FIELDS[3])) {
+		    sb.append(getGrantedToUser(name));
 			//sb.append(getSynonym(name));
 		}
-		if(field[0].equals(FIELDS_PRI)) {	//单独加入privilege处理
-			if (field.length == 2) {
-				String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
-				sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+TempFieldName+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+fieldName+"',event)\" />");
-			} else {
-				if (field[2].equals(PRIVILEGE_FLAG))	sb.append(getPrivilege(field[1]));
-			}
-		}
+        if(fieldName.equals(FIELDS[4])) {
+            sb.append(getGrantedToRole(name));
+            //sb.append(getSynonym(name));
+        }
+
+
+        if (field.length >= 2) {
+            if (field.length == 2) {
+                String ownerName = field[0];
+                String tempFieldName = field[1];
+                String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
+                sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + TempFieldName + "\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS_PRI+"',event)\" />");
+            }
+            if (field.length == 3) {
+                if (field[field.length-1].equals(PRIVILEGE_FLAG)) sb.append(getPrivileges(field[1]));
+                else  {
+                    String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
+                    sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + TempFieldName + "\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS_PRI+"',event)\" />");
+                }
+            }
+            if (field.length == 4) {
+                if (field[field.length-1].equals(PRIVILEGE_FLAG)) sb.append(getPrivileges(field[1] + "." + field[2]));
+            }
+
+        } else if (field.length == 1) {
+            if (field[0].equals(FIELDS_PRI)) {
+                sb.append(getSubPrivileges(name));
+            }
+        }
+
+		//if(field[0].equals(FIELDS_PRI)) {	//单独加入privilege处理
+		//	if (field.length == 2) {
+		//		String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
+		//		sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+TempFieldName+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+fieldName+"',event)\" />");
+		//	} else {
+		//		if (field[2].equals(PRIVILEGE_FLAG))	sb.append(getPrivilege(field[1]));
+		//	}
+		//}
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
 		returnVal.append("myMenu.width = 200;");
@@ -105,7 +136,7 @@ public class DbRoleBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -136,37 +167,216 @@ public class DbRoleBean extends DbBean {
 		return returnVal.toString();
 	}
 
-	public String getPrivilege(String name) {
-		StringBuffer sb = new StringBuffer();
-		ActionContext ctx = ActionContext.getContext();
-		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
-		HttpSession session = request.getSession();
-		UserBean ub = (UserBean)session.getAttribute("user");
-		String sql = null;
-		ResultSet rs = null;
-		
-		try{
-			String obj = null;
-			String roleObj = "role_tab_privs";
-			if(ub.getDbglobal()) {
-				obj = "all_tab_privs";
-				sql = "select privilege from " + obj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
-			} else {
-				obj = "user_tab_privs";
-				sql = "select privilege from " + obj + " userp where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by privilege";
-			}
-			rs = ub.getDb().getRS(sql);
-			int i = 0;
-			while(rs.next()){
-				i = 1;
-				sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))+"\" icon=\""+ ICON_PARAMTER +"\"  openIcon=\""+ ICON_PARAMTER +"\" />"); 
-			}	
-			if (i == 0) sb.append("<tree text=\"Nodata\" />");
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}finally{
-			if(rs != null) ub.getDb().close(rs);
-		}
-		return sb.toString();
-	}
+	//public String getPrivilege(String name) {
+	//	StringBuffer sb = new StringBuffer();
+	//	ActionContext ctx = ActionContext.getContext();
+	//	HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+	//	HttpSession session = request.getSession();
+	//	UserBean ub = (UserBean)session.getAttribute("user");
+	//	String sql = null;
+	//	ResultSet rs = null;
+	//
+	//	try{
+	//		String obj = null;
+	//		String roleObj = "role_tab_privs";
+	//		if(ub.getDbglobal()) {
+	//			obj = "all_tab_privs";
+	//			sql = "select privilege from " + obj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+	//		} else {
+	//			obj = "user_tab_privs";
+	//			sql = "select privilege from " + obj + " userp where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by privilege";
+	//		}
+	//		rs = ub.getDb().getRS(sql);
+	//		int i = 0;
+	//		while(rs.next()){
+	//			i = 1;
+	//			sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))+"\" icon=\""+ ICON_PARAMTER +"\"  openIcon=\""+ ICON_PARAMTER +"\" />");
+	//		}
+	//		if (i == 0) sb.append("<tree text=\"Nodata\" />");
+	//	}catch(Exception e){
+	//		throw new RuntimeException(e);
+	//	}finally{
+	//		if(rs != null) ub.getDb().close(rs);
+	//	}
+	//	return sb.toString();
+	//}
+
+
+    public String getPrivileges(String name) {
+        String[] nameStr = name.split("\\.",3);
+        StringBuffer sb = new StringBuffer();
+        ActionContext ctx = ActionContext.getContext();
+        HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+        HttpSession session = request.getSession();
+        UserBean ub = (UserBean)session.getAttribute("user");
+        String sql = null;
+        ResultSet rs = null;
+
+        try{
+            //String obj = null;
+            String allObj = "all_tab_privs";
+            if(ub.getDbglobal()) {
+                allObj = "all_tab_privs";
+                sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+            } else {
+                allObj = "all_tab_privs";
+                sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+            }
+            if (nameStr.length == 2) {
+                sql = "select privilege,grantable from " + allObj + " where table_name='" + nameStr[1] + "'and grantor='" + nameStr[0] + "'  and grantee='" + this.name.toUpperCase()  + "' order by privilege";
+            } else {
+                sql = "select privilege,grantable from " + allObj + " where table_name='" + name + "' and grantee='" + this.name.toUpperCase() + "' order by privilege";
+            }
+
+            rs = ub.getDb().getRS(sql);
+            int i = 0;
+            while(rs.next()){
+                i = 1;
+                String grantable = "";
+                if (CharSet.nullToEmpty(rs.getString(2)).equals("YES")) grantable = "(GRANTABLE)";
+                sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1)) +  grantable + "\"  icon=\""+ ICON_PARAMTER +"\"  openIcon=\""+ ICON_PARAMTER +"\" />");
+            }
+            if (i == 0) sb.append("<tree text=\"Nodata\" />");
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }finally{
+            if(rs != null) ub.getDb().close(rs);
+        }
+        return sb.toString();
+    }
+
+    public String getSubPrivileges(String name) {
+        String[] nameStr = name.split("\\.",3);
+        StringBuffer sb = new StringBuffer();
+        ActionContext ctx = ActionContext.getContext();
+        HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+        HttpSession session = request.getSession();
+        UserBean ub = (UserBean)session.getAttribute("user");
+        String sql = null;
+        ResultSet rs = null;
+
+        try{
+            //String obj = null;
+            String allObj = "all_tab_privs";
+            if(ub.getDbglobal()) {
+                //obj = "all_tab_privs";
+                sql = "select privilege,grantable from " + allObj + " where table_schema='" + nameStr[0] + "' and grantee='" + nameStr[2] + "' and table_name='" + nameStr[1] + "' order by privilege asc";
+            } else {
+                sql = "select privilege,grantable from " + allObj + " where table_schema='" + nameStr[0] + "' and grantee='" + nameStr[2] + "' and table_name='" + nameStr[1] + "' order by privilege asc";
+            }
+            rs = ub.getDb().getRS(sql);
+            int i = 0;
+            while(rs.next()){
+                i = 1;
+                String grantable = "";
+                if (CharSet.nullToEmpty(rs.getString(2)).equals("YES")) grantable = " (GRANTABLE)";
+                sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1)) +  grantable + "\"  icon=\""+ ICON_PARAMTER +"\"  openIcon=\""+ ICON_PARAMTER +"\"  />");
+            }
+            if (i == 0) sb.append("<tree text=\"Nodata\" />");
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }finally{
+            if(rs != null) ub.getDb().close(rs);
+        }
+        return sb.toString();
+    }
+
+
+    public String getGrantedToUser(String name) {
+        String[] nameStr = name.split("\\.",2);
+        StringBuffer sb = new StringBuffer();
+        ActionContext ctx = ActionContext.getContext();
+        HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+        HttpSession session = request.getSession();
+        UserBean ub = (UserBean)session.getAttribute("user");
+        String sql = null;
+        ResultSet rs = null;
+        String icon= ICON_PARAMTER;
+        try{
+            String obj = null;
+            String roleObj = "role_tab_privs";
+            String subType = "USER";
+            String filed = DbUserBean.FIELDS_PRI + "." + name;
+            if(ub.getDbglobal()) {
+                obj = "all_tab_privs";
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+            } else {
+                obj = "user_tab_privs";
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+            }
+
+            if (nameStr.length == 2) {
+                obj = "all_tab_privs";
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+
+            } else {
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+            }
+
+            rs = ub.getDb().getRS(sql);
+            int i = 0;
+            while(rs.next()){
+                i = 1;
+                String objectName = "";
+                icon = DbBeanManager.getChildMenuIcon(subType,"");
+                objectName = CharSet.nullToEmpty(rs.getString(1));
+                sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
+            }
+            if (i == 0) sb.append("<tree text=\"Nodata\" />");
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }finally{
+            if(rs != null) ub.getDb().close(rs);
+        }
+        return sb.toString();
+    }
+
+    public String getGrantedToRole(String name) {
+        String[] nameStr = name.split("\\.",2);
+        StringBuffer sb = new StringBuffer();
+        ActionContext ctx = ActionContext.getContext();
+        HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+        HttpSession session = request.getSession();
+        UserBean ub = (UserBean)session.getAttribute("user");
+        String sql = null;
+        ResultSet rs = null;
+        String icon= ICON_PARAMTER;
+        try{
+            String obj = null;
+            String roleObj = "role_tab_privs";
+            String subType = "ROLE";
+            String filed = DbUserBean.FIELDS_PRI + "." + name;
+            if(ub.getDbglobal()) {
+                obj = "all_tab_privs";
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+            } else {
+                obj = "user_tab_privs";
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+            }
+
+            if (nameStr.length == 2) {
+                obj = "all_tab_privs";
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+
+            } else {
+                sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+            }
+
+            rs = ub.getDb().getRS(sql);
+            int i = 0;
+            while(rs.next()){
+                i = 1;
+                String objectName = "";
+                icon = DbBeanManager.getChildMenuIcon(subType,"");
+                objectName = CharSet.nullToEmpty(rs.getString(1));
+                sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
+            }
+            if (i == 0) sb.append("<tree text=\"Nodata\" />");
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }finally{
+            if(rs != null) ub.getDb().close(rs);
+        }
+        return sb.toString();
+    }
 }

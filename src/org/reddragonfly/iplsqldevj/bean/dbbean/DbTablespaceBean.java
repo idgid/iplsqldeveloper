@@ -12,7 +12,7 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbTablespaceBean extends DbBean {
-	
+
 	public static String TYPE = "tablespace";
 	public static String ICON_INVALID = "dbimages/tablespaces.png";
 	public static String ICON_VALID = "dbimages/tablespaces.png";
@@ -24,19 +24,19 @@ public class DbTablespaceBean extends DbBean {
 	public static String ICON_COLUMN_OBJ = "dbimages/obj.png";
 	public static String ICON_INDEX = "dbimages/index.png";
 	public static String PRIVILEGE_FLAG = "reddragonflyflag";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Tables","Indexes","Clusters"};
-	protected static String[] COLUMN_TYPE = 
+	protected static String[] COLUMN_TYPE =
 	{"binary_double","binary_float","blob","clob","char","date","interval day to second","interval year to month","long","long raw","nclob","number","nvarchar2","raw","timestamp","timestamp with local time zone","timestamp with time zone","varchar2"};
 
 	protected static String INDEX_PRI = "Indexes";
-	
+
 	protected String name = "";
 	public DbTablespaceBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -62,7 +62,7 @@ public class DbTablespaceBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		String[] field = fieldName.split("\\.",4);
@@ -78,7 +78,7 @@ public class DbTablespaceBean extends DbBean {
 		}
 		if(fieldName.equals(FIELDS[2])) {
 			sb.append(getCluster(name));
-		} 
+		}
 		if(field[0].equals(INDEX_PRI)) {	//单独加入Index处理
 			if (field.length > 1 && !(field[field.length-1].equals(PRIVILEGE_FLAG))) {
 				String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
@@ -106,7 +106,7 @@ public class DbTablespaceBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Drop\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Drop','500px','120px');\"));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -124,7 +124,7 @@ public class DbTablespaceBean extends DbBean {
 		}
 		return returnVal.toString();
 	}
-	
+
 	public String getTable(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -147,9 +147,9 @@ public class DbTablespaceBean extends DbBean {
 				String objectName = "";
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
-				
+
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -158,7 +158,7 @@ public class DbTablespaceBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getIndex(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -173,7 +173,12 @@ public class DbTablespaceBean extends DbBean {
 			String subType = "TABLESPACE";
 			if(ub.getDbglobal()) obj = "all_indexes";
 			else obj = "all_indexes";
-			sql = "select owner,index_name from " + obj + " where tablespace_name='" + name + "' order by owner,index_name";
+			//sql = "select owner,index_name from " + obj + " where tablespace_name='" + name + "' order by owner,index_name";
+			sql = "select owner,index_name from ( " +
+					"      select owner,index_name  from " + obj + " where tablespace_name='" + name + "' and owner='"+ ub.getUsername().toUpperCase() +"' order by index_name asc)  " +
+					"      union all " +
+					"      select owner,index_name  from ( " +
+					"      select owner,index_name  from " + obj + " where tablespace_name='" + name + "' and owner<>'"+ ub.getUsername().toUpperCase() +"' order by owner,index_name asc) ";
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
@@ -186,7 +191,7 @@ public class DbTablespaceBean extends DbBean {
 				String field = INDEX_PRI + "." + objectName;
 				//String field = objectName;
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ INDEX_PRI +"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -195,7 +200,7 @@ public class DbTablespaceBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public String getIndexID(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -204,7 +209,7 @@ public class DbTablespaceBean extends DbBean {
 		UserBean ub = (UserBean)session.getAttribute("user");
 		String sql = null;
 		ResultSet rs = null;
-		
+
 		try{
 			String obj = null;
 			String columnIcon = ICON_COLUMN_CHAR;
@@ -220,13 +225,13 @@ public class DbTablespaceBean extends DbBean {
 					"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
 					"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
 					"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + ub.getUsername().toUpperCase() + "' and ucc.index_name='" + name + "' " +
-					"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name";
+					"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and utc.owner = ucc.index_owner";
 			} else {
 				sql = "select utc.column_name,utc.data_type, " +
 					"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
 					"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
 					"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + field[0] + "' and ucc.index_name='" + field[1] + "' " +
-					"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name";
+					"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and utc.owner = ucc.index_owner";
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
@@ -235,8 +240,8 @@ public class DbTablespaceBean extends DbBean {
 				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
 				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
 				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
-				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />"); 
-			}	
+				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />");
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -245,7 +250,59 @@ public class DbTablespaceBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
+	//public String getIndexID(String name) {
+	//	String[] nameStr = this.name.split("\\.",2);
+	//	StringBuffer sb = new StringBuffer();
+	//	ActionContext ctx = ActionContext.getContext();
+	//	HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+	//	HttpSession session = request.getSession();
+	//	UserBean ub = (UserBean)session.getAttribute("user");
+	//	String sql = null;
+	//	ResultSet rs = null;
+	//
+	//	try{
+	//		String obj = null;
+	//		String columnIcon = ICON_COLUMN_CHAR;
+	//		String foreignTable = "";
+	//		if(ub.getDbglobal()) {
+	//			obj = "all_ind_columns";
+	//		} else {
+	//			obj = "user_ind_columns";
+	//		}
+	//		if (nameStr.length == 2) {
+	//			obj = "all_ind_columns";
+	//			sql = "select utc.column_name,utc.data_type, " +
+	//					"(select ucons.table_name from all_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
+	//					"(select cons.r_owner,cons.r_constraint_name  from all_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
+	//					"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + nameStr[0] + "' and utc.table_name='" + nameStr[1] + "' and ucc.index_name='" + name + "' " +
+	//					"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and ucc.index_owner = utc.owner";
+	//		} else {
+	//			sql = "select utc.column_name,utc.data_type, " +
+	//					"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
+	//					"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where constraint_name=ucc.index_name)) foreigntable " +
+	//					"from " + obj + " ucc, user_tab_columns utc where utc.table_name='" + this.name + "' and ucc.index_name='" + name + "' " +
+	//					"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name";
+	//		}
+	//
+	//		rs = ub.getDb().getRS(sql);
+	//		int i = 0;
+	//		while(rs.next()){
+	//			i = 1;
+	//			columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
+	//			if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
+	//			else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
+	//			sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />");
+	//		}
+	//		if (i == 0) sb.append("<tree text=\"Nodata\" />");
+	//	}catch(Exception e){
+	//		throw new RuntimeException(e);
+	//	}finally{
+	//		if(rs != null) ub.getDb().close(rs);
+	//	}
+	//	return sb.toString();
+	//}
+
 	public String getCluster(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -270,7 +327,7 @@ public class DbTablespaceBean extends DbBean {
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -279,7 +336,7 @@ public class DbTablespaceBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String getColumnTypeIcon(String columnDataType) {
 		String columnIcon=ICON_COLUMN_CHAR;
 		if (columnDataType.equals(COLUMN_TYPE[0].toUpperCase()) || columnDataType.equals(COLUMN_TYPE[1].toUpperCase())
@@ -299,5 +356,5 @@ public class DbTablespaceBean extends DbBean {
 		}
 		return columnIcon;
 	}
-	
+
 }

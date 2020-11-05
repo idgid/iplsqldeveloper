@@ -13,11 +13,11 @@ public class DbRootBean extends DbBean{
 
 	protected static String[] FIELDS =
 	    {"Recent objects","Recycle bin","Functions","Procedures","Packages","Package bodies","Types","Type bodies",
-		"Triggers","Java sources","Jobs","Queues","Queue tables","Libraries","Directories","Tables","Views","Materialized views",
+		"Triggers","Java sources","Jobs","Queues","Queue tables","Libraries","Directories","Tables","Indexes","Constraints","Views","Materialized views",
 		"Sequences","Users","Profiles","Roles","Synonyms","Database links","Tablespaces","Clusters"};
 	protected static String[] USERFIELDS =
 			{"Functions","Procedures","Packages","Package bodies","Types","Type bodies",
-					"Triggers","Java sources","Jobs","Queues","Queue tables","Libraries","Directories","Tables","Views","Materialized views",
+					"Triggers","Java sources","Jobs","Queues","Queue tables","Libraries","Directories","Tables","Indexes","Constraints","Views","Materialized views",
 					"Sequences","Synonyms","Database links","Tablespaces","Clusters"};
 
 	protected String name = "";
@@ -217,12 +217,32 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TABLE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TABLE' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TABLE' and owner = '"+name+"' order by owner asc, object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'TABLE' order by object_name asc";
 			validIcon = DbTableBean.ICON_VALID;
 			inValidIcon = DbTableBean.ICON_INVALID;
 			subType = DbTableBean.TYPE;
-		}else if(fieldName.equals(FIELDS[16])){  //Views
+		}else if(fieldName.equals(FIELDS[16])){  //Indexes
+			if(ub.getDbglobal()) sql = "select * from (select index_name,status from user_indexes where index_type != 'LOB' order by index_name asc) " +
+					"union all " +
+					"select * from (select owner||'.'||index_name, status from all_indexes where index_type != 'LOB' and owner != '"+ubname+"' order by owner asc, index_name asc)";
+			else if (!name.equals("")) {
+				sql = "select * from (select owner||'.'||index_name, status from all_indexes where index_type != 'LOB' and owner = '"+name+"' order by index_name asc)";
+			}else sql = "select index_name,status from user_indexes where index_type != 'LOB' order by index_name asc";
+			validIcon = DbIndexBean.ICON_VALID;
+			inValidIcon = DbIndexBean.ICON_INVALID;
+			subType = DbIndexBean.TYPE;
+		}else if(fieldName.equals(FIELDS[17])){  //Constraints
+			if(ub.getDbglobal()) sql = "select * from (select constraint_name, decode(status,'DISABLED','INVALID',status) status from user_constraints where constraint_name not like 'BIN$%==$0' order by constraint_name asc) " +
+					"union all " +
+					"select * from (select owner||'.'||constraint_name, decode(status,'DISABLED','INVALID',status) status from all_constraints where constraint_name not like 'BIN$%==$0' and owner != '"+ubname+"' order by owner asc, constraint_name asc)";
+			else if (!name.equals("")) {
+				sql = "select * from (select owner||'.'||constraint_name, decode(status,'DISABLED','INVALID',status) status from all_constraints where constraint_name not like 'BIN$%==$0' and owner = '"+name+"' order by constraint_name asc)";
+			}else sql = "select constraint_name, decode(status,'DISABLED','INVALID',status) status from user_constraints where constraint_name not like 'BIN$%==$0' order by constraint_name asc";
+			validIcon = DbConstraintBean.ICON_VALID;
+			inValidIcon = DbConstraintBean.ICON_INVALID;
+			subType = DbConstraintBean.TYPE;
+		}else if(fieldName.equals(FIELDS[18])){  //Views
 			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'VIEW' order by object_name asc) " +
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'VIEW' and owner != '"+ubname+"' order by object_name asc)";
@@ -232,7 +252,7 @@ public class DbRootBean extends DbBean{
 			validIcon = DbViewBean.ICON_VALID;
 			inValidIcon = DbViewBean.ICON_INVALID;
 			subType = DbViewBean.TYPE;
-		}else if(fieldName.equals(FIELDS[17])){  //Materialized views
+		}else if(fieldName.equals(FIELDS[19])){  //Materialized views
 			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'MATERIALIZED VIEW' order by object_name asc) " +
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'MATERIALIZED VIEW' and owner != '"+ubname+"' order by object_name asc)";
@@ -242,7 +262,7 @@ public class DbRootBean extends DbBean{
 			validIcon = DbMaterializedViewBean.ICON_VALID;
 			inValidIcon = DbMaterializedViewBean.ICON_INVALID;
 			subType = DbMaterializedViewBean.TYPE;
-		}else if(fieldName.equals(FIELDS[18])){  //Sequences
+		}else if(fieldName.equals(FIELDS[20])){  //Sequences
 			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'SEQUENCE' order by object_name asc) " +
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'SEQUENCE' and owner != '"+ubname+"' order by object_name asc)";
@@ -252,7 +272,7 @@ public class DbRootBean extends DbBean{
 			validIcon = DbSequenceBean.ICON_VALID;
 			inValidIcon = DbSequenceBean.ICON_INVALID;
 			subType = DbSequenceBean.TYPE;
-		}else if(fieldName.equals(FIELDS[19])){  //Users
+		}else if(fieldName.equals(FIELDS[21])){  //Users
 			sql = "select * from ( " +
                     "select username,'VALID' VALID from all_users  " +
                     "union  " +
@@ -261,17 +281,17 @@ public class DbRootBean extends DbBean{
 			validIcon = DbUserBean.ICON_VALID;
 			inValidIcon = DbUserBean.ICON_INVALID;
 			subType = DbUserBean.TYPE;
-		}else if(fieldName.equals(FIELDS[20])){  //Profiles
+		}else if(fieldName.equals(FIELDS[22])){  //Profiles
 			sql = "select profile,'VALID' from dba_profiles group by profile";
 			validIcon = DbProfileBean.ICON_VALID;
 			inValidIcon = DbProfileBean.ICON_INVALID;
 			subType = DbProfileBean.TYPE;
-		}else if(fieldName.equals(FIELDS[21])){  //Roles
+		}else if(fieldName.equals(FIELDS[23])){  //Roles
 			sql = "select role,'VALID' from session_roles";
 			validIcon = DbRoleBean.ICON_VALID;
 			inValidIcon = DbRoleBean.ICON_INVALID;
 			subType = DbRoleBean.TYPE;
-		}else if(fieldName.equals(FIELDS[22])){  //Synonyms
+		}else if(fieldName.equals(FIELDS[24])){  //Synonyms
 			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'SYNONYM' order by object_name asc) " +
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'SYNONYM' and owner != '"+ubname+"' order by object_name asc)";
@@ -281,7 +301,7 @@ public class DbRootBean extends DbBean{
 			validIcon = DbSynonymBean.ICON_VALID;
 			inValidIcon = DbSynonymBean.ICON_INVALID;
 			subType = DbSynonymBean.TYPE;
-		}else if(fieldName.equals(FIELDS[23])){  //Database links
+		}else if(fieldName.equals(FIELDS[25])){  //Database links
 			if(ub.getDbglobal()) sql = "select db_link,'VALID' from dba_db_links order by db_link asc";
 			else if (!name.equals("")) {
 				sql = "select * from (select owner||'.'||db_link,'VALID' from dba_db_links where owner = '"+name+"' order by db_link asc)";
@@ -289,12 +309,12 @@ public class DbRootBean extends DbBean{
 			validIcon = DbDatabaseLinkBean.ICON_VALID;
 			inValidIcon = DbDatabaseLinkBean.ICON_INVALID;
 			subType = DbDatabaseLinkBean.TYPE;
-		}else if(fieldName.equals(FIELDS[24])){  //Tablespaces
+		}else if(fieldName.equals(FIELDS[26])){  //Tablespaces
 			sql = "select tablespace_name,'VALID' from user_tablespaces order by tablespace_name asc";
 			validIcon = DbTablespaceBean.ICON_VALID;
 			inValidIcon = DbTablespaceBean.ICON_INVALID;
 			subType = DbTablespaceBean.TYPE;
-		}else if(fieldName.equals(FIELDS[25])){  //Clusters
+		}else if(fieldName.equals(FIELDS[27])){  //Clusters
 			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'CLUSTER' order by object_name asc) " +
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'CLUSTER' and owner != '"+ubname+"' order by object_name asc)";
@@ -647,59 +667,67 @@ public class DbRootBean extends DbBean{
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[16])){  //Views
+		}else if(fieldName.equals(FIELDS[16])){  //Indexes
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','"+FIELDS[16]+"','New...','550px','300px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[17])){  //Materialized views
+		}else if(fieldName.equals(FIELDS[17])){  //Constraints
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','"+FIELDS[17]+"','New...','550px','300px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[18])){  //Sequences
+		}else if(fieldName.equals(FIELDS[18])){  //Views
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','"+FIELDS[18]+"','New...','550px','300px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[19])){  //Users
+		}else if(fieldName.equals(FIELDS[19])){  //Materialized views
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showTreeOperate('"+TYPE+"','"+name+"','"+FIELDS[19]+"','New...','500px','200px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[20])){  //Profiles
+		}else if(fieldName.equals(FIELDS[20])){  //Sequences
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showTreeOperate('"+TYPE+"','"+name+"','"+FIELDS[20]+"','New...','500px','200px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[21])){  //Roles
+		}else if(fieldName.equals(FIELDS[21])){  //Users
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showTreeOperate('"+TYPE+"','"+name+"','"+FIELDS[21]+"','New...','500px','200px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[22])){  //Synonyms
+		}else if(fieldName.equals(FIELDS[22])){  //Profiles
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showTreeOperate('"+TYPE+"','"+name+"','"+FIELDS[22]+"','New...','500px','200px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[23])){  //Database links
+		}else if(fieldName.equals(FIELDS[23])){  //Roles
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showTreeOperate('"+TYPE+"','"+name+"','"+FIELDS[23]+"','New...','500px','200px');\"));");
 			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[24])){  //Tablespaces
+		}else if(fieldName.equals(FIELDS[24])){  //Synonyms
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
-		}else if(fieldName.equals(FIELDS[25])){  //Clusters
+		}else if(fieldName.equals(FIELDS[25])){  //Database links
+			returnVal.append("myMenu.width = 150;");
+			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
+			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
+		}else if(fieldName.equals(FIELDS[26])){  //Tablespaces
+			returnVal.append("myMenu.width = 150;");
+			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
+			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
+		}else if(fieldName.equals(FIELDS[27])){  //Clusters
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");

@@ -1,28 +1,28 @@
 package org.reddragonfly.iplsqldevj.bean.dbbean;
 
-import java.sql.ResultSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.opensymphony.xwork2.ActionContext;
 import org.apache.struts2.ServletActionContext;
 import org.reddragonfly.iplsqldevj.bean.CharSet;
 import org.reddragonfly.iplsqldevj.bean.UserBean;
 
-import com.opensymphony.xwork2.ActionContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.sql.ResultSet;
 
-public class DbSynonymBean extends DbBean {
+public class DbConstraintBean extends DbBean {
 
-	public static String TYPE = "synonym";
-	public static String ICON_INVALID = "dbimages/synonyms.png";
-	public static String ICON_VALID = "dbimages/synonyms.png";
+	public static String TYPE = "constraints";
+	public static String ICON_INVALID = "dbimages/disable_key.png";
+	public static String ICON_VALID = "dbimages/key.png";
 	public static String ICON_PARAMTER = "dbimages/parameter.png";
 
 	protected static String[] FIELDS =
-	    {"References","Referenced by"};
+	    {"Columns"};
+	protected static String FIELDS_PRI = "Privileges"; //by phanrider 特殊调用
+
 
 	protected String name = "";
-	public DbSynonymBean(String name){
+	public DbConstraintBean(String name){
 		this.name = name;
 	}
 
@@ -57,11 +57,12 @@ public class DbSynonymBean extends DbBean {
 		StringBuffer sb = new StringBuffer();
 		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		sb.append("<tree>");
+		//System.out.println(name);
 		if(fieldName.equals(FIELDS[0])) {
-			sb.append(getReference(name));
+			sb.append(getGrantedToUser(name));
 		}
 		if(fieldName.equals(FIELDS[1])) {
-			sb.append(getReferencedBy(name));
+			sb.append(getGrantedToRole(name));
 		}
 		sb.append("</tree>");
 		return sb.toString();
@@ -80,15 +81,7 @@ public class DbSynonymBean extends DbBean {
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 		returnVal.append("myMenu.add(new WFXMI(\"View\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Edit\"));");
-		returnVal.append("myMenu.add(new WFXMI(\"Rename\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Rename','500px','140px');\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Drop\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Drop','500px','120px');\"));");
-		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
-		returnVal.append("myMenu.add(new WFXMI(\"Recompile referencing objects\"));");
-		returnVal.append("var sub1 = new WebFXMenu;");
-		returnVal.append("sub1.width = 100;");
-		returnVal.append("sub1.add(new WFXMI(\"DDL\"));");
-		returnVal.append("sub1.add(new WFXMI(\"XML\"));");
-		returnVal.append("myMenu.add(new WFXMI(\"DBMS_Metadata\",null,null,sub1));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 		returnVal.append("var sub2 = new WebFXMenu;");
 		returnVal.append("sub2.width = 180;");
@@ -111,7 +104,7 @@ public class DbSynonymBean extends DbBean {
 		return returnVal.toString();
 	}
 
-	public String getReference(String name) {
+	public String getGrantedToUser(String name) {
 		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -122,38 +115,34 @@ public class DbSynonymBean extends DbBean {
 		ResultSet rs = null;
 		String icon= ICON_PARAMTER;
 		try{
-			String obj = null, obj1 = null;
+			String obj = null;
+			String roleObj = "role_tab_privs";
+			String subType = "USER";
+			String filed = DbUserBean.FIELDS_PRI + "." + name;
 			if(ub.getDbglobal()) {
-				obj = "all_synonyms";
-				obj1="all_objects";
-				sql = "select table_name,(select object_type from " + obj1 + " where object_name=table_name and owner=table_owner) type from " + obj + " where synonym_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
 			} else {
-				obj = "user_synonyms";
-				obj1 = "user_objects";
-				sql = "select table_name,(select object_type from " + obj1 + " where object_name=table_name) type from " + obj + " where synonym_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
+				obj = "user_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)" +
+						" union all select distinct grantee from all_tab_privs allp where table_name='" + name + "' and grantee='PUBLIC'" +
+						" and not exists (select 1 from " + roleObj + " rolepp where rolepp.role = allp.grantee and rolepp.table_name = allp.table_name)";
 			}
-
 			if (nameStr.length == 2) {
-				obj = "all_synonyms";
-				obj1="all_objects";
-				sql = "select table_name,(select object_type from " + obj1 + " where object_name=table_name and owner=table_owner) type from " + obj + " where synonym_name='" + nameStr[1] + "' and table_owner='" + nameStr[0] + "'";
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 
 			} else {
-				obj = "user_synonyms";
-				obj1 = "user_objects";
-				sql = "select table_name,(select object_type from " + obj1 + " where object_name=table_name) type from " + obj + " where synonym_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
-
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
-
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
 				i = 1;
 				String objectName = "";
-				String subType = CharSet.nullToEmpty(rs.getString(2));
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				objectName = CharSet.nullToEmpty(rs.getString(1));
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+FIELDS_PRI+"',event)\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
@@ -164,7 +153,8 @@ public class DbSynonymBean extends DbBean {
 		return sb.toString();
 	}
 
-	public String getReferencedBy(String name) {
+	public String getGrantedToRole(String name) {
+		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -172,46 +162,35 @@ public class DbSynonymBean extends DbBean {
 		UserBean ub = (UserBean)session.getAttribute("user");
 		String sql = null;
 		ResultSet rs = null;
+		String icon= ICON_PARAMTER;
 		try{
 			String obj = null;
+			String roleObj = "role_tab_privs";
+			String subType = "ROLE";
+			String filed = DbUserBean.FIELDS_PRI + "." + name;
 			if(ub.getDbglobal()) {
-				obj = "all_dependencies";
-				String[] field = name.split("\\.",2);
-				if (field[0].equals(name)) {
-					sql = "select owner,name,type, " +
-						"(select status from all_objects where object_type=type and owner=referenced_owner and object_name=name) status " +
-						" from " + obj + " where referenced_name='" + name + "' and referenced_owner='" + ub.getUsername().toUpperCase() + "' and referenced_type != 'NON-EXISTENT' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc, TYPE asc, NAME asc";
-				} else {
-					sql = "select owner,name,type, " +
-						"(select status from all_objects where object_type=type and owner=referenced_owner and object_name=name) status " +
-						" from " + obj + " where referenced_name='" + field[1].toUpperCase() + "' and referenced_owner='" + field[0].toUpperCase() + "' and referenced_type != 'NON-EXISTENT' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc, TYPE asc, NAME asc";
-				}
-			}else {
-				obj = "all_dependencies";
-				String[] field = name.split("\\.",2);
-				if (field[0].equals(name)) {
-					sql = "select owner,name,type, " +
-						"(select status from all_objects where object_type=type and owner=referenced_owner and object_name=name) status " +
-						" from " + obj + " where referenced_name='" + name + "' and referenced_owner='" + ub.getUsername().toUpperCase() + "' and referenced_type != 'NON-EXISTENT' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc, TYPE asc, NAME asc";
-				} else {
-					sql = "select owner,name,type, " +
-						"(select status from all_objects where object_type=type and owner=referenced_owner and object_name=name) status " +
-						" from " + obj + " where referenced_name='" + field[1].toUpperCase() + "' and referenced_owner='" + field[0].toUpperCase() + "' and referenced_type != 'NON-EXISTENT' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc, TYPE asc, NAME asc";
-				}
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+			} else {
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+			}
+			if (nameStr.length == 2) {
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+
+			} else {
+
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
 				i = 1;
 				String objectName = "";
-				String subType = CharSet.nullToEmpty(rs.getString(3));
-				String icon= ICON_PARAMTER;
-
-				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
-				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
-
-				icon = DbBeanManager.getChildMenuIcon(subType,CharSet.nullToEmpty(rs.getString(4)));
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
+				icon = DbBeanManager.getChildMenuIcon(subType,"");
+				objectName = CharSet.nullToEmpty(rs.getString(1));
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+FIELDS_PRI+"',event)\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
