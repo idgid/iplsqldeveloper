@@ -12,20 +12,20 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbClusterBean extends DbBean {
-	
+
 	public static String TYPE = "cluster";
 	public static String ICON_INVALID = "dbimages/clusters.png";
 	public static String ICON_VALID = "dbimages/clusters.png";
 	public static String ICON_PARAMTER = "dbimages/valid_queue_tables.png";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Tables"};
-	
+
 	protected String name = "";
 	public DbClusterBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -58,12 +58,12 @@ public class DbClusterBean extends DbBean {
 		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		sb.append("<tree>");
 		if(fieldName.equals(FIELDS[0])) {
-			sb.append(getTable(name));
+			sb.append(getTables(name));
 		}
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
 		returnVal.append("myMenu.width = 200;");
@@ -75,7 +75,7 @@ public class DbClusterBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Drop\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Drop','500px','120px');\"));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -86,7 +86,7 @@ public class DbClusterBean extends DbBean {
 		return returnVal.toString();
 	}
 
-	public String getTable(String name) {
+	public String getTables(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
 		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
@@ -124,7 +124,7 @@ public class DbClusterBean extends DbBean {
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				icon = DbBeanManager.getChildMenuIcon(subType,"");
 				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
-			}	
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);

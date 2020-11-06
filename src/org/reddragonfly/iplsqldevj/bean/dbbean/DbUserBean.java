@@ -58,10 +58,10 @@ public class DbUserBean extends DbBean {
 			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
 			if( i == 0 ) {
 				TYPE = "root";
-				sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+ "" +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+				sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+ "" +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 			} else {
 				TYPE = "user";
-				sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+				sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 			}
 
 		}
@@ -99,7 +99,7 @@ public class DbUserBean extends DbBean {
 		sb.append("<tree>");
 		//System.out.println(name);
 		if(fieldName.equals(FIELDS[0])) {
-			sb.append("<tree text=\""+FIELDS[0]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[0]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[0]+"',event)\" />");
+			sb.append("<tree text=\""+FIELDS[0]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[0]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[0]+"',event)\" />");
 		}
 		if(fieldName.equals(FIELDS[1])) {
 			sb.append(getObjectPrivileges(name));
@@ -119,13 +119,13 @@ public class DbUserBean extends DbBean {
 				String ownerName = field[0];
 				String tempFieldName = field[1];
 				String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
-				sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + TempFieldName + "\" />");
+				sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field=" + TempFieldName + "\" />");
 			}
 			if (field.length == 3) {
 				if (field[field.length-1].equals(PRIVILEGE_FLAG)) sb.append(getPrivileges(field[1]));
 				else  {
 					String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
-					sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field=" + TempFieldName + "\" />");
+					sb.append("<tree text=\""+FIELDS_PRI+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field=" + TempFieldName + "\" />");
 				}
 			}
 			if (field.length == 4) {
@@ -358,7 +358,7 @@ public class DbUserBean extends DbBean {
 					}
 				}
 				//sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))  + "\" icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon +"\" />");
-				sb.append("<tree text=\""+ CharSet.nullToEmpty(rs.getString(1)) + "\" src=\"showTree.action?type=" + TYPESUB +"&amp;name="+ granType +"&amp;field="+ "" +"\"  icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon + "\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[1]+"',event)\" />");
+				sb.append("<tree text=\""+ CharSet.nullToEmpty(rs.getString(1)) + "\" src=\"showTree.action?type=" + TYPESUB +"&amp;name="+ granType.replaceAll("#","%23") +"&amp;field="+ "" +"\"  icon=\""+ tmpIcon +"\"  openIcon=\""+ tmpIcon + "\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[1]+"',event)\" />");
 
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");

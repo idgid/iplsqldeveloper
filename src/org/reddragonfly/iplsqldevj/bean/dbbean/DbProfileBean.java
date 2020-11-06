@@ -12,20 +12,20 @@ import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
 public class DbProfileBean extends DbBean {
-	
+
 	public static String TYPE = "profile";
 	public static String ICON_INVALID = "dbimages/profiles.png";
 	public static String ICON_VALID = "dbimages/profiles.png";
 	public static String ICON_USER = "dbimages/users.png";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Users"};
-	
+
 	protected String name = "";
 	public DbProfileBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -33,7 +33,7 @@ public class DbProfileBean extends DbBean {
 		sb.append("<tree>");
 		for(int i = 0;i < FIELDS.length;i++){
 			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 		}
 		sb.append("</tree>");
 		return sb.toString();
@@ -51,7 +51,7 @@ public class DbProfileBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -84,7 +84,7 @@ public class DbProfileBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -94,7 +94,7 @@ public class DbProfileBean extends DbBean {
 		}
 		return returnVal.toString();
 	}
-	
+
 	public String getUser(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -121,8 +121,8 @@ public class DbProfileBean extends DbBean {
 				objectName = CharSet.nullToEmpty(rs.getString(1));
 				//String field = INDEX_PRI + "." + objectName;
 				//String field = objectName;
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\" />");
-			}	
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\" />");
+			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
 			throw new RuntimeException(e);
@@ -131,5 +131,5 @@ public class DbProfileBean extends DbBean {
 		}
 		return sb.toString();
 	}
-	
+
 }

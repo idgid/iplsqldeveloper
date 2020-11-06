@@ -34,12 +34,12 @@ public class DbRootBean extends DbBean{
 			sb.append("<tree text=\""+FIELDS[1]+"\" />");
 			for(int i = 2;i < FIELDS.length;i++){
 				//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-				sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+				sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 			}
 		} else {
 			for(int i = 0;i < USERFIELDS.length;i++){
 				//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-				sb.append("<tree text=\""+USERFIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+USERFIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+USERFIELDS[i]+"',event)\" />");
+				sb.append("<tree text=\""+USERFIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+USERFIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+USERFIELDS[i]+"',event)\" />");
 			}
 		}
 
@@ -338,7 +338,7 @@ public class DbRootBean extends DbBean{
 					String icon = validIcon;
 					if("INVALID".equals(status)) icon = inValidIcon;
 					//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\"/>");
+					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\"/>");
 				}
 				if(i == 0) sb.append("<tree text=\"Nodata\" />");
 			}catch(Exception e){
@@ -563,7 +563,7 @@ public class DbRootBean extends DbBean{
 					String icon = validIcon;
 					if("INVALID".equals(status)) icon = inValidIcon;
 					//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\"/>");
+					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\"/>");
 				}
 				if(i == 0) sb.append("<tree text=\"Nodata\" />");
 			}catch(Exception e){

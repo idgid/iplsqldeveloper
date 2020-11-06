@@ -1,19 +1,19 @@
 package org.reddragonfly.iplsqldevj.bean.dbbean;
 
 public class DbQueueTableBean extends DbBean {
-	
+
 	public static String TYPE = "queuetable";
 	public static String ICON_INVALID = "dbimages/valid_queue_tables.png";
 	public static String ICON_VALID = "dbimages/valid_queue_tables.png";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"Columns","Primary key","Unique keys","Foreign keys","Check constraints","Triggers","Indexes","Foreign key references","Referenced by","Synonyms","Granted to users","Granted to roles"};
-	
+
 	protected String name = "";
 	public DbQueueTableBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -21,7 +21,7 @@ public class DbQueueTableBean extends DbBean {
 		sb.append("<tree>");
 		for(int i = 0;i < FIELDS.length;i++){
 			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 		}
 		sb.append("</tree>");
 		return sb.toString();
@@ -44,7 +44,7 @@ public class DbQueueTableBean extends DbBean {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
 		returnVal.append("myMenu.width = 200;");
@@ -80,7 +80,7 @@ public class DbQueueTableBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){

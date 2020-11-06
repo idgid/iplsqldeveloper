@@ -1,19 +1,19 @@
 package org.reddragonfly.iplsqldevj.bean.dbbean;
 
 public class DbQueueBean extends DbBean {
-	
+
 	public static String TYPE = "queue";
 	public static String ICON_INVALID = "dbimages/valid_queue_tables.png";
 	public static String ICON_VALID = "dbimages/valid_queue_tables.png";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {"References","Referenced by"};
-	
+
 	protected String name = "";
 	public DbQueueBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -21,7 +21,7 @@ public class DbQueueBean extends DbBean {
 		sb.append("<tree>");
 		for(int i = 0;i < FIELDS.length;i++){
 			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 		}
 		sb.append("</tree>");
 		return sb.toString();
@@ -39,7 +39,7 @@ public class DbQueueBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		return null;
@@ -69,7 +69,7 @@ public class DbQueueBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -83,5 +83,5 @@ public class DbQueueBean extends DbBean {
 		}
 		return returnVal.toString();
 	}
-	
+
 }

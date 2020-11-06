@@ -1,19 +1,30 @@
 package org.reddragonfly.iplsqldevj.bean.dbbean;
 
+import com.opensymphony.xwork2.ActionContext;
+import org.apache.struts2.ServletActionContext;
+import org.reddragonfly.iplsqldevj.bean.CharSet;
+import org.reddragonfly.iplsqldevj.bean.UserBean;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.sql.ResultSet;
+
 public class DbDatabaseLinkBean extends DbBean {
-	
+
 	public static String TYPE = "databaselink";
 	public static String ICON_INVALID = "dbimages/db_links.png";
 	public static String ICON_VALID = "dbimages/db_links.png";
-	
-	protected static String[] FIELDS = 
+	public static String ICON_PARAMTER = "dbimages/parameter.png";
+
+
+	protected static String[] FIELDS =
 	    {"Synonyms"};
-	
+
 	protected String name = "";
 	public DbDatabaseLinkBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -21,7 +32,7 @@ public class DbDatabaseLinkBean extends DbBean {
 		sb.append("<tree>");
 		for(int i = 0;i < FIELDS.length;i++){
 			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 		}
 		sb.append("</tree>");
 		return sb.toString();
@@ -39,12 +50,22 @@ public class DbDatabaseLinkBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
-		return null;
+		String[] field = fieldName.split("\\.",4);
+		StringBuffer sb = new StringBuffer();
+		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		sb.append("<tree>");
+
+		if(fieldName.equals(FIELDS[0])) {
+			sb.append(getSynonym(name));
+		}
+
+		sb.append("</tree>");
+		return sb.toString();
 	}
-	
+
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
 		returnVal.append("myMenu.width = 200;");
@@ -66,7 +87,7 @@ public class DbDatabaseLinkBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		if(fieldName.equals(FIELDS[0])){
@@ -75,6 +96,45 @@ public class DbDatabaseLinkBean extends DbBean {
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
 		}
 		return returnVal.toString();
+	}
+
+	public String getSynonym(String name) {
+		String[] nameStr = name.split("\\.",2);
+		StringBuffer sb = new StringBuffer();
+		ActionContext ctx = ActionContext.getContext();
+		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+		HttpSession session = request.getSession();
+		UserBean ub = (UserBean)session.getAttribute("user");
+		String sql = null;
+		ResultSet rs = null;
+		String icon= ICON_PARAMTER;
+		try{
+			String obj = null;
+			String subType = "SYNONYM";
+			if(ub.getDbglobal()) obj = "all_synonyms";
+			else obj = "user_synonyms";
+			if (nameStr.length == 2) {
+				obj = "all_synonyms";
+				sql = "select synonym_name from " + obj + " where db_link='" + nameStr[1] + "' and table_owner='" + nameStr[0] + "' order by synonym_name asc";
+			} else {
+				sql = "select synonym_name from " + obj + " where db_link='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "' order by synonym_name asc";
+			}
+			rs = ub.getDb().getRS(sql);
+			int i = 0;
+			while(rs.next()){
+				i = 1;
+				String objectName = "";
+				icon = DbBeanManager.getChildMenuIcon(subType,"");
+				objectName = CharSet.nullToEmpty(rs.getString(1));
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
+			}
+			if (i == 0) sb.append("<tree text=\"Nodata\" />");
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}finally{
+			if(rs != null) ub.getDb().close(rs);
+		}
+		return sb.toString();
 	}
 
 }

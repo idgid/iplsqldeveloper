@@ -15,10 +15,20 @@ public class DbConstraintBean extends DbBean {
 	public static String ICON_INVALID = "dbimages/disable_key.png";
 	public static String ICON_VALID = "dbimages/key.png";
 	public static String ICON_PARAMTER = "dbimages/parameter.png";
+	public static String ICON_COLUMN_CHAR = "dbimages/char.png";
+	public static String ICON_COLUMN_DATE = "dbimages/date.png";
+	public static String ICON_COLUMN_NUMBER = "dbimages/number.png";
+	public static String ICON_COLUMN_BLOB = "dbimages/blob.png";
+	public static String ICON_COLUMN_OBJ = "dbimages/obj.png";
+	public static String ICON_INDEX = "dbimages/index.png";
+	public static String ICON_TABLE = "dbimages/valid_queue_tables.png";
 
 	protected static String[] FIELDS =
 	    {"Columns"};
 	protected static String FIELDS_PRI = "Privileges"; //by phanrider 特殊调用
+	protected static String[] COLUMN_TYPE =
+			{"binary_double","binary_float","blob","clob","char","date","interval day to second","interval year to month","long","long raw","nclob","number","nvarchar2","raw","timestamp","timestamp with local time zone","timestamp with time zone","varchar2"};
+
 
 
 	protected String name = "";
@@ -33,7 +43,7 @@ public class DbConstraintBean extends DbBean {
 		sb.append("<tree>");
 		for(int i = 0;i < FIELDS.length;i++){
 			//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
+			sb.append("<tree text=\""+FIELDS[i]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[i]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[i]+"',event)\" />");
 		}
 		sb.append("</tree>");
 		return sb.toString();
@@ -59,11 +69,9 @@ public class DbConstraintBean extends DbBean {
 		sb.append("<tree>");
 		//System.out.println(name);
 		if(fieldName.equals(FIELDS[0])) {
-			sb.append(getGrantedToUser(name));
+			sb.append(getColumns(name));
 		}
-		if(fieldName.equals(FIELDS[1])) {
-			sb.append(getGrantedToRole(name));
-		}
+
 		sb.append("</tree>");
 		return sb.toString();
 	}
@@ -104,100 +112,78 @@ public class DbConstraintBean extends DbBean {
 		return returnVal.toString();
 	}
 
-	public String getGrantedToUser(String name) {
-		String[] nameStr = name.split("\\.",2);
+	public String getColumns(String name) {
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
-		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+		HttpServletRequest request = (HttpServletRequest) ctx.get(ServletActionContext.HTTP_REQUEST);
 		HttpSession session = request.getSession();
-		UserBean ub = (UserBean)session.getAttribute("user");
+		UserBean ub = (UserBean) session.getAttribute("user");
 		String sql = null;
 		ResultSet rs = null;
-		String icon= ICON_PARAMTER;
-		try{
+
+		try {
 			String obj = null;
-			String roleObj = "role_tab_privs";
-			String subType = "USER";
-			String filed = DbUserBean.FIELDS_PRI + "." + name;
-			if(ub.getDbglobal()) {
-				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
+			String columnIcon = ICON_COLUMN_CHAR;
+			String foreignTable = "";
+			if (ub.getDbglobal()) {
+				obj = "all_cons_columns";
 			} else {
-				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)" +
-						" union all select distinct grantee from all_tab_privs allp where table_name='" + name + "' and grantee='PUBLIC'" +
-						" and not exists (select 1 from " + roleObj + " rolepp where rolepp.role = allp.grantee and rolepp.table_name = allp.table_name)";
+				obj = "user_cons_columns";
 			}
-			if (nameStr.length == 2) {
-				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+			String[] field = name.split("\\.", 2);
+			if (field[0].equals(name)) {
+				obj = "user_cons_columns";
+				//sql = "select owner,constraint_name,table_name from " + obj + " where (r_owner,r_constraint_name) in ( " +
+				//		"select owner,constraint_name from all_cons_columns where table_name='" + this.name + "' and owner='" + ub.getUsername().toUpperCase() + "') " +
+				//		"and constraint_type='R' " +
+				//		"order by table_name,constraint_name";
+				sql = "select owner, column_name, (select data_type from all_tab_columns where owner= ucc.owner and table_name = ucc.table_name and column_name = ucc.COLUMN_NAME and rownum = 1) data_type from " + obj + " ucc where constraint_name='" + this.name + "' order by owner asc, column_name asc";
 
 			} else {
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
+				obj = "all_cons_columns";
+				//sql = "select owner,constraint_name,table_name from " + obj + " where (r_owner,r_constraint_name) in ( " +
+				//		"select owner,constraint_name from all_cons_columns where table_name='" + field[1] + "' and owner='" + field[0] + "') " +
+				//		"and constraint_type='R' " +
+				//		"order by table_name,constraint_name";
+				sql = "select owner, column_name, (select data_type from all_tab_columns where owner= ucc.owner and table_name = ucc.table_name and column_name = ucc.COLUMN_NAME and rownum = 1) data_type from " + obj + " ucc where constraint_name='" + field[1]  + "' and owner='" + field[0] + "' order by owner asc, column_name asc";
+
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
-			while(rs.next()){
+			while (rs.next()) {
 				i = 1;
-				String objectName = "";
-				icon = DbBeanManager.getChildMenuIcon(subType,"");
-				objectName = CharSet.nullToEmpty(rs.getString(1));
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+FIELDS_PRI+"',event)\" />");
+				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(3)));
+
+				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(2)) + "\" icon=\"" + columnIcon + "\"  openIcon=\"" + columnIcon + "\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
-		}catch(Exception e){
+		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}finally{
-			if(rs != null) ub.getDb().close(rs);
+		} finally {
+			if (rs != null) ub.getDb().close(rs);
 		}
 		return sb.toString();
 	}
 
-	public String getGrantedToRole(String name) {
-		String[] nameStr = name.split("\\.",2);
-		StringBuffer sb = new StringBuffer();
-		ActionContext ctx = ActionContext.getContext();
-		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
-		HttpSession session = request.getSession();
-		UserBean ub = (UserBean)session.getAttribute("user");
-		String sql = null;
-		ResultSet rs = null;
-		String icon= ICON_PARAMTER;
-		try{
-			String obj = null;
-			String roleObj = "role_tab_privs";
-			String subType = "ROLE";
-			String filed = DbUserBean.FIELDS_PRI + "." + name;
-			if(ub.getDbglobal()) {
-				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
-			} else {
-				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
-			}
-			if (nameStr.length == 2) {
-				obj = "all_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
 
-			} else {
-
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name) order by grantee asc";
-			}
-			rs = ub.getDb().getRS(sql);
-			int i = 0;
-			while(rs.next()){
-				i = 1;
-				String objectName = "";
-				icon = DbBeanManager.getChildMenuIcon(subType,"");
-				objectName = CharSet.nullToEmpty(rs.getString(1));
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field="+filed+"\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+FIELDS_PRI+"',event)\" />");
-			}
-			if (i == 0) sb.append("<tree text=\"Nodata\" />");
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}finally{
-			if(rs != null) ub.getDb().close(rs);
+	public static String getColumnTypeIcon(String columnDataType) {
+		String columnIcon=ICON_COLUMN_CHAR;
+		if (columnDataType.equals(COLUMN_TYPE[0].toUpperCase()) || columnDataType.equals(COLUMN_TYPE[1].toUpperCase())
+				|| columnDataType.equals(COLUMN_TYPE[2].toUpperCase()) || columnDataType.equals(COLUMN_TYPE[9].toUpperCase())
+				|| columnDataType.equals(COLUMN_TYPE[13].toUpperCase())) {
+			columnIcon = ICON_COLUMN_BLOB;
+		} else if (columnDataType.equals(COLUMN_TYPE[3].toUpperCase()) || columnDataType.equals(COLUMN_TYPE[4].toUpperCase())
+				|| columnDataType.equals(COLUMN_TYPE[8].toUpperCase()) || columnDataType.equals(COLUMN_TYPE[12].toUpperCase())
+				|| columnDataType.equals(COLUMN_TYPE[17].toUpperCase())) {
+			columnIcon = ICON_COLUMN_CHAR;
+		} else if (columnDataType.equals(COLUMN_TYPE[11].toUpperCase())) {
+			columnIcon = ICON_COLUMN_NUMBER;
+		} else if (columnDataType.equals(COLUMN_TYPE[10].toUpperCase())) {
+			columnIcon = ICON_COLUMN_OBJ;
+		} else {
+			columnIcon = ICON_COLUMN_DATE;
 		}
-		return sb.toString();
+		return columnIcon;
 	}
+
 }
