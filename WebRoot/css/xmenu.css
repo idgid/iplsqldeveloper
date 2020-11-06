@@ -47,7 +47,7 @@
 	text-decoration:	none;
 	vertical-align:		center;
 		color:				black;
-	border:				1px solid white;}	
+	border:				1px solid white;}
 
 .webfx-menu a:visited,
 .webfx-menu a:visited:hover {
@@ -58,7 +58,7 @@
 	color:			black;
 	background:		rgb(234,242,255);/*#ffeedd;*/
 	border:			1px solid rgb(120,172,255);/*#ff8800;*/
-}	
+}
 
 .webfx-menu a .arrow {
 	float:			right;
@@ -81,10 +81,10 @@
 	background:		rgb(120,172,255);/*rgb(255,128,0);*/
 
 	padding:		2px;
-	
+
 	font-family:	Verdana, Helvetica, Sans-Serif;
 	font-size:		11px;
-	
+
 	/* IE5.0 has the wierdest box model for inline elements */
 	padding:		expression(constExpression(ie50 ? "0px" : "2px"));
 }
@@ -101,7 +101,7 @@
 
 .webfx-menu-bar a:hover {
 	color:			black;
-	background:		rgb(120,172,255);	
+	background:		rgb(120,172,255);
 	border-left:	1px solid rgb(234,242,255);
 	border-right:	1px solid rgb(0,66,174);
 	border-top:		1px solid rgb(234,242,255);
@@ -123,29 +123,29 @@
 	border-right:	1px solid rgb(234,242,255);
 	border-top:		1px solid rgb(0,66,174);
 	border-bottom:	1px solid rgb(234,242,255);}
-	
+
 
 /*另加其他自己的CSS*/
 .EditorBody  { border-left: 1px solid #999999; border-right: 1px solid #999999; border-top-width: 1px; border-bottom: 1px solid #999999; width:100%; }
 
 .EditorBodyLog  { border-left: 1px solid #999999; border-right: 1px solid #999999; border-top: 1px solid #999999; border-bottom: 1px solid #999999; width:100%; }
-	
+
 .EditorButton { border-left: 1px solid #999999; border-right: 1px solid #999999; border-top: 1px solid #999999; background-color: buttonface; width:100%; }
-	
+
 .Normal      { background-color: buttonface; width:25px;}
-	
+
 .MouseDown   { background-color: #999999; width:25px;}
-	
+
 .MouseMove   { background-color: #EEEEEE; width:25px;}
 
 .a		{background-color: #E5FFE5; border: 0; height: 12px; border-color: black #999999 #999999 black; border-style: solid; border-top-width: 0px; border-right-width: 1pt; border-bottom-width: 1pt; border-left-width: 0px;
 }
 .b		{background-color: #FFFFFF; border: 0; height: 12px;border-color: black #999999 #999999 black; border-style: solid; border-top-width: 0px; border-right-width: 1pt; border-bottom-width: 1pt; border-left-width: 0px;
-} 
+}
 .c		{background-color: buttonface;border-color: black #999999 #999999 black; border-style: solid; border-top-width: 0px; border-right-width: 1pt; border-bottom-width: 1pt; border-left-width: 0px;
 }
 .d		{background-color: #FFFFE5; border: 0; height: 12px;border-color: black #999999 #999999 black; border-style: solid; border-top-width: 0px; border-right-width: 1pt; border-bottom-width: 1pt; border-left-width: 0px;
-}    
+}
 .tblhead	{BACKGROUND-COLOR: buttonface; COLOR:#FFFFFF 1px solid; FONT-SIZE:12px;}
 .tblborder	{border: 1px solid #eeeeee; FONT-SIZE:12px; cellspacing: 0px solid; cellpadding: 4px;}
 td		{FONT-FAMILY: "Verdana", "Tahoma", "宋体"; FONT-SIZE: 12px; line-height: 120%; color: #000000;}
@@ -165,34 +165,34 @@ td.coolButton {
 	padding: 1px; text-align: left; cursor: default;
 }
 .div1 {
-	border: 2px inset; 
-	background-color: #FFFFFF; 
+	border: 2px inset;
+	background-color: #FFFFFF;
 	overflow:auto;width:100%;height:56%;
 	vertical-align:middle;
 	align:center;
 }
 
 a:link { text-decoration: none;}
-.10p {  font-size: 10px; }
+.p10 {  font-size: 10px; }
 .input_b {
 	border: 0;
 	background-color: #FFFFFF;
-	FONT-FAMILY: "Verdana", "Tahoma", "宋体"; 
+	FONT-FAMILY: "Verdana", "Tahoma", "宋体";
 	FONT-SIZE: 11px;
 	border-color: black #999999 #999999 black; border-style: solid; border-top-width: 0px; border-right-width: 1pt; border-bottom-width: 1pt; border-left-width: 0px;
-	
+
 }
 .input_a {
 	border: 0;
 	background-color: #E5FFE5;
-	FONT-FAMILY: "Verdana", "Tahoma", "宋体"; 
+	FONT-FAMILY: "Verdana", "Tahoma", "宋体";
 	FONT-SIZE: 11px;
 	border-color: black #999999 #999999 black; border-style: solid; border-top-width: 0px; border-right-width: 1pt; border-bottom-width: 1pt; border-left-width: 0px;
 }
 .input_d {
 	border: 0;
 	background-color: #FFFFE5;
-	FONT-FAMILY: "Verdana", "Tahoma", "宋体"; 
+	FONT-FAMILY: "Verdana", "Tahoma", "宋体";
 	FONT-SIZE: 11px;
 	border-color: black #999999 #999999 black; border-style: solid; border-top-width: 0px; border-right-width: 1pt; border-bottom-width: 1pt; border-left-width: 0px;
 }
