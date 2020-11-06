@@ -562,7 +562,7 @@ public class DbTableBean extends DbBean {
 		String icon= ICON_KEY;
 		try{
 			String obj = null;
-			String subType = "TABLE";
+			String subType = "index";
 			if(ub.getDbglobal()) obj = "all_indexes";
 			else obj = "all_indexes";
 			if (nameStr.length == 2) {
@@ -586,7 +586,7 @@ public class DbTableBean extends DbBean {
 
 				String field = INDEX_PRI + "." + objectName;
 				//String field = objectName;
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+name+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ INDEX_PRI +"',event)\" />");
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){

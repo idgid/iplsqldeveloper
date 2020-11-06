@@ -21,6 +21,8 @@ public class DbIndexBean extends DbBean {
 	public static String ICON_COLUMN_BLOB = "dbimages/blob.png";
 	public static String ICON_COLUMN_OBJ = "dbimages/obj.png";
 	public static String ICON_INDEX = "dbimages/index.png";
+	public static String ICON_TABLE = "dbimages/valid_queue_tables.png";
+
 
 	protected static String[] FIELDS =
 	    {"Columns","Table"};
@@ -170,6 +172,7 @@ public class DbIndexBean extends DbBean {
 		try{
 			String obj = null;
 			String columnIcon = ICON_COLUMN_CHAR;
+			String subType = "table";
 			String foreignTable = "";
 			if(ub.getDbglobal()) {
 				obj = "all_ind_columns";
@@ -178,13 +181,13 @@ public class DbIndexBean extends DbBean {
 			}
 			String[] field = name.split("\\.",2);
 			if(field[0].equals(name)) {
-				sql = "select utc.column_name,utc.data_type, " +
+				sql = "select ucc.table_owner,utc.table_name, " +
 						"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
 						"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
 						"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + ub.getUsername().toUpperCase() + "' and ucc.index_name='" + name + "' " +
 						"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and utc.owner = ucc.index_owner";
 			} else {
-				sql = "select utc.column_name,utc.data_type, " +
+				sql = "select ucc.table_owner,utc.table_name, " +
 						"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
 						"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
 						"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + field[0] + "' and ucc.index_name='" + field[1] + "' " +
@@ -194,10 +197,17 @@ public class DbIndexBean extends DbBean {
 			int i = 0;
 			while(rs.next()){
 				i = 1;
-				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
-				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
-				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
-				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />");
+				String objectName = "";
+				columnIcon = ICON_TABLE;
+				//if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
+				//else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
+
+				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
+				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
+
+				//sb.append("<tree text=\"" + objectName + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" 	/>");
+				sb.append("<tree text=\""+ objectName +"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName+"&amp;field=\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\" />");
+
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
