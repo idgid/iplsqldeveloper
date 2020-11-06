@@ -107,6 +107,8 @@ public class DbBeanManager {
 		else if(type.toLowerCase().equals(DbLibraryBean.TYPE)) dbbean = new DbLibraryBean(name);
 		else if(type.toLowerCase().equals(DbDirectoryBean.TYPE)) dbbean = new DbDirectoryBean(name);
 		else if(type.toLowerCase().equals(DbTableBean.TYPE)) dbbean = new DbTableBean(name);
+		else if(type.toLowerCase().equals(DbIndexBean.TYPE)) dbbean = new DbIndexBean(name);
+		else if(type.toLowerCase().equals(DbConstraintBean.TYPE)) dbbean = new DbConstraintBean(name);
 		else if(type.toLowerCase().equals(DbViewBean.TYPE)) dbbean = new DbViewBean(name);
 		else if(type.toLowerCase().equals(DbMaterializedViewBean.TYPE)) dbbean = new DbMaterializedViewBean(name);
 		else if(type.toLowerCase().equals(DbSequenceBean.TYPE)) dbbean = new DbSequenceBean(name);
