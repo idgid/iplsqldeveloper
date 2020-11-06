@@ -669,14 +669,10 @@ public class DbRootBean extends DbBean{
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
 		}else if(fieldName.equals(FIELDS[16])){  //Indexes
 			returnVal.append("myMenu.width = 150;");
-			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','"+FIELDS[16]+"','New...','550px','300px');\"));");
-			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
 		}else if(fieldName.equals(FIELDS[17])){  //Constraints
 			returnVal.append("myMenu.width = 150;");
-			returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','"+FIELDS[17]+"','New...','550px','300px');\"));");
-			returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
 		}else if(fieldName.equals(FIELDS[18])){  //Views
