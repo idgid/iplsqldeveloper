@@ -181,13 +181,13 @@ public class DbIndexBean extends DbBean {
 			}
 			String[] field = name.split("\\.",2);
 			if(field[0].equals(name)) {
-				sql = "select ucc.table_owner,utc.table_name, " +
+				sql = "select distinct ucc.table_owner,utc.table_name, " +
 						"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
 						"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
 						"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + ub.getUsername().toUpperCase() + "' and ucc.index_name='" + name + "' " +
 						"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and utc.owner = ucc.index_owner";
 			} else {
-				sql = "select ucc.table_owner,utc.table_name, " +
+				sql = "select distinct ucc.table_owner,utc.table_name, " +
 						"(select ucons.table_name from user_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
 						"(select cons.r_owner,cons.r_constraint_name  from user_constraints cons where cons.owner=ucc.index_owner and constraint_name=ucc.index_name)) foreigntable " +
 						"from " + obj + " ucc, all_tab_columns utc where ucc.index_owner='" + field[0] + "' and ucc.index_name='" + field[1] + "' " +
