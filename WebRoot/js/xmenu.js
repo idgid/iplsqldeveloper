@@ -52,7 +52,7 @@ webfxMenuDefaultUseAutoPosition	= nn6 ? false : true;
 webfxMenuImagePath				= "../images/";
 
 wfMUH				= opera ? true : false;
-webfxMenuHideTime				= 300;
+webfxMenuHideTime				= 100;
 webfxMenuShowTime				= 100;
 
 var wFxmhl = {
@@ -251,7 +251,7 @@ WFXMI.prototype.toString = function () { //针对有时点击菜单后this.href�
 			" id='" + this.id + "'" +
 			//" href=\"" + this.href + "\"" +
 			" href=\"#\"" +
-			" onclick=\""+this.href+"\"" +
+			" onmousedown=\""+this.href+"\"" +	// 此处由 2018-07-26 smalle 解决onblur与onclick事件冲突(先触发onblur菜单关闭事件，再触发点击事件)，通过onmousedown代替onclick。(还可调高webfxMenuHideTime的时间)
 			(this.toolTip ? " title=\"" + this.toolTip + "\"" : "") +
 			" onmouseover='wFxmhl.overMenuItem(this)'" +
 			(wfMUH ? " onmouseout='wFxmhl.outMenuItem(this)'" : "") +

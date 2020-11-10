@@ -34,7 +34,7 @@
 						Developer</font></i></b>
 			</h1>
 		</div>
-		<div align="center" class="10p">
+		<div align="center" class="p10">
 			<font face="Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif"><%=Utilities.getVersion() %></font>
 		</div>
 		<br />

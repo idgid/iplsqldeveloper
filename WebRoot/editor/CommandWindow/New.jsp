@@ -200,7 +200,7 @@
             } else if ("<%=objType %>" == "type_body") {
                 imgIco = "valid_types_b.png";
             } else if ("<%=objType %>" == "trigger") {
-                imgIco = "ena_trigers.png";
+                imgIco = "ena_triggers.png";
             } else if ("<%=objType %>" == "java_source") {
                 imgIco = "valid_javas.png";
             } else if ("<%=objType %>" == "view") {

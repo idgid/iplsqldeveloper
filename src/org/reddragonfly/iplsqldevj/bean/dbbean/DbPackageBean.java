@@ -16,12 +16,18 @@ public class DbPackageBean extends DbBean {
 	public static String TYPE = "package";
 	public static String ICON_INVALID = "dbimages/invalid_pkgs.png";
 	public static String ICON_VALID = "dbimages/valid_pkgs.png";
-	public static String ICON_PARAMTER = "dbimages/parameter.png";
+	public static String ICON_VALID_FUN = "dbimages/valid_funs.png";
+	public static String ICON_VALID_PRO = "dbimages/valid_prcs.png";
+	public static String ICON_PARAMTER = "dbimages/fun_parameters.png";
+	public static String PRIVILEGE_FLAG = "flag";
+
 
 	protected static String[] FIELDS =
 	    {"Functions","Procedures","Types","Variables","Constants","Exceptions","References","Referenced by","Synonyms","Granted to users","Granted to roles"};
 
 	protected String name = "";
+	protected String parameterField = "Parameters";
+
 	public DbPackageBean(String name){
 		this.name = name;
 	}
@@ -54,15 +60,16 @@ public class DbPackageBean extends DbBean {
 
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
+		String[] field = fieldName.split("\\.",4);
 		StringBuffer sb = new StringBuffer();
 		sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		sb.append("<tree>");
 		//System.out.println(name);
 		if(fieldName.equals(FIELDS[0])) {
-			sb.append(getParameter(name));
+			sb.append(getFunction(name));
 		}
 		if(fieldName.equals(FIELDS[1])) {
-			sb.append("<tree text=\""+FIELDS[1]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[2]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[1]+"',event)\" />");
+			sb.append(getProcedure(name));
 		}
 		if(fieldName.equals(FIELDS[2])) {
 			sb.append("<tree text=\""+FIELDS[2]+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+FIELDS[2]+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+FIELDS[2]+"',event)\" />");
@@ -91,6 +98,16 @@ public class DbPackageBean extends DbBean {
 		if(fieldName.equals(FIELDS[10])) {
 			sb.append(getGrantedToRole(name));
 		}
+			if(field[0].equals(parameterField)) {
+			if (field.length == 1) {
+				String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
+				String columnStr = parameterField;
+				sb.append("<tree text=\""+columnStr+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+TempFieldName+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+columnStr+"',event)\" />");
+			} else if (field.length > 1) {
+				if (field[1].equals(PRIVILEGE_FLAG))	sb.append(getParameter(name));
+			}
+		}
+
 		sb.append("</tree>");
 		return sb.toString();
 	}
@@ -175,11 +192,63 @@ public class DbPackageBean extends DbBean {
 			returnVal.append("myMenu.width = 150;");
 			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
+		}else {
+			returnVal.append("myMenu.width = 150;");
+			returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
+			returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
 		}
 		return returnVal.toString();
 	}
 
 	public String getParameter(String name) {
+		String[] nameStr = name.split("\\.",3);
+		StringBuffer sb = new StringBuffer();
+		ActionContext ctx = ActionContext.getContext();
+		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+		HttpSession session = request.getSession();
+		UserBean ub = (UserBean)session.getAttribute("user");
+		String sql = null;
+		ResultSet rs = null;
+		try{
+			String obj = null;
+			if(ub.getDbglobal()) obj = "all_arguments";
+			else obj = "user_arguments";
+			if (nameStr.length == 3) {
+				obj = "all_arguments";
+				sql = "select argument_name,position,data_type from " + obj + " where owner='" + nameStr[0] + "' and package_name='" + nameStr[1]  + "' and subprogram_id='" + nameStr[2]  + "' order by sequence asc\n";
+			} else if (nameStr.length == 2) {
+				sql = "select argument_name,position,data_type from " + obj + " where package_name='" + nameStr[0] + "' and subprogram_id='" + nameStr[1]  + "' order by sequence asc";
+			} else {
+
+			}
+			rs = ub.getDb().getRS(sql);
+			int i = 0;
+			while(rs.next()){
+				i = 1;
+				if (CharSet.nullToEmpty(rs.getString(1)).equals("")) {
+					if (CharSet.nullToEmpty(rs.getString(2)).equals("0"))
+					sb.append("<tree text=\"(RESULT)\" icon=\""+ ICON_PARAMTER +"\" openIcon=\""+ ICON_PARAMTER +"\" />");
+					else {
+						sb.append("<tree text=\"Nodata\" />");
+					}
+				}
+				else {
+					String tmpParameterType = "";
+					if (!CharSet.nullToEmpty(rs.getString(3)).equals(""))  tmpParameterType = " (" + CharSet.nullToEmpty(rs.getString(3)) + ")";
+					sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1)) + tmpParameterType +"\" icon=\""+ ICON_PARAMTER +"\" openIcon=\""+ ICON_PARAMTER +"\" />");
+				}
+			}
+			if (i == 0) sb.append("<tree text=\"Nodata\" />");
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}finally{
+			if(rs != null) ub.getDb().close(rs);
+		}
+		return sb.toString();
+	}
+
+
+	public String getFunction(String name) {
 		String[] nameStr = name.split("\\.",2);
 		StringBuffer sb = new StringBuffer();
 		ActionContext ctx = ActionContext.getContext();
@@ -194,54 +263,23 @@ public class DbPackageBean extends DbBean {
 			else obj = "user_arguments";
 			if (nameStr.length == 2) {
 				obj = "all_arguments";
-				sql = "select argument_name from " + obj + " where owner='" + nameStr[0] + "' and object_name='" + nameStr[1]  + "' and PACKAGE_NAME IS NULL order by sequence";
+				sql = "select object_name,subprogram_id from " + obj + " where owner='" + nameStr[0] + "' and package_name='" + nameStr[1] + "' and POSITION = 0 group by object_name,SUBPROGRAM_ID order by SUBPROGRAM_ID";
 			} else {
-				sql = "select argument_name from " + obj + " where object_name='" + name + "' and PACKAGE_NAME IS NULL order by sequence";
+				sql = "select object_name,subprogram_id from " + obj + " where package_name='" + name + "' and POSITION = 0 group by object_name,SUBPROGRAM_ID order by SUBPROGRAM_ID";
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
 			while(rs.next()){
 				i = 1;
-				if (CharSet.nullToEmpty(rs.getString(1)).equals("")) sb.append("<tree text=\"(RESULT)\" icon=\""+ ICON_PARAMTER +"\" openIcon=\""+ ICON_PARAMTER +"\" />");
-				else sb.append("<tree text=\""+CharSet.nullToEmpty(rs.getString(1))+"\" icon=\""+ ICON_PARAMTER +"\" openIcon=\""+ ICON_PARAMTER +"\" />");
-			}
-			if (i == 0) sb.append("<tree text=\"Nodata\" />");
-		}catch(Exception e){
-			throw new RuntimeException(e);
-		}finally{
-			if(rs != null) ub.getDb().close(rs);
-		}
-		return sb.toString();
-	}
+				String objectName = "";
+				String objceId = "";
+				String subType = TYPE;
+				String icon= ICON_VALID_FUN;
 
+				objectName = CharSet.nullToEmpty(rs.getString(1));
+				objceId = CharSet.nullToEmpty(rs.getString(2));
 
-	public String getFunction(String name) {
-		StringBuffer sb = new StringBuffer();
-		ActionContext ctx = ActionContext.getContext();
-		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
-		HttpSession session = request.getSession();
-		UserBean ub = (UserBean)session.getAttribute("user");
-		String sql = null;
-		ResultSet rs = null;
-		try{
-			String obj = null;
-			if(ub.getDbglobal()) obj = "all_dependencies";
-			else obj = "user_dependencies";
-			sql = "select referenced_owner,referenced_name,referenced_type from " + obj + " where name='" + name + "' and referenced_type != 'NON-EXISTENT' and type = '" +  TYPE.toUpperCase() + "' order by REFERENCED_TYPE asc, REFERENCED_OWNER asc, REFERENCED_NAME asc";
-			rs = ub.getDb().getRS(sql);
-			int i = 0;
-			while(rs.next()){
-				i = 1;
-				String objectName = CharSet.nullToEmpty(rs.getString(1))+ "." + CharSet.nullToEmpty(rs.getString(2));
-				String subType = CharSet.nullToEmpty(rs.getString(3));
-				String icon= ICON_PARAMTER;
-
-				if (CharSet.nullToEmpty(rs.getString(1)).toUpperCase().equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
-				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
-
-				icon = DbBeanManager.getChildMenuIcon(subType,"");
-
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+""+"',event)\" />");
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+this.name + "." + objceId.replaceAll("#","%23")+"&amp;field=" + parameterField + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+parameterField+"',event)\" />");
 				//sb.append(DbBeanManager.getTreeXml(subType, objectName, ""));
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
@@ -252,6 +290,52 @@ public class DbPackageBean extends DbBean {
 		}
 		return sb.toString();
 	}
+
+	public String getProcedure(String name) {
+		String[] nameStr = name.split("\\.",2);
+		StringBuffer sb = new StringBuffer();
+		ActionContext ctx = ActionContext.getContext();
+		HttpServletRequest request = (HttpServletRequest)ctx.get(ServletActionContext.HTTP_REQUEST);
+		HttpSession session = request.getSession();
+		UserBean ub = (UserBean)session.getAttribute("user");
+		String sql = null;
+		ResultSet rs = null;
+		try{
+			String obj = null;
+			if(ub.getDbglobal()) obj = "all_arguments";
+			else obj = "user_arguments";
+			if (nameStr.length == 2) {
+				obj = "all_arguments";
+				sql = "select object_name,subprogram_id from " + obj + " where owner='" + nameStr[0] + "' and package_name='" + nameStr[1] + "' and POSITION <> 0  and subprogram_id not in (select subprogram_id from " + obj + " aa where aa.owner='" + nameStr[0] + "' and package_name='" + nameStr[1] + "' and position=0) group by object_name,SUBPROGRAM_ID order by SUBPROGRAM_ID";
+			} else {
+				sql = "SELECT object_name,subprogram_id from " + obj + " where package_name='" + name + "' and POSITION <> 0 and subprogram_id not in (select subprogram_id from " + obj + " aa where package_name='" + name + "' and position=0) group by object_name,SUBPROGRAM_ID order by SUBPROGRAM_ID";
+			}
+			rs = ub.getDb().getRS(sql);
+			int i = 0;
+			while(rs.next()){
+				i = 1;
+				String objectName = "";
+				String objceId = "";
+				String subType = TYPE;
+				String icon= ICON_VALID_PRO;
+
+				objectName = CharSet.nullToEmpty(rs.getString(1));
+				objceId = CharSet.nullToEmpty(rs.getString(2));
+
+
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+this.name + "." + objceId.replaceAll("#","%23")+"&amp;field=" + parameterField + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+parameterField+"',event)\" />");
+				//sb.append(DbBeanManager.getTreeXml(subType, objectName, ""));
+			}
+			if (i == 0) sb.append("<tree text=\"Nodata\" />");
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}finally{
+			if(rs != null) ub.getDb().close(rs);
+		}
+		return sb.toString();
+	}
+
+
 
 	public String getReference(String name) {
 		StringBuffer sb = new StringBuffer();

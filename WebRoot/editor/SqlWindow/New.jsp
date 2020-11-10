@@ -170,6 +170,7 @@
 		}
 		#autoCompletion.show{
 			border: 2px solid #a0a0a0;
+            z-index: 999999;
 		}
 		#autoCompletion.hide{
 			border: none;

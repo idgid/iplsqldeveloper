@@ -136,15 +136,15 @@
 		    text-align: right;
 		}
 		.editorout {
-		    border-left: 1px ridge #999999; 
-		    border-right: 1px ridge #999999;	
-		    border-top: 1px ridge #999999; 
+		    border-left: 1px ridge #999999;
+		    border-right: 1px ridge #999999;
+		    border-top: 1px ridge #999999;
 		    border-bottom: 1px ridge #999999;
 		}
 		.editorin {
-		    border-left: 1px inset #999999; 
-		    border-right: 1px inset #999999; 
-		    border-top: 1px inset #999999; 
+		    border-left: 1px inset #999999;
+		    border-right: 1px inset #999999;
+		    border-top: 1px inset #999999;
 		    border-bottom: 1px inset #999999;
 		}
 		.editor {
@@ -159,11 +159,11 @@
 			WIDTH: 100%;
 			height:100%;
 			float: left;
-			
+
 		}
 		.dynamic-tab-pane-control .tab-page {
 			height:		610px;
-			
+
 		}
 
 		.dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
@@ -202,7 +202,7 @@
 					if (type.equals("TABLE")) {
 				%>
 					<div class="tab-page" id="tabpage_1" style=" min-height:90%; _height:90%;">
-						<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>General</span></h2>	
+						<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>General</span></h2>
 		                    <table style="border:0;">
 		                    <tr>
 		                    <td align="right" style="width: 30px;">
@@ -284,16 +284,16 @@
 									<label class="smallfont">&nbsp;&nbsp;Name</label><input name="name" id="name" type="text" size="30" style="background:ThreeDFace" readonly />
 		                    		<label class="smallfont">&nbsp;&nbsp;Columns</label><input name="name" id="name" type="text" size="10" style="background:ThreeDFace" readonly />
 		                    		</label>
-		                    		 
+
 							</fieldset>
 							<table style="border:0; width:480px;">
 							<tr>
 							<td style="width:70%; ">
 							<fieldset style="width:90%" align="left">
-							
+
 								<legend>Duration</legend>
 									<input type="checkbox">Temporary</input> <input type="checkbox">Preserve rows on commit</input>
-		                    		 
+
 							</fieldset>
 							</td>
 							<td style="width:30%;">
@@ -307,10 +307,10 @@
 							<a align="right" width="20px" height="25" class="smallfont">&nbsp;&nbsp;Comments</a>
 		                    <input name="name" id="name" type="text" size="50" style="background:ThreeDFace" value="<%=tbp.getGetComment()%>" readonly />
 					</div>
-					
-					
+
+
 					<div class="tab-page" id="tabpage_2" style=" min-height:90%; _height:90%;">
-						<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Columns</span></h2>	
+						<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Columns</span></h2>
 						<table style="border:0;">
 		                    <tr>
 		                    	<td align="right" style="width: 80px;">
@@ -327,17 +327,17 @@
 		                 		</td>
 		                 	</tr>
 		                 </table>
-		                 
+
 		                 <div id='resultdiv'  style="background-color:ThreeDFace; overflow:hidden; height:480px; width:95%">
 		                 	<script>
 		                 		var sqls="<%=sql%>";
 		                 		DbObjectBean.getOther2(sqls,['Name','Type','Nullable','Default','Storage', 'Comments'], showDataHtmlD);
 		                 	</script>
 		                 </div>
-		                 		
+
 					</div>
 					<div class="tab-page" id="tabpage_3" style=" min-height:90%; _height:90%;">
-						<h2 class="tab" id="tabTitle_3"><img style="border:none" id='objIcoId_3' src='' align='absmiddle' /><span id="tmpImg_3" style="display:none"></span> <span id='objTitle_3'>Keys</span></h2>	
+						<h2 class="tab" id="tabTitle_3"><img style="border:none" id='objIcoId_3' src='' align='absmiddle' /><span id="tmpImg_3" style="display:none"></span> <span id='objTitle_3'>Keys</span></h2>
 						<div id='resultdiv_keys' style="background-color:ThreeDFace; overflow:hidden; height:480px; width:95%">
 		                 	<script>
 		                 		var keysqls="<%=keysql%>";
@@ -346,7 +346,7 @@
 		                 </div>
 					</div>
 					<div class="tab-page" id="tabpage_4" style=" min-height:90%; _height:90%;">
-						<h2 class="tab" id="tabTitle_4"><img style="border:none" id='objIcoId_4' src='' align='absmiddle' /><span id="tmpImg_4" style="display:none"></span> <span id='objTitle_4'>Checks</span></h2>	
+						<h2 class="tab" id="tabTitle_4"><img style="border:none" id='objIcoId_4' src='' align='absmiddle' /><span id="tmpImg_4" style="display:none"></span> <span id='objTitle_4'>Checks</span></h2>
 						<div id='resultdiv_checks' style="background-color:ThreeDFace; overflow:hidden; height:90%; width:95%">
 		                 	<script>
 		                 		var checksqls="<%=checksql%>";
@@ -355,7 +355,7 @@
 		                 </div>
 					</div>
 					<div class="tab-page" id="tabpage_5" style=" min-height:90%; _height:90%;">
-						<h2 class="tab" id="tabTitle_5"><img style="border:none" id='objIcoId_5' src='' align='absmiddle' /><span id="tmpImg_5" style="display:none"></span> <span id='objTitle_5'>Indexes</span></h2>	
+						<h2 class="tab" id="tabTitle_5"><img style="border:none" id='objIcoId_5' src='' align='absmiddle' /><span id="tmpImg_5" style="display:none"></span> <span id='objTitle_5'>Indexes</span></h2>
 						<div id='resultdiv_indexs' style="background-color:ThreeDFace; overflow:hidden; height:90%; width:95%">
 		                 	<script>
 		                 		var indexsqls="<%=indexsql%>";
@@ -364,7 +364,7 @@
 		                 </div>
 					</div>
 					<div class="tab-page" id="tabpage_6" style=" min-height:90%; _height:90%;">
-						<h2 class="tab" id="tabTitle_6"><img style="border:none" id='objIcoId_6' src='' align='absmiddle' /><span id="tmpImg_6" style="display:none"></span> <span id='objTitle_6'>Privileges</span></h2>	
+						<h2 class="tab" id="tabTitle_6"><img style="border:none" id='objIcoId_6' src='' align='absmiddle' /><span id="tmpImg_6" style="display:none"></span> <span id='objTitle_6'>Privileges</span></h2>
 						<div id='resultdiv_privileges' style="background-color:ThreeDFace; overflow:hidden; height:90%; width:95%">
 		                 	<script>
 		                 		var privilegesqls="<%=privilegesql%>";
@@ -400,10 +400,10 @@
 								</td>
 							</tr>
 			</table>
-			
+
 			<%
 							} else {
-						%> 
+						%>
 			<div id="foot_outputDiv"
 					style="position:relative; overflow: no; background-color : ButtonFace; bottom: 0px; _bottom: -1px; height: 30px; width: 100%">
 					<table border="0" id="toolBar_2" style="background: ButtonFace;"
@@ -431,16 +431,16 @@
 				}
 			%>
 		</div>
-		
+
 		<script>
-			
+
 			function addMyTextAreaKeyDown() {
 							$('myTextarea').addEvent('keydown', function(event) {
 								mykeydown(event, 'myTextarea');
 							});
 			}
-			
-			
+
+
 			function initViewFootButton() {
 				var cells1 = document.getElementById('toolBar_2').rows[0].cells;
 				for (var i = 1; i <= 1; i++)
@@ -449,10 +449,10 @@
 					//cells1[i].setAlwaysUp(true)
 				}
 				cells1[1].setToggle(true);
-				
+
 				cells1[1].setValue(true, true);
 			}
-			
+
 			if ("<%=type%>" == "TABLE") {
 				//暂时什么也不做
 			} else {
@@ -460,7 +460,7 @@
 				initViewFootButton();
 				setFootView(5,'');
 			}
-			
+
 			//setupAllTabs();
 			function changeObjIco() {
 				imgPath = "../../tree/dbimages/";
@@ -478,7 +478,7 @@
 				} else if ("<%=type%>" == "TYPE BODY") {
 					imgIco = "valid_types_b.png";
 				} else if ("<%=type%>" == "TRIGGER") {
-					imgIco = "ena_trigers.png";
+					imgIco = "ena_triggers.png";
 				} else if ("<%=type%>" == "JAVA SOURCE") {
 					imgIco = "valid_javas.png";
 				} else if ("<%=type%>" == "VIEW") {
@@ -487,7 +487,7 @@
 					imgIco = "mat_views.png";
 				} else if ("<%=type%>" == "TABLE") {
 					imgIco = "general.png";
-				} 
+				}
 				if ("<%=type%>" == "TABLE") {
 					columnsIco = "col.png";
 					keysIco = "key.png";

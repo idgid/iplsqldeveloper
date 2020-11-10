@@ -221,7 +221,7 @@
 					} else if ("<%=typelow %>" == "type_body") {
 						imgIco = "valid_types_b.png";
 					} else if ("<%=typelow %>" == "trigger") {
-						imgIco = "ena_trigers.png";
+						imgIco = "ena_triggers.png";
 					} else if ("<%=typelow %>" == "java_source") {
 						imgIco = "valid_javas.png";
 					} else if ("<%=typelow %>" == "view") {

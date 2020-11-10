@@ -108,12 +108,16 @@ public class DbTableBean extends DbBean {
 			sb.append(getGrantedToRole(name));
 		}
 		if(field[0].equals(FIELDS_PRI)) {	//单独加入privilege处理
-			if (field.length == 2) {
+			if (!field[field.length-1].equals(PRIVILEGE_FLAG)) {
 				String TempFieldName = fieldName + "." + PRIVILEGE_FLAG;
 				String columnStr = "Columns";
 				sb.append("<tree text=\""+columnStr+"\" src=\"showTree.action?type="+TYPE+"&amp;name="+name.replaceAll("#","%23")+"&amp;field="+TempFieldName+"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+TYPE+"','"+name+"','"+columnStr+"',event)\" />");
-			} else if (field.length > 1) {
-				if (field[2].equals(PRIVILEGE_FLAG))	sb.append(getPrimaryKeyID(field[1]));
+			} else {
+				if (field.length == 3) {
+					sb.append(getPrimaryKeyID(field[1]));
+				} else  if (field.length == 4) {
+					sb.append(getPrimaryKeyID(field[1] + "." + field[2]));
+				}
 			}
 		}
 		if(field[0].equals(INDEX_PRI)) {	//单独加入Index处理
@@ -479,7 +483,7 @@ public class DbTableBean extends DbBean {
 				sql = "select utc.column_name,utc.data_type, " +
 						"(select ucons.table_name from all_constraints ucons where (ucons.owner,ucons.constraint_name) in " +
 						"(select cons.r_owner,cons.r_constraint_name  from all_constraints cons where cons.owner=ucc.owner and constraint_name=ucc.constraint_name)) foreigntable " +
-						"from " + obj + " ucc, all_tab_columns utc where ucc.owner='" + nameStr[0] + "' and utc.table_name='" + nameStr[1] + "' and ucc.constraint_name='" + name + "' " +
+						"from " + obj + " ucc, all_tab_columns utc where ucc.owner='" + nameStr[0] + "' and ucc.constraint_name='" + nameStr[1] + "' " +
 						"and ucc.table_name = utc.table_name and ucc.column_name = utc.column_name and ucc.owner = utc.owner";
 			} else {
 				sql = "select utc.column_name,utc.data_type, " +

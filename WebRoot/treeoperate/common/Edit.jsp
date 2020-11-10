@@ -37,15 +37,15 @@
 		    font-size: 12px;
 		}
 		.editorout {
-		    border-left: 1px ridge #999999; 
-		    border-right: 1px ridge #999999;	
-		    border-top: 1px ridge #999999; 
+		    border-left: 1px ridge #999999;
+		    border-right: 1px ridge #999999;
+		    border-top: 1px ridge #999999;
 		    border-bottom: 1px ridge #999999;
 		}
 		.editorin {
-		    border-left: 1px inset #999999; 
-		    border-right: 1px inset #999999; 
-		    border-top: 1px inset #999999; 
+		    border-left: 1px inset #999999;
+		    border-right: 1px inset #999999;
+		    border-top: 1px inset #999999;
 		    border-bottom: 1px inset #999999;
 		}
 		.editor {
@@ -60,11 +60,11 @@
 			WIDTH: 100%;
 			height:100%;
 			float: left;
-			
+
 		}
 		.dynamic-tab-pane-control .tab-page {
 			height:		610px;
-			
+
 		}
 
 		.dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
@@ -106,7 +106,7 @@
 					</div>
 				</div>
 			</div>
-		
+
 			<div id="foot_outputDiv"
 					style="position: relative; overflow: no; background-color : ButtonFace; width: 100%">
 					<table border="0" id="toolBar_2" style="background: ButtonFace;"
@@ -131,7 +131,7 @@
 
 			</div>
 		</div>
-		
+
 		<script>
 			function addMyTextAreaKeyDown() {
 							$('myTextarea').addEvent('keydown', function(event) {
@@ -139,8 +139,8 @@
 							});
 			}
 			addMyTextAreaKeyDown();
-			
-			
+
+
 			function initViewFootButton() {
 				var cells1 = document.getElementById('toolBar_2').rows[0].cells;
 				for (var i = 1; i <= 1; i++)
@@ -149,7 +149,7 @@
 					//cells1[i].setAlwaysUp(true)
 				}
 				cells1[1].setToggle(true);
-				
+
 				cells1[1].setValue(true, true);
 			}
 			initViewFootButton();
@@ -170,7 +170,7 @@
 				} else if ("<%=type %>" == "TYPE BODY") {
 					imgIco = "valid_types_b.png";
 				} else if ("<%=type %>" == "TRIGGER") {
-					imgIco = "ena_trigers.png";
+					imgIco = "ena_triggers.png";
 				} else if ("<%=type %>" == "JAVA SOURCE") {
 					imgIco = "valid_javas.png";
 				} else if ("<%=type %>" == "VIEW") {

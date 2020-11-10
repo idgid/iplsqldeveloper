@@ -40,6 +40,21 @@ public class CharSet {
 
   }
 
+  public static final String toUTF8(String unicodeStr) {
+    try {
+      if (unicodeStr == null) {
+        return null;
+      }
+      else {
+        return new String(unicodeStr.getBytes("ISO8859_1"), "UTF-8");
+      }
+    }
+    catch (Exception e) {
+      return null;
+    }
+
+  }
+
   /**
    * 转换成简体中文gb2312
    * @param unicodeStr - 待转换的字符串

@@ -791,12 +791,12 @@ function editOnOpen() {
 
 //div值清空
 function setDivValueNull (divName) {
-	$(divName).set('text','');
+    parent.parent.parent.editorFrame.GGETFRAME.$(divName).set('html','');
 }
 
 //div赋值html
 function setDivValueHtml (divName,htmlvalue) {
-	$(divName).set('html',htmlvalue);
+    parent.parent.parent.editorFrame.GGETFRAME.$(divName).set('html',htmlvalue);
 }
 
 //div赋值Text
@@ -897,7 +897,7 @@ function executeRun(textareaname) {
 					|| currWindoType == "PAB" || currWindoType == "TYP" || currWindoType == "TYB"
 					|| currWindoType == "TRI" || currWindoType == "JAV" || currWindoType == "VIE"
 					|| currWindoType == "VIM") {
-			executeFUN(alltmpSql, currWindoType);
+            parent.parent.editorFrame.executeFUN(alltmpSql, currWindoType);
 		}
 	}
 }
@@ -906,7 +906,10 @@ function executeRun(textareaname) {
 //SQL执行控制
 function executeSQL(textareaname) {
 	tempSql = getTextareaContents(textareaname);
-	if (getIfForupdate(textareaname) && getIfSelect(textareaname)) {
+    tempSql = tempSql.trim().replace(/[;]*$/, '');
+    parent.parent.parent.editorFrame.GGETFRAME.tempSql = tempSql;
+
+    if (getIfForupdate(textareaname) && getIfSelect(textareaname)) {
 		//如果为for update，并且开始为select
 		//设置commit、rollback按钮可用
 		setCommit(true);
@@ -920,6 +923,9 @@ function executeSQL(textareaname) {
             GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
         }
 
+
+        tempSql = tempSql.trim().replace(/[;]*$/, '');
+        parent.parent.parent.editorFrame.GGETFRAME.tempSql = tempSql;
         //提交给接口
         getResultFromSql(tempSql);
 		//getResultFromSql(tempSql); 有问题
@@ -977,7 +983,9 @@ function executeSQL(textareaname) {
 			GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
 		}
 
-		//提交给接口
+		// 过滤一下字符
+
+        //提交给接口
 		getResultFromSql(tempSql);
 		//alert(tempSql);
 		//breakRun(textareaname);
@@ -1120,7 +1128,7 @@ function getTextareaContents(EditorName) {
         }
 	}
 	// 去除最后的一次或多次‘;’
-    myText = myText.trim().replace(/[;]*$/, '');
+    // myText = myText.trim().replace(/[;]*$/, '');
 	return myText;
 }
 
@@ -1820,8 +1828,8 @@ function setRollback(rollbackFlag) {
 
 function setNoresult(divname,str) {
 	setDivValueNull(divname);
-	htmlStr = "<table style='height: 100%; width: 100%;'><tr><td align='center'>" + str + "</td></tr></table>";
-	$(divname).set('html',htmlStr);
+	htmlStr = "<table style='height: 100%; width: 100%;'><tr><td align='center' style='font-size: 12px;'>" + str + "</td></tr></table>";
+    parent.parent.parent.editorFrame.GGETFRAME.$(divname).set('html',htmlStr);
 }
 
 function commit() {
@@ -3735,6 +3743,7 @@ function getUserObject(data) {
 }
 
 // 本函数由 edit_area 中的 keyDown 函数中调用
+// 自动补全功能的入口
 function keyDownInterface(e) {
 
 	var s = '';
@@ -3760,6 +3769,9 @@ function keyDownInterface(e) {
     var cNumHeight = 16;
     var cNumWidth = 7.2;
 
+    // 测试数据
+    // titleUserObject = [['abc','table'],['abcd','table'],['abce','view'],['bbcc','table']];
+
 	GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
 
     // 大写转小写
@@ -3783,14 +3795,17 @@ function keyDownInterface(e) {
 		stmp = currstr.substr(0, currstrpos-1).trim().split(" ");
 		if ((s_after == "" || s_after == " ") && e.keyCode != 32 && s_before != " " ) {
 			s = stmp[stmp.length - 1];
-			if ( !GtitleShowFlag && e.keyCode != 38 && e.keyCode != 40 ) {
+			if ( e.keyCode != 38 && e.keyCode != 40 ) {
+			    // 当前输入超过 2 个字符才开始提示
 				if ( s != "*" && s.length > 2) {
 					regE = RegExp('^' + s, "i");
 					autoMacth(regE, s, titleUserObject);
 				}
 			}
 
-		}
+		} else {
+            clearAutoCompletion();
+        }
 
 		if (GtitleShowFlag) {
 			// down key
@@ -3862,12 +3877,10 @@ function keyDownInterface(e) {
 
 		for(var i = 0 ; i < c.length ; i++ ){
 
-            //创建tr
+            //创建 table 中的提示内容
             trtmp = document.createElement('tr');
-            // trtmp.setAttribute("onclick", "replaceCurrPostionStrFromTr()");
-            //创建td
             tdtmp = document.createElement('td');
-            tdtmp.innerHTML = '<a href="#" style="text-decoration: none; -moz-outline-style: none; outline: none;">'+ c[i][0] + '</a>';
+            tdtmp.innerHTML = '<a href="#" style="color:#000; text-decoration: none; -moz-outline-style: none; outline: none;">'+ c[i][0] + '</a>';
             trtmp.appendChild(tdtmp);
 
             tdtmp = document.createElement('td');
@@ -3918,12 +3931,14 @@ function keyDownInterface(e) {
         tmpstr.focus();
 	}
 
+    // 在当前光标位置插入关键词的后几个字符串（按键或当前 A 标签点击）
 	function replaceCurrPostionStr(rstr) {
         gs_after = rstr.substr(s.length);
         parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags("myTextarea", gs_after, "");
 
     }
 
+    // 在当前光标位置插入关键词的后几个字符串（当前 Tr 位置点击）
     function replaceCurrPostionStrFromTr() {
         gs_after = this.childNodes[0].childNodes[0].childNodes[0].data.substr(s.length);
         parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags("myTextarea", gs_after, "");
@@ -3953,18 +3968,22 @@ function keyDownInterface(e) {
         //添加有焦点的效果
         for(var k in autoElemCss.focus){
             this.parentElement.parentElement.style[k] = autoElemCss.focus[k];
+            this.style[k] = autoElemCss.focus[k];
+
         }
     }
 
     function aBlur() {
-        for(var k in autoElemCss.blur)
+        for(var k in autoElemCss.blur) {
             this.parentElement.parentElement.style[k] = autoElemCss.blur[k];
+            this.style[k] = autoElemCss.blur[k];
+        }
     }
 
     function aKeydown(event) {
         e = event || window.event;
 
-        console.log(this.childNodes[0].data);
+        // console.log(this.childNodes[0].data);
         //如果在选择数据项时按了tab键，此时的情况与“百度首页”的处理情况一样
         aArray = autoCompletionObj.getElementsByTagName('a');
         var aSelect = document.getElementById("autoSelector");

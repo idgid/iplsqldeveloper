@@ -79,12 +79,16 @@ public class BaisWorkBean {
 		sqlnum = sqlNum;// 得到插入数据的数组
 		this.sql = sqlnum[0];
 		int rows = Integer.valueOf(sqlnum[1]).intValue();
-		// System.out.println("111="+rows);
+
 		// 判断sql去掉for update 并且给个标记readonly=1
 		Database db = null;
 		ResultSet rs = null;
 		pageNo = 20 * (rows - 1);
 		countPage = 20 * rows;
+
+		//修改此处，增加 2018-9-5 20:59:36 smalle 替换不间断空格(non-breaking space) https://blog.csdn.net/lewky_liu/article/details/79353151
+		this.sql = this.sql.replaceAll("\\u00A0+", " ");
+
 		String sqlCount = "select count(*) from (" + this.sql + ")";
 		if (sqlnum.length >= 3 && sqlnum[2].equals("Q")) {
 //			sql = "SELECT A.* FROM (" + this.sql + " ) A" + " minus "
