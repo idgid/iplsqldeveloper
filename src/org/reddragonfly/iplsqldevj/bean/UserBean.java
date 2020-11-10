@@ -38,7 +38,7 @@ public class UserBean {
 			}
 			this.username = username;
 			//======== add end ========
-			String url = "jdbc:oracle:thin:@" +  databaseip + ":" + listenport + ":" + servername;
+			String url = "jdbc:oracle:thin:@//" +  databaseip + ":" + listenport + "/" + servername;
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			conn = DriverManager.getConnection(url, username, password);
 			db = new Database(false,conn); //2009-06-04 phanrider 从true->false 默认不自动提交
