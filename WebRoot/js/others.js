@@ -105,8 +105,6 @@ if (GtitleShowFlag == null)     var GtitleShowFlag = false;
 
 
 
-
-
 //设置提示 --已改
 function setFootView(errNo, ename) {
 	if (errNo == 0) parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Initializing...');
@@ -1004,10 +1002,21 @@ function executeFUN(sqlString,currWindoType) {
 	var tmpv = c.editAreaLoader.getValue(gMyTextArea);
 	if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
 		|| currWindoType == "PAB" || currWindoType == "TYP" || windowType == "TYB") {
-		tmpv = tmpv.split('(')[0].trim().split(' ');
+
+	     if (currWindoType == "FUN" || currWindoType == "PRO" ) {
+             tmpv = tmpv.split('(')[0].trim().split(' ');
+             tmpv = tmpv[tmpv.length-1];
+         } else if ( currWindoType == "PAC") {
+             tmpv = tmpv.match(/package([\s\S]*?)is/i)[1].trim();
+         } else if (windowType == "PAB") {
+             tmpv = tmpv.match(/package[\s]*body([\s\S]*?)is/i)[1].trim();
+         } else if ( currWindoType == "TYP") {
+             tmpv = tmpv.match(/type([\s\S]*?)as/i)[1].trim();
+         } else if (windowType == "TYB") {
+             tmpv = tmpv.match(/type[\s]*body([\s\S]*?)is/i)[1].trim();
+         }
 	}
 	// tmpv = tmpv.split('(')[0].trim().split(' ');
-	tmpv = tmpv[tmpv.length-1];
 	tmpv += "&nbsp;&nbsp;";
 
 	var t = c.document.getElementById('frame_myTextarea').contentWindow;

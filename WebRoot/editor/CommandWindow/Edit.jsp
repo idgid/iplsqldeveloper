@@ -214,19 +214,19 @@
 						imgIco = "valid_prcs.png";
 					} else if ("<%=typelow %>" == "package") {
 						imgIco = "valid_pkgs.png";
-					} else if ("<%=typelow %>" == "package_body") {
+					} else if ("<%=typelow %>" == "package body") {
 						imgIco = "valid_pkgs_b.png";
 					} else if ("<%=typelow %>" == "type") {
 						imgIco = "valid_types.png";
-					} else if ("<%=typelow %>" == "type_body") {
+					} else if ("<%=typelow %>" == "type body") {
 						imgIco = "valid_types_b.png";
 					} else if ("<%=typelow %>" == "trigger") {
 						imgIco = "ena_triggers.png";
-					} else if ("<%=typelow %>" == "java_source") {
+					} else if ("<%=typelow %>" == "java source") {
 						imgIco = "valid_javas.png";
 					} else if ("<%=typelow %>" == "view") {
 						imgIco = "valid_views.png";
-					} else if ("<%=typelow %>" == "materialized_view") {
+					} else if ("<%=typelow %>" == "materialized view") {
 						imgIco = "mat_views.png";
 					}
 

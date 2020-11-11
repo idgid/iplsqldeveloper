@@ -42,7 +42,7 @@
 		}
 	</style>
 	<body ondragstart="return false" oncontextmenu="return false">
-		<form name="formx" method="post" action="Rename.jsp?action=exec&type=<%=type %>&name=<%=name %>&field=<%=field %>" onsubmit="return validate()">
+		<form name="formx" method="post" action="Rename.jsp?action=exec&type=<%=type %>&name=<%=name.replaceAll("#","%23") %>&field=<%=field %>" onsubmit="return validate()">
 		    <table align="center" border="0" class="editorout" width="100%" cellpadding="0" cellspacing="0">
 		       <tr><td>New name</td></tr>
 		       <tr><td><input type="text" name="new_name" size="50" value="<%=name %>" /></td></tr>

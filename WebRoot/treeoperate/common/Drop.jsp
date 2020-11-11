@@ -38,7 +38,7 @@
 			padding: 0px;
 			font-family: 'Verdana', 'Tahoma', 'Helvetica', 'Arial';
 		}
-		
+
 	</style>
 	<body ondragstart="return false" oncontextmenu="return false">
 		<form name="formx" method="post" action="">
@@ -50,7 +50,7 @@
 		       </tr>
 		       <tr>
 		          <td colspan="2" align="center">
-		             <input type="button" value="&nbsp;&nbsp;Yes&nbsp;&nbsp;" onclick="location.href='Drop.jsp?type=<%=type %>&name=<%=name %>&field=<%=field %>&action=exec';">&nbsp;&nbsp;
+		             <input type="button" value="&nbsp;&nbsp;Yes&nbsp;&nbsp;" onclick="location.href='Drop.jsp?type=<%=type %>&name=<%=name.replaceAll("#","%23") %>&field=<%=field %>&action=exec';">&nbsp;&nbsp;
 		             <input type="button" value="&nbsp;&nbsp;No&nbsp;&nbsp;" onclick="window.close();">
 		          </td>
 		       </tr>
@@ -68,6 +68,6 @@
 				</tr>
 	  		</table>
 		</form>
-		
+
 	</body>
 </html>

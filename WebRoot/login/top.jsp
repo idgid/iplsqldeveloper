@@ -21,7 +21,7 @@ UserBean ub = (UserBean) session.getAttribute("user");
 		<script type='text/javascript' src='../dwr/engine.js'></script>
 		<style>
 			.topSS {
-				background-repeat: repeat;background-image: url('../images/log.png')!important;background-image:url('');
+				background-repeat: repeat;background-image: url('../images/log1.png')!important;background-image:url('');
 			}
 			*html .topSS {filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=scale, src="../images/log.png");
 			}
@@ -45,8 +45,8 @@ UserBean ub = (UserBean) session.getAttribute("user");
 				</td>
 				<td align="right">
 					<br />
-					<span class="style1"> <%=ub.getUsername()%><%="@" + ub.getDatabaseip() + ":" + ub.getListenport()
-					+ ":" + ub.getServername()%>
+					<span class="style1"> <%=ub.getUsername()%><%="@//" + ub.getDatabaseip() + ":" + ub.getListenport()
+					+ "/" + ub.getServername()%>
 						<br /> <%=ub.getDbversion()%><br /> <%=Utilities.getTeam()%> </span>
 				</td>
 			</tr>

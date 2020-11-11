@@ -247,6 +247,7 @@ function WFXMI(sText, sHref, sToolTip, oSubMenu) {
 };
 WFXMI.prototype.height = webfxMenuItemDefaultHeight;
 WFXMI.prototype.toString = function () { //针对有时点击菜单后this.href脚本不能执行的问题，现将this.href转移至onclick事件，这就要求传进来的href必须是脚本而不能再是简单的url(jeanwendy,2009.07.16)
+	console.log(this.href);
 	return	"<a" +
 			" id='" + this.id + "'" +
 			//" href=\"" + this.href + "\"" +

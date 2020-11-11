@@ -338,7 +338,7 @@ public class DbRootBean extends DbBean{
 					String icon = validIcon;
 					if("INVALID".equals(status)) icon = inValidIcon;
 					//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
-					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\"/>");
+					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName.replaceAll("#","%23")+"','',event)\"/>");
 				}
 				if(i == 0) sb.append("<tree text=\"Nodata\" />");
 			}catch(Exception e){
