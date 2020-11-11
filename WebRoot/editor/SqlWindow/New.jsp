@@ -163,7 +163,7 @@
 			position: absolute;
             background-color: #fff;
 			width: 350px;
-			height: 100px;
+			height: 96px;
 			overflow-y: auto;
 			font-size: 12px;
 			font-family: "Courier New", Courier, mono;

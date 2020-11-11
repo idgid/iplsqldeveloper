@@ -2053,7 +2053,7 @@ function execClear(textareaname, e) {
 function menuShowObjPD (str, flag, strTopX, strTopY) {
 	var tmpData = parent.parent.topFrame.UserObject;
 	for (i=0; i<tmpData.length; i++) {
-		if (baisworkSQL.toUpperCase().trim() == tmpData[i][0]) {
+		if (baisworkSQL.toLowerCase().trim() == tmpData[i][0]) {
 			if (flag == '1') showCommonFormRightMenu(tmpData[i][1], tmpData[i][0],'',str, strTopX, strTopY);
 			if (flag == '2') showViewObject(tmpData[i][1], tmpData[i][0],'1',str);  // 1 表示是从右键菜单调用，不需要刷新左边菜单
 			i = tmpData.length;
@@ -3734,9 +3734,9 @@ function closeWindow(imgId,evt) {
 
 function execQueryObjData(textareaname,objname) {
 	var texttmp = "select * from " + objname + " t";
-	parent.leftFrameList.createNewSql('SQL','myTextarea');
-	parent.editorFrame.setDivValueText (textareaname,texttmp);
-	parent.editorToolFrame.executeRun(textareaname);
+	parent.parent.leftFrameList.createNewSql('SQL','myTextarea');
+	parent.parent.editorFrame.setDivValueText (textareaname,texttmp);
+	parent.parent.editorToolFrame.executeRun(textareaname);
 }
 
 function execQueryTable(tablename, textareaname) {
@@ -3751,8 +3751,9 @@ function getUserObject(data) {
 	//alert(UserObject[1][0]);
 }
 
-// 本函数由 edit_area 中的 keyDown 函数中调用
-// 自动补全功能的入口
+// 本函数由 edit_area_full.js 中的 keyDown 函数中调用
+// 返回值 e.returnValue   true: 原调用函数继续执行   false: 原调用函数直接退出
+// 自动补全功能的入口  2020-11-1 by phanrider
 function keyDownInterface(e) {
 
 	var s = '';
@@ -3774,9 +3775,16 @@ function keyDownInterface(e) {
     var aArray = [];
     var autoElemCss={ focus:{'color':'#fff','background':'#0078d7', '-moz-outline-style': 'none', 'outline': 'none' }, blur:{'color':'#000','background':'#fff'} };
     var startX = 45;
-    var startY = 12;
+    var startY = 15;
     var cNumHeight = 16;
-    var cNumWidth = 7.2;
+    var cNumWidth = 7.35;
+	// textarea 滚动计算
+	var tclientHeight = tmpstr.result.clientHeight;  // 当前可视域的高度
+	var tScrollTop = tmpstr.result.scrollTop;	// 滚动了多少px
+	var tScrollHeight = tmpstr.result.scrollHeight; // 当前 textarea 最大高度，含不可见视域
+	var tHeight = 14;  // 行高
+	var tScrollRow = tScrollTop / tHeight;
+	currline =  currline - tScrollRow;
 
     // 测试数据
     // titleUserObject = [['abc','table'],['abcd','table'],['abce','view'],['bbcc','table']];
@@ -3789,7 +3797,7 @@ function keyDownInterface(e) {
 		titleUserObject[i][1] = titleUserObject[i][1].toLowerCase();
 	}
 
-    if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40) {
+    if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
         getTmpStr();
     } else {
         setTimeout(getTmpStr,100);
@@ -3803,8 +3811,8 @@ function keyDownInterface(e) {
 		s_after = currstr.substr(currstrpos-1, 1);
 		stmp = currstr.substr(0, currstrpos-1).trim().split(" ");
 		if ((s_after == "" || s_after == " ") && e.keyCode != 32 && s_before != " " ) {
-			s = stmp[stmp.length - 1];
-			if ( e.keyCode != 38 && e.keyCode != 40 ) {
+			s = stmp[stmp.length - 1].trim();
+			if ( e.keyCode != 38 && e.keyCode != 40 && e.keyCode != 13  && e.keyCode != 16  && e.keyCode != 17 && e.keyCode != 18 && e.keyCode != 19 ) {
 			    // 当前输入超过 2 个字符才开始提示
 				if ( s != "*" && s.length > 2) {
 					regE = RegExp('^' + s, "i");
@@ -3821,7 +3829,8 @@ function keyDownInterface(e) {
 			if ( e.keyCode == 40 ) {
 
 				if (autoCompletionObj.style.display == "") {
-					autoCompletionObj.getElementsByTagName('a')[0].focus();
+					aClear(0);
+					autoCompletionObj.getElementsByTagName('a')[1].focus();
 				} else {
 					tmpstr.focus();
 				}
@@ -3830,6 +3839,7 @@ function keyDownInterface(e) {
 			else if ( e.keyCode == 38 ) {
 
 				if(autoCompletionObj.style.display == ""){
+					aClear(0);
 					autoCompletionObj.getElementsByTagName('a')[autoCompletionObj.getElementsByTagName('a').length-1].focus();
 				}else{     //如果“提示”列表未显示,则把焦点依旧留在文本框中
 					tmpstr.focus();
@@ -3837,16 +3847,23 @@ function keyDownInterface(e) {
 			}
 			// tab key
 			else if ( e.keyCode == 9 ) {
-				if (autoCompletionObj.style.display == "") {
-					autoCompletionObj.getElementsByTagName('a')[0].focus();
-				}
+
 				clearAutoCompletion();
+				e.returnValue = false;
 
 			} else if ( e.keyCode == 27  || e.keyCode == 8 || e.keyCode== 32) {  // ESC key
-
 				clearAutoCompletion();
+			} else if ( e.keyCode == 13 ) { // Enter key
+				if (autoCompletionObj.style.display == "") {
+					replaceCurrPostionStr( autoCompletionObj.getElementsByTagName('a')[0].text );
+					autoCompletionObj.getElementsByTagName('a')[0].focus();
+
+				}
+					clearAutoCompletion();
 
 			}
+			e.returnValue = false;
+
 		}
 
 	}
@@ -3903,8 +3920,10 @@ function keyDownInterface(e) {
 
             //检验table下面的 tr 标签的数量，以此确定是否将“提示”列表显示
             if (autoCompletionObj.getElementsByTagName('tr').length){
+            	var tmpTopHeight = currline * cNumHeight;
+				tmpTopHeight < 0 ? tmpTopHeight = cNumHeight : tmpTopHeight;
             	autoCompletionObj.style.left = startX + (currstrpos - 1)* cNumWidth + "px";
-				autoCompletionObj.style.top = currline * cNumHeight + "px";
+				autoCompletionObj.style.top = tmpTopHeight + "px";
 				autoCompletionObj.style.display = "";
 				autoCompletionObj.className = "show";
 				parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag = true;
@@ -3924,6 +3943,13 @@ function keyDownInterface(e) {
             aArray[i].onblur = aBlur;
             aArray[i].onkeydown = aKeydown;
             trTmpObj[i].onclick = replaceCurrPostionStrFromTr;
+            if ( i == 0) {
+                for(var k in autoElemCss.focus){
+                    trTmpObj[i].style[k] = autoElemCss.focus[k];
+                    trTmpObj[i].style[k] = autoElemCss.focus[k];
+                }
+                aArray[i].style["color"] = "#FFF";
+            }
         }
 
         autoCompletionObj.focus();
@@ -3943,14 +3969,14 @@ function keyDownInterface(e) {
     // 在当前光标位置插入关键词的后几个字符串（按键或当前 A 标签点击）
 	function replaceCurrPostionStr(rstr) {
         gs_after = rstr.substr(s.length);
-        parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags("myTextarea", gs_after, "");
+        parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags(gMyTextArea, gs_after, "");
 
     }
 
     // 在当前光标位置插入关键词的后几个字符串（当前 Tr 位置点击）
     function replaceCurrPostionStrFromTr() {
         gs_after = this.childNodes[0].childNodes[0].childNodes[0].data.substr(s.length);
-        parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags("myTextarea", gs_after, "");
+        parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags(gMyTextArea, gs_after, "");
         clearAutoCompletion();
     }
 
@@ -3989,6 +4015,17 @@ function keyDownInterface(e) {
         }
     }
 
+
+    function aClear(n) {
+		var aArray = autoCompletionObj.getElementsByTagName('a');
+		var trTmpObj = autoCompletionObj.getElementsByTagName('tr');
+		for(var k in autoElemCss.blur){
+			trTmpObj[n].style[k] = autoElemCss.blur[k];
+			trTmpObj[n].style[k] = autoElemCss.blur[k];
+		}
+		aArray[n].style["color"] = "#000";
+	}
+
     function aKeydown(event) {
         e = event || window.event;
 
@@ -4008,9 +4045,11 @@ function keyDownInterface(e) {
             currentA ++;
             //如果当前焦点在最后一个数据项上，用户用按了down键，则循环向上，回到文本框上
             if(currentA > aArray.length - 1){
-                currentA = -1;
                 tmpstr.focus();
-            }else{
+				currentA = 0;
+				aSelect.getElementsByTagName('a')[currentA].focus();
+
+			}else{
                 aSelect.getElementsByTagName('a')[currentA].focus();
             }
         }
@@ -4021,17 +4060,21 @@ function keyDownInterface(e) {
             //如果当前焦点在文本框上，用户用按了up键，则循环向下，回到最后一个数据项上
             if(currentA < 0){
                 tmpstr.focus();
+				currentA = aArray.length - 1;
+				aSelect.getElementsByTagName('a')[currentA].focus();
             }else{
                 aSelect.getElementsByTagName('a')[currentA].focus();
             }
+
+
         }
-        else if (e.keyCode == 13 || e.keyCode == 8 ) {
+        else if ( e.keyCode == 8 ) {
             replaceCurrPostionStr( this.childNodes[0].data );
             clearAutoCompletion();
         }
     }
 
-
+    return e;
 }
 
 
