@@ -3782,8 +3782,8 @@ function keyDownInterface(e) {
 	var tclientHeight = tmpstr.result.clientHeight;  // 当前可视域的高度
 	var tScrollTop = tmpstr.result.scrollTop;	// 滚动了多少px
 	var tScrollHeight = tmpstr.result.scrollHeight; // 当前 textarea 最大高度，含不可见视域
-	var tHeight = 14;  // 行高
-	var tScrollRow = tScrollTop / tHeight;
+	var tHeight = 15;  // 行高
+	var tScrollRow = Math.round(tScrollTop / tHeight);
 	currline =  currline - tScrollRow;
 
     // 测试数据
@@ -3958,11 +3958,16 @@ function keyDownInterface(e) {
 
     //清除提示内容
 	function clearAutoCompletion(){
-        autoCompletionObj.innerHTML = '';
-        autoCompletionObj.style.display = "none";
+        // table 中 tr 移动位置重置
+		currentA = 0;
+		// div 滚动位置重置,有些浏览器有滚动记忆
+		autoCompletionObj.scrollTop = 0;
+		autoCompletionObj.innerHTML = '';
+		autoCompletionObj.style.display = "none";
 		document.getElementById("autoCompletion").className = "hide";
 		parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag = false;
 		titleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
+
         tmpstr.focus();
 	}
 

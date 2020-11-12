@@ -135,6 +135,7 @@ public class DbTableBean extends DbBean {
 
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
+		String name =  this.name.replaceAll("#","%23");
 		returnVal.append("myMenu.width = 200;");
 		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Duplicate...\", \"\"));");
@@ -158,7 +159,7 @@ public class DbTableBean extends DbBean {
 		returnVal.append("sub1.add(new WFXMI(\"XML\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"DBMS_Metadata\",null,null,sub1));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
-		returnVal.append("myMenu.add(new WFXMI(\"Query data\",\"javascript:execQueryObjData(\'myTextarea\','" + name +"')\"));");
+		returnVal.append("myMenu.add(new WFXMI(\"Query data\",\"javascript:execQueryObjData(\'myTextarea\','" + this.name +"')\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Edit data\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Export data\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");

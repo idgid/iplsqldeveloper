@@ -47,6 +47,7 @@ public class DbQueueBean extends DbBean {
 
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
+		String name =  this.name.replaceAll("#","%23");
 		returnVal.append("myMenu.width = 200;");
 		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Duplicate...\", \"\"));");

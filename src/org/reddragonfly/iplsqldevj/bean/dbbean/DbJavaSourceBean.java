@@ -71,6 +71,7 @@ public class DbJavaSourceBean extends DbBean {
 
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
+		String name =  this.name.replaceAll("#","%23");
 		returnVal.append("myMenu.width = 200;");
 		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','Java sources','New...','550px','300px');\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");

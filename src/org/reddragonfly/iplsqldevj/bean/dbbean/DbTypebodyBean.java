@@ -68,6 +68,7 @@ public class DbTypebodyBean extends DbBean {
 
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
+		String name =  this.name.replaceAll("#","%23");
 		returnVal.append("myMenu.width = 200;");
 		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','Type bodies','New...','550px','300px');\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
@@ -83,8 +84,8 @@ public class DbTypebodyBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Drop\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Drop','500px','120px');\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Browse\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
-		returnVal.append("myMenu.add(new WFXMI(\"Recompile\", \"javascript:recompile('"+TYPE+"','"+name+"','0');\"));");
-		returnVal.append("myMenu.add(new WFXMI(\"Add debug information\", \"javascript:recompile('"+TYPE+"','"+name+"','1');\"));");
+		returnVal.append("myMenu.add(new WFXMI(\"Recompile\", \"javascript:recompile('"+TYPE+"','"+this.name+"','0');\"));");
+		returnVal.append("myMenu.add(new WFXMI(\"Add debug information\", \"javascript:recompile('"+TYPE+"','"+this.name+"','1');\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Add source to editor\"));");
 		returnVal.append("var sub1 = new WebFXMenu;");
 		returnVal.append("sub1.width = 100;");

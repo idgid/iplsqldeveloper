@@ -94,6 +94,7 @@ public class DbMaterializedViewBean extends DbBean {
 
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
+		String name =  this.name.replaceAll("#","%23");
 		returnVal.append("myMenu.width = 200;");
 		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','Materialized_views','New...','550px','300px');\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
@@ -108,7 +109,7 @@ public class DbMaterializedViewBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Drop\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Drop','500px','120px');\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Browse\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
-		returnVal.append("myMenu.add(new WFXMI(\"Recompile\", \"javascript:recompile('"+TYPE+"','"+name+"','0');\"));");
+		returnVal.append("myMenu.add(new WFXMI(\"Recompile\", \"javascript:recompile('"+TYPE+"','"+this.name+"','0');\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Recompile referencing objects\"));");
 		returnVal.append("var sub1 = new WebFXMenu;");
 		returnVal.append("sub1.width = 100;");
@@ -116,7 +117,7 @@ public class DbMaterializedViewBean extends DbBean {
 		returnVal.append("sub1.add(new WFXMI(\"XML\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"DBMS_Metadata\",null,null,sub1));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
-		returnVal.append("myMenu.add(new WFXMI(\"Query data\",\"javascript:execQueryObjData(\'myTextarea\','" + name +"')\"));");
+		returnVal.append("myMenu.add(new WFXMI(\"Query data\",\"javascript:execQueryObjData(\'myTextarea\','" + this.name +"')\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Edit data\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 		returnVal.append("var sub2 = new WebFXMenu;");

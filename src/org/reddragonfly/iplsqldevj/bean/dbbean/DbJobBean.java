@@ -1,19 +1,19 @@
 package org.reddragonfly.iplsqldevj.bean.dbbean;
 
 public class DbJobBean extends DbBean {
-	
+
 	public static String TYPE = "job";
 	public static String ICON_INVALID = "dbimages/valid_jobs.png";
 	public static String ICON_VALID = "dbimages/valid_jobs.png";
-	
-	protected static String[] FIELDS = 
+
+	protected static String[] FIELDS =
 	    {};
-	
+
 	protected String name = "";
 	public DbJobBean(String name){
 		this.name = name;
 	}
-	
+
 	public String getTreeXml() {
 		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
@@ -33,7 +33,7 @@ public class DbJobBean extends DbBean {
 		sb.append("</tree>");
 		return sb.toString();
 	}
-	
+
 	public String getFieldTreeXml(String fieldName) {
 		// TODO Auto-generated method stub
 		return null;
@@ -41,6 +41,7 @@ public class DbJobBean extends DbBean {
 
 	public String getMenuScript(){
 		StringBuffer returnVal = new StringBuffer();
+		String name =  this.name.replaceAll("#","%23");
 		returnVal.append("myMenu.width = 200;");
 		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Duplicate...\", \"\"));");
@@ -62,10 +63,10 @@ public class DbJobBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Add to folder\",null,null,sub2));");
 		return returnVal.toString();
 	}
-	
+
 	public String getFieldMenuScript(String fieldName){
 		StringBuffer returnVal = new StringBuffer();
 		return returnVal.toString();
 	}
-	
+
 }
