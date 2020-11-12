@@ -870,7 +870,7 @@ function mykeydown(myevent_key,textareaname){
 //execute执行按钮的function --正常
 function executeRun(textareaname) {
 	tempSql = getTextareaContents(textareaname);
-	console.log(tempSql);
+	// console.log(tempSql);
 	// alltmpSql = parent.parent.editorFrame.GGETFRAME.$(textareaname).get('text');
     alltmpSql = parent.parent.editorFrame.GGETFRAME.getTextareaContents(textareaname);
 	if(tempSql == "") {
