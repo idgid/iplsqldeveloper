@@ -199,7 +199,11 @@ function IdH() {
 		idHtml += "<tr><td>" + j + "</td></tr>";
 	}
 	idHtml += "</table>";
-	alert(idHtml);
+	parent.parent.editorFrame.dhtmlx.alert({
+		type:"alert-warning",
+		top: dAlertTop,
+		text: idHtml
+	});
 	idhNum.insertAdjacentHTML("beforeEnd", idHtml);
 }
 /*2009-3-25鼠标移动到哪一行小箭头就追踪到哪一行*/
@@ -244,7 +248,7 @@ function gettrId() {
 		trHTML.appendChild(tdHTML);
 	}
 	var trOption = parent.editorFrame.GGETFRAME.document.getElementById(trId);
-	alert(trId);
+	// alert(trId);
 	trOption.parentNode.insertBefore(trHTML, trOption.nextSibling);//关键的一行啊！
 }
 /*(-)减一行的操作*/
@@ -297,7 +301,7 @@ function insertNumber() {
 			}
 			if (trhave) { //如果值存在就加到数组里面
 				addvalues[valueID] = values.substring(0, values.length - 1);//这里有问题
-				alert(valueID + "=" + addvalues[valueID]);
+				// alert(valueID + "=" + addvalues[valueID]);
 				valueID++;
 			}
 		}
@@ -306,14 +310,19 @@ function insertNumber() {
 	insert(addvalues);
 }
 function insert(addvalues) {
-	alert(addvalues[0]);
+	// alert(addvalues[0]);
 	BaisWorkBean.insertNumber(addvalues, backInsert);
 }
 function backInsert(dataResult) {
 	var tcell = dataResult[0].length;
 	if(tcell == 2 && dataResult[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = dataResult[0][1];
-		alert(intdata[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : dataResult[0][1]
+		});
 	} else if(tcell == 2 && dataResult[0][0] == "ReddragonflySuccessFlag*") {
 		rows = dataResult[0][1];
 		//alert(intdata[0][1]);
@@ -357,7 +366,12 @@ function execResultFromSql(localsql,insertordelflag) {
 
 	if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = intdata[0][1];
-    	alert(intdata[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : intdata[0][1]
+		});
 	} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 		rows = intdata[0][1];
 	}
@@ -405,7 +419,12 @@ function execObject(localsql) {
 
 	if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = intdata[0][1];
-    	alert(intdata[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : intdata[0][1]
+		});
 	} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 		rows = intdata[0][1];
 		//alert(intdata[0][1]);
@@ -455,7 +474,12 @@ function execOtherObject(localsql) {
 
 		if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 			errOracleMsg = intdata[0][1];
-	    	alert(intdata[0][1]);
+			parent.parent.editorFrame.dhtmlx.alert({
+				title : "ERROR",
+				top: dAlertTop,
+				type : "alert-error",
+				text : intdata[0][1]
+			});
 		} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 			rows = intdata[0][1];
 		}

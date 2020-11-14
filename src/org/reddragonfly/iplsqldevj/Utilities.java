@@ -11,7 +11,7 @@ public class Utilities {
 					+"		face=\"Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif\">Copyright"
 					+"		<a href=\"http://www.reddragonfly.org\" target=\"_blank\"><font color=#000000"
 					+"			face=\"Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif\">Reddragonfly"
-					+"				&amp; Studio</font> </a> &copy; 2007-2013 Code By </font>"
+					+"				&amp; Studio</font> </a> &copy; 2007-2020 Code By </font>"
 					+"	<a href=\"http://iplsqldeveloper.sf.net\" target=\"_blank\"> <font"
 					+"		color=#000000"
 					+"		face=\"Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif\">iPlsqldeveloper Team</font>"

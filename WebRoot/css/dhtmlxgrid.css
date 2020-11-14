@@ -31,7 +31,7 @@ div.gridbox table.hdr td div.hdrcell{
 }
 div.gridbox table.obj td {
 	border: 1px solid;
-	border-color : white Gray Gray white;
+	border-color : white #d6d6d6 #d6d6d6 white;
 	font-family: MS Sans Serif,arial;
 	font-size:12px;
 	font:12px arial;
@@ -51,7 +51,7 @@ div.gridbox table.obj th, div.gridbox table.hdr th{
 div.gridbox table.row20px tr  td{
     height:20px;
     white-space: nowrap;
-    padding:1px;
+    padding:2px;
 }
 div.gridbox .objbox {
 	background-color:white;

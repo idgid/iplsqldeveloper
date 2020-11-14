@@ -102,6 +102,11 @@ if (GGRIDHEADATTR ==  null)  var GGRIDHEADATTR = [];
 // 是否显示
 if (GtitleShowFlag == null)     var GtitleShowFlag = false;
 
+// 提示信息 TOP
+if (dAlertTop == null)     var dAlertTop = 120;
+
+
+
 
 
 
@@ -219,7 +224,6 @@ function fetchlastbuttonpress() {
 
 //退出函数 --不用改 正常
 function logout() {
-	//alert("1");
 	var name="webfx-tree-cookie-persistence";
 	var ie = /msie/i.test(navigator.userAgent);
 	if (ie) {
@@ -230,7 +234,6 @@ function logout() {
 	}
 	} else {
 		//Cookie.remove(name);
-		//alert('test');
 		parent.location.replace("./quit.action");
 	}
 }
@@ -561,7 +564,6 @@ function changeRecordViewInit() {
 	changeRecordShowHtml();
 
 	parent.parent.editorFrame.GGETFRAME.$('changeOutResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
-	//alert($('changeOutResultDiv').get('style'));
 }
 
 //按下NextRecord按钮执行的功能
@@ -823,7 +825,11 @@ function mykeydown_old(myevent,textareaname){
 		if(myevent.key == 'f9') {
 			//'F9' 按下，和点击图标调用同一个事件处理函数
 			//parent.editorFrame.rollback();
-			alert("coding...");
+			parent.parent.editorFrame.dhtmlx.alert({
+				type:"alert-warning",
+				top: dAlertTop,
+				text:"coding..."
+			});
 		}
 		if(myevent.key == 'f10') {
 			//'F10' 按下，和点击图标调用同一个事件处理函数
@@ -853,7 +859,11 @@ function mykeydown(myevent_key,textareaname){
 	if(myevent_key == 'f9') {
 		//'F9' 按下，和点击图标调用同一个事件处理函数
 		//parent.editorFrame.rollback();
-		alert("coding...");
+		parent.parent.editorFrame.dhtmlx.alert({
+			type:"alert-warning",
+			top: dAlertTop,
+			text:"coding..."
+		});
 	}
 	if(myevent_key == 'f10') {
 		//'F10' 按下，和点击图标调用同一个事件处理函数
@@ -874,7 +884,12 @@ function executeRun(textareaname) {
 	// alltmpSql = parent.parent.editorFrame.GGETFRAME.$(textareaname).get('text');
     alltmpSql = parent.parent.editorFrame.GGETFRAME.getTextareaContents(textareaname);
 	if(tempSql == "") {
-		alert("Error: SQL can not null!");
+		parent.parent.editorFrame.dhtmlx.alert({
+			title:"ERROR",
+			top: dAlertTop,
+			type:"alert-error",
+			text:"Error: SQL can not null!"
+		});
 	} else {
 
 		var currWindoType = parent.parent.leftFrameList.getWindowType();
@@ -1176,7 +1191,7 @@ function addComment(EditorName) {
 
 	//myText.replace();
 	myText = "<font color='red'>/*" + myText + "*/</red>";
-	alert(myText);
+	// alert(myText);
 	parent.editorFrame.$(EditorName).set('html',myText);
 }
 
@@ -1201,7 +1216,7 @@ function resetBaseWorkToolBar(baisWorkFlag) {
 
 //对树操作的接口方法(该方法的实现已改成由phanrider提供的showTreeOperateOther方法实现,showTreeOperateOther已经去除，改用showCommon)
 function showTreeOperate(type,name,field,operate,width,height){
-   	alert("Coding...");
+   	console.log("Coding...");
    	/*
    	selectedNote = tree.getSelected();
    	var url = "../treeoperate/"+type+"/";
@@ -1308,6 +1323,7 @@ function showDataHtml(rows,data) {
     tcell = data[0].length; //表格展示的列数
     var strHeader = "";
     var strSort = "";
+    var strAlign = "right,";
     var gridRowType = "";
     var gridRowTypeFlag = "ed";
     var splitStr = "_$$$_";
@@ -1315,13 +1331,23 @@ function showDataHtml(rows,data) {
 		GGRIDHEADATTR[i] = data[0][i].split(splitStr);
 		GGRIDHEADATTR[i][2] < GGRIDCELLLENGTH ? gridRowTypeFlag = "ed" : gridRowTypeFlag = "txt";
     	if(i == (tcell - 1)) {
-    		strHeader = strHeader + GGRIDHEADATTR[i][0];
+    		strHeader = strHeader + GGRIDHEADATTR[i][0].replace(/\,/gi," ");  // 逗号转义成空格
     		strSort = strSort + "str";
 			gridRowType = gridRowType + gridRowTypeFlag;
+			if (GGRIDHEADATTR[i][1] == "NUMBER") {
+				strAlign = strAlign + "right";
+			} else {
+				strAlign = strAlign + "left";
+			}
     	} else  {
     		strHeader = strHeader + GGRIDHEADATTR[i][0] + "," ;
     		strSort = strSort + "str" + ",";
 			gridRowType = gridRowType + gridRowTypeFlag + ",";
+			if (GGRIDHEADATTR[i][1] == "NUMBER") {
+				strAlign = strAlign + "right" + ",";
+			} else {
+				strAlign = strAlign + "left" + ",";
+			}
     	}
     }
 
@@ -1330,7 +1356,7 @@ function showDataHtml(rows,data) {
     strSort = "int," + strSort; //前面数字排序
 	gridRowType = "ro," + gridRowType;
     mygrid.setHeader(strHeader);
-    mygrid.setColAlign("right");
+    mygrid.setColAlign(strAlign);
 	mygrid.setColTypes(gridRowType);
 	mygrid.setColSorting(strSort);
 	mygrid.attachEvent("onRowSelect",doOnRowSelected);
@@ -1370,7 +1396,12 @@ function showDataHtml(rows,data) {
 
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
-    	alert(data[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : data[0][1]
+		});
     } else {
 
     	mygrid.init();  //进行初始化
@@ -1451,7 +1482,13 @@ function showDataHtml(rows,data) {
 
 	function onKeyPressed(code, ctrl, shift){
 		if( code==67 && ctrl ){
-			if (!mygrid._selectionArea ) return alert("You need to select a block area first!");
+			if (!mygrid._selectionArea && !mygrid.isEditable) {
+				return parent.parent.editorFrame.dhtmlx.alert({
+					type : "alert-warning",
+					top: dAlertTop,
+					text : "You need to select a block area first!"
+				});
+			}
 			mygrid.setCSVDelimiter("\t");
 			mygrid.copyBlockToClipboard()
 		}
@@ -1710,7 +1747,14 @@ function setWarning(flag) {
 	if(flag == 0) {
 
 		errMsg="These query results are not updateable.\nInclude the ROWID to get updateable results.";
-		alert(errMsg);
+
+		parent.parent.editorFrame.dhtmlx.alert({
+			title: "ERROR",
+			top: dAlertTop,
+			type: "alert-error",
+			text: errMsg
+		});
+
 
 		//lockButtonObject.setToggle(false);
 		return false;
@@ -1900,9 +1944,8 @@ function queryByExample() {
 	}
 }
 
-
+// 暂不用
 function clearRecord() {
-
 	console.log('1');
 }
 
@@ -2230,7 +2273,12 @@ function showDataHtmlP(data) {
 
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
-    	alert(data[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : data[0][1]
+		});
     } else {
     	mygrid.enableAutoHeigth(true);
 
@@ -2326,7 +2374,12 @@ function showDataHtmlD(data) {
 
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
-    	alert(data[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : data[0][1]
+		});
     } else {
 
     	//mygrid.enableAutoHeigth(true,380);
@@ -2440,7 +2493,12 @@ function showDataHtmlReal(data, divname)
 
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
-    	alert(data[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : data[0][1]
+		});
     } else {
 
     	//mygrid.enableAutoHeigth(true,380);
@@ -2623,7 +2681,12 @@ function recompile(objectType, objectName, debugFlag) {
 
 	if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = intdata[0][1];
-    	alert(intdata[0][1]);
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : intdata[0][1]
+		});
 	} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 		rows = intdata[0][1];
 	}
@@ -2640,7 +2703,11 @@ function recompile(objectType, objectName, debugFlag) {
 
 	//左边树的选中节点重新加载，只有执行成功才重新加载
 	if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
-			alert(oracleTitle);
+			parent.parent.editorFrame.dhtmlx.alert({
+				type: "alert-warning",
+				top: dAlertTop,
+				text: oracleTitle
+			});
 			parent.leftFrame.tree.getSelected().getParent().reload();  //父节点刷新
 		}
 	}
@@ -2745,7 +2812,12 @@ function createWindowList(windowType, str, eFlag) {
 
 	if (introws > GMIXWINDOWS - 1) {
 		//超过20个弹出提示
-		alert("Has exceeded the maximum window can be created!");
+		parent.parent.editorFrame.dhtmlx.alert({
+			type : "alert-warning",
+			top: dAlertTop,
+			text : "Has exceeded the maximum window can be created!"
+		});
+
 	} else {
 		var newTr = tableObject.insertRow(introws);
 		var newTd = newTr.insertCell(0);
@@ -2931,7 +3003,7 @@ function createNewSql(windowType, textareaname) {
 	//var getText = parent.editorFrame.$('myTextarea').get('html');
 	//var getExecValue = parent.editorFrame.$('outResultDiv').get('html');
 	//var getChangeExecValue = parent.editorFrame.$('changeOutResultDiv').get('html');
-	console.log("click.this.createNewSql");
+	// console.log("click.this.createNewSql");
 
 	var f =  false;
 	// 是否为查看
@@ -3430,9 +3502,6 @@ function deleteWindowList() {
 	var currTrRown = parent.leftFrameList.getWindowTr();
 	var currWindowFlag = parent.leftFrameList.getWindowType();
 
-	//alert(currTrRown);
-	//alert(currWindowFlag);
-
 	//得到已有表格对象
 	var tableObject=parent.leftFrameList.document.getElementById("windowListBar");
 
@@ -3441,7 +3510,11 @@ function deleteWindowList() {
 
 	if (introws == 1 ) {
 		//最后一个弹出提示，不可以删除
-		alert("Do not delete last window!");
+		parent.parent.editorFrame.dhtmlx.alert({
+			type:"alert-warning",
+			top: dAlertTop,
+			text:"Do not delete last window!"
+		});
 	} else {
 		//清空leftFrameList中当前的div值
 		parent.leftFrameList.deleteWindowListDiv(currTrRown);
@@ -3492,7 +3565,6 @@ function deleteWindowList() {
 
 //删除当前活动窗口的div中的值
 function deleteWindowListDiv(currTrRown) {
-	//alert(currTrRown);
 	var windowDiv = "SQLWindow" + currTrRown;
 	parent.leftFrameList.$(windowDiv).set('html','');
 }
@@ -3585,7 +3657,6 @@ function adjustmentWindowListDiv(trRow) {
 		// parent.leftFrameList.$(oldWindowDiv).set('html',parent.leftFrameList.$(windowDiv).get('html'));
 		// parent.leftFrameList.$(windowDiv).set('html','');
 
-		//alert(parent.leftFrameList.$(oldWindowDiv).get('id'));
 
 		var oldTdId = tmpTdId + old;
 		var oldSpanId = "WindowListValue" + old;
@@ -3800,7 +3871,7 @@ function keyDownInterface(e) {
     if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
         getTmpStr();
     } else {
-        setTimeout(getTmpStr,100);
+        setTimeout(getTmpStr,50);
     }
 
 
@@ -3812,12 +3883,17 @@ function keyDownInterface(e) {
 		stmp = currstr.substr(0, currstrpos-1).trim().split(" ");
 		if ((s_after == "" || s_after == " ") && e.keyCode != 32 && s_before != " " ) {
 			s = stmp[stmp.length - 1].trim();
-			if ( e.keyCode != 38 && e.keyCode != 40 && e.keyCode != 13  && e.keyCode != 16  && e.keyCode != 17 && e.keyCode != 18 && e.keyCode != 19 ) {
-			    // 当前输入超过 2 个字符才开始提示
-				if ( s != "*" && s.length > 2) {
-					regE = RegExp('^' + s, "i");
-					autoMacth(regE, s, titleUserObject);
+			if ( e.keyCode != 38 && e.keyCode != 40 && e.keyCode != 13  && e.keyCode != 16  && e.keyCode != 17 && e.keyCode != 18 && e.keyCode != 19  ) {
+				if (e.keyCode >= 112 && e.keyCode <= 123) {
+					return e;
+				} else {
+					// 当前输入超过 2 个字符才开始提示
+					if ( s != "*" && s.length > 2) {
+						regE = RegExp('^' + s, "i");
+						autoMacth(regE, s, titleUserObject);
+					}
 				}
+
 			}
 
 		} else {
@@ -3834,6 +3910,7 @@ function keyDownInterface(e) {
 				} else {
 					tmpstr.focus();
 				}
+				e.returnValue = false;
 			}
 			// up key
 			else if ( e.keyCode == 38 ) {
@@ -3844,15 +3921,17 @@ function keyDownInterface(e) {
 				}else{     //如果“提示”列表未显示,则把焦点依旧留在文本框中
 					tmpstr.focus();
 				}
+				e.returnValue = false;
 			}
 			// tab key
 			else if ( e.keyCode == 9 ) {
-
 				clearAutoCompletion();
 				e.returnValue = false;
 
 			} else if ( e.keyCode == 27  || e.keyCode == 8 || e.keyCode== 32) {  // ESC key
 				clearAutoCompletion();
+				e.returnValue = false;
+
 			} else if ( e.keyCode == 13 ) { // Enter key
 				if (autoCompletionObj.style.display == "") {
 					replaceCurrPostionStr( autoCompletionObj.getElementsByTagName('a')[0].text );
@@ -3860,11 +3939,14 @@ function keyDownInterface(e) {
 
 				}
 					clearAutoCompletion();
+				e.returnValue = false;
 
 			}
-			e.returnValue = false;
 
-		}
+		} else {
+            e.returnValue = true;
+
+        }
 
 	}
 
@@ -3952,9 +4034,10 @@ function keyDownInterface(e) {
             }
         }
 
-        autoCompletionObj.focus();
+        tmpstr.focus();
 
-	}
+
+    }
 
     //清除提示内容
 	function clearAutoCompletion(){
@@ -3966,7 +4049,7 @@ function keyDownInterface(e) {
 		autoCompletionObj.style.display = "none";
 		document.getElementById("autoCompletion").className = "hide";
 		parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag = false;
-		titleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
+		GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
 
         tmpstr.focus();
 	}

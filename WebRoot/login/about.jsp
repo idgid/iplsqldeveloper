@@ -101,7 +101,7 @@ body {
 						<a href="http://www.reddragonfly.org" target="_blank"><font
 							color=#000000
 							face="Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif">Reddragonfly
-							&amp; Studio</font> </a> &copy; 2007-2011 </font>
+							&amp; Studio</font> </a> &copy; 2007-2020 </font>
 						<br />
 
 						Code By

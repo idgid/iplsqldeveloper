@@ -267,6 +267,44 @@ public class Database {
 	     * @throws Exception
 	     */
 	    public byte[] getBlob(ResultSet rs, int columnIndex) throws Exception {
+			//Blob blob = null;
+			//
+			//try{
+			//	blob = rs.getBlob(columnIndex);
+			//	if (blob != null) {
+			//		InputStream is = blob.getBinaryStream();
+			//
+			//		int upMaxByte = 1024;
+			//		byte[] buffer = new byte[upMaxByte];
+			//		int readByte = 0;
+			//		int flength = (int) blob.length();
+			//		byte[] rtn = new byte[flength];
+			//
+			//		int i = 0;
+			//		while (i < flength) {
+			//			if (i + upMaxByte > flength) {
+			//				readByte = (int) (flength - i);
+			//			}
+			//			else {
+			//				readByte = upMaxByte;
+			//			}
+			//
+			//			is.read(buffer, 0, readByte);
+			//			System.arraycopy(buffer,0,rtn,i,readByte);
+			//			i += upMaxByte;
+			//		}
+			//		is.close();
+			//		return rtn;
+			//
+			//	} else {
+			//		return new byte[0];
+			//	}
+			//
+			//}catch (Exception e) {
+			//	throw new Exception(e.getMessage());
+			//}
+
+
 	      return this.getBlob( ( (OracleResultSet) rs).getBLOB(columnIndex));
 	    }
 

@@ -9,17 +9,15 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link type="text/css" rel="StyleSheet" href="../css/cb2.css" />
 	<link type="text/css" rel="StyleSheet" href="../css/grid.css" />
-	<%--<link type="text/css" rel="StyleSheet" href="../css/dhtmlxgrid.css" />--%>
+	<link type="text/css" rel="stylesheet" href="../js/codebase/dhtmlx.css"/>
+
 	<script type="text/javascript" src="../js/others.js"></script>
-	<%--<script type="text/javascript" src="../js/sqlhighlighter.js"></script>--%>
 	<script type="text/javascript" src="../js/mootools.js"></script>
-	<%--<script type="text/javascript" src="../js/dhtmlxcommon.js"></script>--%>
-	<%--<script type="text/javascript" src="../js/dhtmlxgrid.js"></script>--%>
-	<%--<script type="text/javascript" src="../js/dhtmlxgridcell.js"></script>--%>
+
 	<script type="text/javascript" language="JavaScript1.5"	src="../js/ieemu.js"></script>
 	<script type="text/javascript" src="../js/cb2.js"></script>
+	<script type="text/javascript" src="../js/codebase/dhtmlx.js"></script>
 	<script type="text/javascript" src="../js/baisworksql.js"></script>
-	<%--<script type="text/javascript" src="../js/edit_area/edit_area_full.js"></script>--%>
 	<script type="text/javascript" src="../js/jquery-1.3.2.min.js"></script>
 
 	<script type='text/javascript' src='../dwr/interface/BaisWorkBean.js'></script>

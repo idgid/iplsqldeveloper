@@ -6,22 +6,30 @@
  */
 package org.reddragonfly.iplsqldevj.bean;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.lang.reflect.Proxy;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.sql.rowset.serial.SerialClob;
 
 import dm.jdbc.util.StringUtil;
+import oracle.sql.BLOB;
+import oracle.sql.CLOB;
 import org.apache.struts2.ServletActionContext;
 import org.directwebremoting.WebContextFactory;
 
 
 import com.opensymphony.xwork2.ActionContext;
+import org.reddragonfly.iplsqldevj.DateUtilities;
 
 public class BaisWorkBean {
 	// 当前起始
@@ -271,7 +279,10 @@ public class BaisWorkBean {
 
 						if ( "BLOB".equals(rs.getMetaData().getCatalogName(j)) ||"BLOB".equals( rs.getMetaData().getColumnTypeName(j))  ) {
 							byte[] blobTmp = db.getBlob(rs , j );
-							value = "";
+							if (blobTmp.length == 0) value="<BLOB>";
+							else {
+								value = new String(blobTmp);  // 暂时测试string
+							}
 						}
 
 
@@ -320,6 +331,7 @@ public class BaisWorkBean {
 		}
 	}
 
+	// 更新、删除、插入 数据 by phanrider 2020-10-6
     public List forUpdateNumber(String[] addvalues[]) {
         ResultSet rs = null;
         String[] addValues[] = new String[addvalues.length][];
@@ -347,8 +359,45 @@ public class BaisWorkBean {
                     if ( addValues[i][0].equals(Integer.toString(j))) {
                         rs.absolute(j);
                         // 更新该行的所有列
-                        for( int k = 1; k < colNum; k++ )
-                            rs.updateString(k, addValues[i][k]);
+                        for( int k = 1; k < colNum; k++ ) {
+                        	if (rs.getMetaData().getColumnTypeName(k).equals("TIMESTAMP")) {
+								Timestamp ts = Timestamp.valueOf(addValues[i][k]);
+								rs.updateTimestamp(k, ts);
+							} else if (rs.getMetaData().getColumnTypeName(k).equals("DATE")) {
+								Date da = DateUtilities.getParseDateString(addValues[i][k], "yyyy-MM-dd HH:mm:ss");
+								rs.updateDate(k, new java.sql.Date(da.getTime()));
+							} else if ("CLOB".equals( rs.getMetaData().getColumnTypeName(k)))  {
+								char[] c = addValues[i][k].toCharArray();
+								oracle.sql.CLOB clob = (CLOB) rs.getClob(k);
+								if( clob == null) {
+									oracle.sql.CLOB cl = oracle.sql.CLOB.createTemporary(rs.getStatement().getConnection(), false, CLOB.DURATION_SESSION);
+									cl.putString(1, addvalues[i][k]);
+									rs.updateClob(k, cl);
+
+								} else {
+									Writer outStream = clob.getCharacterOutputStream();
+									outStream.write(c, 0, c.length);
+									outStream.flush();
+								}
+
+							} else if ( "BLOB".equals(rs.getMetaData().getCatalogName(k)) ||"BLOB".equals( rs.getMetaData().getColumnTypeName(k))  ) {
+								byte[] c = addValues[i][k].getBytes();
+								oracle.sql.BLOB blob = (BLOB) rs.getBlob(k);
+								if( blob == null) {
+									oracle.sql.BLOB bl = oracle.sql.BLOB.createTemporary(rs.getStatement().getConnection(), false, BLOB.DURATION_SESSION);
+									bl.putBytes(1, c);
+									rs.updateBlob(k, bl);
+								} else {
+									OutputStream outStream = blob.getBinaryOutputStream();
+									outStream.write(c, 0, c.length);
+									outStream.flush();
+								}
+
+							} else {
+								rs.updateString(k, addValues[i][k]);
+							}
+
+						}
                         rs.updateRow();
                         uNum++;
                     }
@@ -380,8 +429,45 @@ public class BaisWorkBean {
                     } else {
                         if ( j == rowCount ) {
                             rs.moveToInsertRow();
-                            for( int k = 1; k < colNum; k++ )
-                                rs.updateString(k, addValues[i][k]);
+                            for( int k = 1; k < colNum; k++ ) {
+
+								if (rs.getMetaData().getColumnTypeName(k).equals("TIMESTAMP")) {
+									Timestamp ts = Timestamp.valueOf(addValues[i][k]);
+									rs.updateTimestamp(k, ts);
+								} else if (rs.getMetaData().getColumnTypeName(k).equals("DATE")) {
+									Date da = DateUtilities.getParseDateString(addValues[i][k], "yyyy-MM-dd HH:mm:ss");
+									rs.updateDate(k, new java.sql.Date(da.getTime()));
+								} else if ("CLOB".equals( rs.getMetaData().getColumnTypeName(k)))  {
+									char[] c = addValues[i][k].toCharArray();
+									oracle.sql.CLOB clob = (CLOB) rs.getClob(k);
+									if( clob == null) {
+										oracle.sql.CLOB cl = oracle.sql.CLOB.createTemporary(rs.getStatement().getConnection(), false, CLOB.DURATION_SESSION);
+										cl.putString(1, addvalues[i][k]);
+										rs.updateClob(k, cl);
+									} else {
+										clob = (oracle.sql.CLOB) rs.getClob(k);
+										Writer outStream = clob.getCharacterOutputStream();
+										outStream.write(c, 0, c.length);
+										outStream.flush();
+									}
+
+								} else if ( "BLOB".equals(rs.getMetaData().getCatalogName(k)) ||"BLOB".equals( rs.getMetaData().getColumnTypeName(k))  ) {
+                                    byte[] c = addValues[i][k].getBytes();
+                                    oracle.sql.BLOB blob = (BLOB) rs.getBlob(k);
+                                    if( blob == null) {
+                                        oracle.sql.BLOB bl = oracle.sql.BLOB.createTemporary(rs.getStatement().getConnection(), false, BLOB.DURATION_SESSION);
+                                        bl.putBytes(1, c);
+                                        rs.updateBlob(k, bl);
+                                    } else {
+                                        OutputStream outStream = blob.getBinaryOutputStream();
+                                        outStream.write(c, 0, c.length);
+                                        outStream.flush();
+                                    }								} else {
+									rs.updateString(k, addValues[i][k]);
+
+								}
+                            	//   rs.updateString(k, addValues[i][k]);
+							}
                             rs.insertRow();
                             iNum++;
                         }
