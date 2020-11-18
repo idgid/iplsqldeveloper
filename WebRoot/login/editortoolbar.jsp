@@ -96,6 +96,9 @@ table {
 					<td class="coolButton" id="newTd" onclick="parent.parent.leftFrameList.createNewSql('SQL','myTextarea');">
 						<img id='columnButton' src="../images/new.gif"  title="New" alt="New" align="absmiddle">
 					</td>
+					<td class="coolButton" id="newCommandTd" onclick="parent.parent.leftFrameList.createNewSql('CSQ','CommandNew.jsp');">
+						<img id='columnButton' src="../images/newcommand.gif" title="New Command" alt="New Command" align="absmiddle">
+					</td>
 					<td class="coolButton" onclick="execSysCommand('myTextarea','open');">
 						<img id='columnButton' src="../images/open.gif" title="Open" alt="Open" align="absmiddle">
 					</td>
