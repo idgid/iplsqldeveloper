@@ -671,3 +671,5 @@ div.gridbox_material.gridbox table.hdr td.dhxgrid_sort_asc_col div {
 div.gridbox_material.gridbox table.hdr td.dhxgrid_sort_asc_col {
 	background-image:url("../js/codebase/imgs/dhxgrid_material/sort_asc.gif");
 }
+
+.dhtmlx_validation_error{border-bottom:2px solid red!important;}

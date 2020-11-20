@@ -54,6 +54,25 @@ function getResultFromSql(localsql) {
 	//phanrider 2009-05-17
 	BaisWorkBean.GetResultList(sqlNum, callbackadd);
 }
+
+// for CommandSQL  2020-11-15
+function getResultFromCommmandSql(localsql, callfun) {
+	parent.parent.editorFrame.GGETFRAME.fyNum = 1;
+	fyNum = parent.parent.editorFrame.GGETFRAME.fyNum;
+	sqlNum[0] = localsql;
+	sqlNum[1] = fyNum;
+	sqlNum[2] = "Q";
+	sql2 = localsql;
+	//设置右下角提示信息--正在执行 --phanrider 2009-04-30 增加
+	setFootView(1, "");
+	//这里加入执行开始的时间计算
+	//BaisWorkBean.initBean(sqlNum, callbackadd);
+
+	//将展用新的展示方式，返回类型为list
+	//phanrider 2009-05-17
+	BaisWorkBean.GetResultList(sqlNum, callfun);
+}
+
 /*传入SQL把数据从数据库里面拉出来展示--新*分页用*/
 function getFYSql_run() {
 	fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum ;
@@ -347,15 +366,16 @@ function backInsert(dataResult) {
 
 
 //inserted or deleted 最终调用此函数据 by phanrider
-function execResultFromSql(localsql,insertordelflag) {
+function execResultFromSql(localsql,insertordelflag, callfun) {
 	//置空
 	setFootView(1, "");
-	var oldtime = $time();
+	// var oldtime = $time(); // mootools
+	var oldtime = new Date().getTime(); // 非 mootools 方法 $time()
 
-	BaisWorkBean.intOfInsertDelete(localsql, callinsertdelback);
+	BaisWorkBean.intOfInsertDelete(localsql, callfun);
 
 	function callinsertdelback(intdata){
-	var newtime = ($time() - oldtime) / 1000;
+	var newtime = (new Date().getTime() - oldtime) / 1000;
 	var oracleTitle = "";
 	var insertordel = "";
 	var rows="";
@@ -385,7 +405,7 @@ function execResultFromSql(localsql,insertordelflag) {
 	 	errOracleMsg = "";
 	} else  {
 		if (insertordelflag == 3)	{
-			if (getIfDDL('myTextarea')) {
+			if (getIfDDL('myTextarea', 0)) {
 				setCommit(false);
 				setRollback(false);
 			}
