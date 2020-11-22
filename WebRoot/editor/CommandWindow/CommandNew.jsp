@@ -2,8 +2,6 @@
 <%@ page import="org.reddragonfly.iplsqldevj.bean.CharSet" %>
 <%@page import="org.reddragonfly.iplsqldevj.DBUtilities"%>
 <%@ page import="org.reddragonfly.iplsqldevj.bean.UserBean"%>
-
-
 <%
 	String name = CharSet.nullToEmpty(request.getParameter("name"));
 	if ("".equals(name)) name="Name";
@@ -15,11 +13,9 @@
 	UserBean ub = (UserBean) session.getAttribute("user");
 
 %>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 	<title>View</title>
 	<link type="text/css" rel="StyleSheet" href="../../css/cb2.css" />
 	<link type="text/css" rel="StyleSheet" href="../../css/tab.winclassic.css" />
@@ -174,13 +170,14 @@
 	var greetingsTitle = "Connected to <%=ub.getDbversion()%> " + "\n" + "Connected as <%=ub.getUsername()%>@<%=ub.getServername()%>\n";
 	var defaultClobLen = 100;
 
+
 	jQuery(function($) {
 		var id = 1;
 		term = $('#commandTerm').terminal(function(command, term) {
 			if (command !== '') {
 				var dFlag = 0;
 				var oldtime = 0;
-				command = command.trim().replace(/[;]*$/, '');
+				command = command.trim().replaceAll(/\n/g,' ').replace(/[;]*$/, '');
                 executebuttonpress();   //工具条
                 parent.parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton"); // footer
                 parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(),command);  //左边 window list
@@ -413,11 +410,76 @@
 			prompt: "SQL> ",
             keypress: function (event) {
                 document.getElementById('positionCurr').innerText = (this.last_index() + 2) + ":" + (this.before_cursor().length + 2);
-            }
+            },
+			keymap: {
+				ENTER: function(e, original) {
+					if (balance(this.get_command()) === 0) {
+						original();
+					} else {
+						this.insert('\n');
+					}
+				}
+			}
 
 		});
 	});
 
+
+	function balance(code) {
+		var tokens = inputTokenize(code);
+		var count = -1;
+		var token;
+		var i = tokens.length;
+		while ((token = tokens[--i])) {
+			if (token.token === ';') {
+				count++
+			}
+		}
+
+
+		function inputTokenize(str) {
+			var count = 0;
+			var offset = 0;
+			var tokens = [];
+			var pre_parse_re = /("(?:\\[\S\s]|[^"])*"|\/(?! )[^\/\\]*(?:\\[\S\s][^\/\\]*)*\/[gimy]*(?=\s|\(|\)|$)|;.*)/g;
+			var tokens_re = /("(?:\\[\S\s]|[^"])*"|\/(?! )[^\/\\]*(?:\\[\S\s][^\/\\]*)*\/[gimy]*(?=\s|\(|\)|$)|\(|\)|'|"(?:\\[\S\s]|[^"])+|(?:\\[\S\s]|[^"])*"|;.*|(?:[-+]?(?:(?:\.[0-9]+|[0-9]+\.[0-9]+)(?:[eE][-+]?[0-9]+)?)|[0-9]+\.)[0-9]|\.|,@|,|`|[^(\s)]+)/gim;
+
+
+			str.split(pre_parse_re).filter(Boolean).forEach(function(string) {
+				if (string.match(pre_parse_re)) {
+					var col = (string.split(/\n/), [""]).pop().length;
+					tokens.push({
+						token: string,
+						col,
+						offset: count + offset,
+						line: offset
+					});
+					count += string.length;
+
+					offset += (string.match("\n") || []).length;
+					return;
+				}
+				string.split('\n').filter(Boolean).forEach(function(line, i) {
+					var col = 0;
+					line.split(tokens_re).filter(Boolean).forEach(function(token) {
+						var line = i + offset;
+						var result = {
+							col,
+							line,
+							token,
+							offset: count + line
+						};
+						col += token.length;
+						count += token.length;
+						tokens.push(result);
+					});
+				});
+			});
+			return tokens;
+		}
+
+		return count;
+	}
 
 	function initViewFootButton() {
 		var cells1 = document.getElementById('toolBar_footer').rows[0].cells;
