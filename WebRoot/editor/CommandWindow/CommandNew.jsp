@@ -33,7 +33,8 @@
 
 	<!--以下是dwr的必备js  -->
 	<script type='text/javascript' src='../../dwr/interface/BaisWorkBean.js'></script>
-	<script type='text/javascript' src='../../dwr/engine.js'></script>
+    <script type='text/javascript' src='../../dwr/interface/DbObjectBean.js'></script>
+    <script type='text/javascript' src='../../dwr/engine.js'></script>
 
 
 </head>
@@ -174,14 +175,13 @@
 	jQuery(function($) {
 		var id = 1;
 		term = $('#commandTerm').terminal(function(command, term) {
-			if (command !== '') {
+            command = command.trim().replaceAll(/\n/g,' ').replace(/[;]*$/, '');
+            if (command != '' && command.toLowerCase().trim() != 'clear') {
 				var dFlag = 0;
 				var oldtime = 0;
-				command = command.trim().replaceAll(/\n/g,' ').replace(/[;]*$/, '');
                 executebuttonpress();   //工具条
                 parent.parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton"); // footer
                 parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(),command);  //左边 window list
-
 				if (parent.parent.editorToolFrame.getIfSelect(command, 1)) {
 					getResultFromCommmandSql(command, callbackCommandadd);
 				} else {
@@ -189,11 +189,98 @@
 						setCommit(true);
 						setRollback(true);
 						dFlag = 1;
-					} else if (parent.parent.editorToolFrame.getIfDelete(command, 1)) {
+					} else if (parent.parent.editorToolFrame.getIfCommit(command, 1)) {
+                        oldtime = new Date().getTime();
+                        parent.parent.editorFrame.GGETFRAME.commit();
+                        var newtime = (new Date().getTime() - oldtime) / 1000;
+                        breakRun('');
+                        oracleTitle = "Commit complete in " + newtime + " seconds";
+                        this.echo("Commit complete");
+                        this.echo("");
+                        setFootView(9999, oracleTitle);
+                        parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+                        dFlag = 0;
+                    } else if (parent.parent.editorToolFrame.getIfRollback(command, 1)) {
+                        oldtime = new Date().getTime();
+                        parent.parent.editorFrame.GGETFRAME.rollback();
+                        var newtime = (new Date().getTime() - oldtime) / 1000;
+                        breakRun('');
+                        oracleTitle = "Rollback complete in " + newtime + " seconds";
+                        this.echo("Rollback complete");
+                        this.echo("");
+                        setFootView(9999, oracleTitle);
+                        parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+                        dFlag = 0;
+                    } else if (parent.parent.editorToolFrame.getIfDesc(command, 1)) {
+                        var c1 = command.split(" ")[command.trim().split(" ").length-1];
+                        var ca = c1.split(".");
+                        var sql = "";
+                        var otmp = parent.parent.topFrame.UserObject;
+                        var otype = "";
+                        for ( var i = 0; i < otmp.length; i++ ) {
+                            if ( ca.length ==1 ) {
+                                if (ca[0].toUpperCase() == otmp[i][0]) {
+                                    otype = otmp[i][1];
+                                    i = otmp.length;
+                                }
+                            } else if ( ca.length ==2 )  {
+                                if (ca[1].toUpperCase() == otmp[i][0]) {
+                                    otype = otmp[i][1];
+                                    i = otmp.length;
+                                }
+                            }
+                        }
+                        if ( ca.length >= 1 ) {
+                            if (ca.length == 1) {
+                                if ( otype.toUpperCase() == "TABLE" ) {
+                                    sql = "select a.column_name, a.data_type||decode(a.char_col_decl_length,'',null,'('||a.char_col_decl_length||')') type, a.nullable, "  +
+                                        "a.data_default \"DEFAULT\", b.comments from user_tab_columns a, user_col_comments b " +
+                                        "where a.table_name='" + ca[0].toUpperCase() + "' " +
+                                        "and a.table_name = b.table_name " +
+                                        "and a.column_name = b.column_name " +
+                                        "order by a.column_id asc";
+                                } else {
+                                    sql = "select argument_name,data_type,in_out,default_value from user_arguments where package_name is null and object_name='" + ca[0].toUpperCase() + "'";
+                                }
+                            } else if (ca.length == 2) {
+                                if ( otype.toUpperCase() == "TABLE" ) {
+                                    headStr="Columns";
+                                    sql = "select a.column_name, a.data_type||decode(a.char_col_decl_length,'',null,'('||a.char_col_decl_length||')') type, a.nullable, " +
+                                        "a.data_default \"DEFAULT\", b.comments from user_tab_columns a, user_col_comments b " +
+                                        "where a.table_name='" + ca[1].toUpperCase() + "' " +
+                                        "and a.onwer = '" + ca[0].toUpperCase() + "' " +
+                                        "and a.table_name = b.table_name " +
+                                        "and a.column_name = b.column_name " +
+                                        "and a.onwer = b.onwer " +
+                                        "order by a.column_id asc";
+                                } else {
+                                    sql = "select argument_name,data_type,in_out,default_value from all_arguments where package_name is null and object_name='" +ca[1].toUpperCase()+"' and owner='"+ca[0].toUpperCase()+"'";
+                                }
+
+                            }
+                        }
+                        if ( otype == "" ) {
+                            this.error("Object " + ca[ca.length-1] + " does not exist");
+                            this.echo("");
+                            breakRun('');
+                            parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+                        } else {
+                            otype.toUpperCase() == "TABLE" ? DbObjectBean.getOther2(sql, ['Name','Type','Nullable','Default','Comments'], callbackCommandadd) :
+                                DbObjectBean.getOther2(sql, ['Parameter','Type','Mode','Default?'], callbackCommandadd);
+                        }
+
+
+                        dFlag = 0;
+                    } else if (parent.parent.editorToolFrame.getIfShow(command, 1)) {
+
+
+                        dFlag = 0;
+                    } else if (parent.parent.editorToolFrame.getIfDelete(command, 1)) {
 						setCommit(true);
 						setRollback(true);
 						dFlag = 2;
 					} else {
+
 						dFlag = 3;
 					}
 					if (dFlag == 2) {
@@ -213,7 +300,7 @@
 							oldtime = new Date().getTime();
 							execResultFromSql(command, dFlag, callbackCommandDelIns);
 						}
-					} else {
+					} else if ( dFlag != 0 ){
 						oldtime = new Date().getTime();
 						execResultFromSql(command, dFlag, callbackCommandDelIns);
 					}
@@ -258,7 +345,24 @@
 							} else {
 								oracleTitle = rows + " rows " + insertordel + " in " + newtime + " seconds";	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
 							}
-							term.echo(rows + " rows " + insertordel);
+                            parent.parent.editorToolFrame.getIfDDL(command, 1) == true ? (function() {
+                                var vc = "";
+                                command.match(/^create *\S* /i) != undefined ? (vc = command.match(/^create *\S* /i)[0].trim().split(" "),vc[0] = "created") :
+                                    command.match(/^alter *\S* /i) != undefined ? (vc = command.match(/^alter *\S* /i)[0].trim().split(" "), vc[0] = "altered" ):
+                                        command.match(/^drop *\S* /i) != undefined ? (vc = command.match(/^drop *\S* /i)[0].trim().split(" "), vc[0] = "dropped" ):
+                                            command.match(/^rename *\S* /i) != undefined ? (vc = command.match(/^rename *\S* /i)[0].trim().split(" "), vc[0] = "renamed" ): vc = "Unknow";
+                                var ts = vc[0];
+                                var te = vc[vc.length -1];
+                                var tt = "";
+
+                                // 拼 提示字符串
+                                tt =  te + " "+  ts;
+                                // 首字母大写
+                                tt = tt.replace(tt[0],tt[0].toUpperCase());
+
+							    term.echo(tt);
+                            })() : term.echo(rows + " rows " + insertordel);
+
 							term.echo("");
 
 						}
@@ -413,11 +517,16 @@
             },
 			keymap: {
 				ENTER: function(e, original) {
-					if (balance(this.get_command()) === 0) {
-						original();
-					} else {
-						this.insert('\n');
-					}
+				    if (this.get_command().trim() == "" || this.get_command().trim().toLowerCase() == "clear") {
+                        original();
+                    } else {
+                        if (balance(this.get_command()) === 0) {
+                            original();
+                        } else {
+                            this.insert('\n');
+                        }
+                    }
+
 				}
 			}
 

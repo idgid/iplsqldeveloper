@@ -114,14 +114,14 @@ if (dAlertTop == null)     var dAlertTop = 120;
 function setFootView(errNo, ename) {
 	if (errNo == 0) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Initializing...');
 	else if (errNo == 1) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText ='Executing...';
-	else if (errNo == 2) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiling...');
-	else if (errNo == 3) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiled succesfully');
-	else if (errNo == 4) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Compiled with errors');
-	else if (errNo == 5) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','File is read-only');
-	else if (errNo == 6) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Edit data unlocked');
-	else if (errNo == 7) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Edit data locked');
-	else if (errNo == 9) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Rollbacked');
-	else if (errNo == 10) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Commited');
+	else if (errNo == 2) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Compiling...';
+	else if (errNo == 3) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Compiled succesfully';
+	else if (errNo == 4) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Compiled with errors';
+	else if (errNo == 5) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'File is read-only';
+	else if (errNo == 6) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Edit data unlocked';
+	else if (errNo == 7) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Edit data locked';
+	else if (errNo == 9) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Rollbacked';
+	else if (errNo == 10) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Commited';
 	else if (errNo == 9999) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = ename;
 }
 
@@ -1842,7 +1842,7 @@ function getIfSelect(textareaname, cflag) {
     var tempStr;
 	cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
 	var selectFlag = false;
-	if (tempStr.trim().test("^select ","i")) {
+	if ( tempStr.trim().test("^select ", "i") ) {
 		selectFlag = true;
 	} else {
 		selectFlag = false;
@@ -1888,12 +1888,75 @@ function getIfDDL(textareaname, cflag) {
 	var Flag = false;
 	if (tempStr.trim().test("^alter ","i") ||
 		tempStr.trim().test("^drop ","i") ||
-		tempStr.trim().test("^create ","i") ) {
+		tempStr.trim().test("^create ","i") ||
+        tempStr.trim().test("^rename ","i") ) {
 		Flag = true;
 	} else {
 		Flag = false;
 	}
 	return Flag;
+}
+
+
+//得到sql语句是否为desc, show开头
+//返回值： true or false
+// 2020-11-21
+function getIfDesc(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^desc ","i") ) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
+}
+
+//得到sql语句是否为desc, show开头
+//返回值： true or false
+// 2020-11-21
+function getIfShow(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^show ","i")) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
+}
+
+//得到sql语句是否为 commit
+//返回值： true or false
+// 2020-11-21
+function getIfCommit(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^commit *$","i")  ) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
+}
+
+
+//得到sql语句是否为 rollback
+//返回值： true or false
+// 2020-11-21
+function getIfRollback(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^rollback *$","i")) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
 }
 
 //设置commit按钮的可用或不可用
