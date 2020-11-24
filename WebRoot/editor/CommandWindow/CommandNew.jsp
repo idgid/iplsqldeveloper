@@ -117,6 +117,41 @@
 		background-color: #FFF;
 		border: 0px;
 	}
+
+    #autoCompletion{
+        position: absolute;
+        background-color: #fff;
+        width: 350px;
+        height: 96px;
+        overflow-y: auto;
+        font-size: 12px;
+        font-family: "Courier New", Courier, mono;
+        z-index: -1;
+    }
+    #autoCompletion.show{
+        border: 2px solid #a0a0a0;
+        z-index: 999999;
+    }
+    #autoCompletion.hide{
+        border: none;
+    }
+    #autoSelector {
+        font-size: 12px;
+    }
+
+    ul{
+        list-style: none;
+        margin: 0px; padding: 0px;
+    }
+    li.mouseOver{
+        background-color: #004a7e;
+        color: #FFFFFF;
+    }
+    li.mouseOut{
+        background-color: #FFFFFF;
+        color: #004a7e;
+    }
+
 </style>
 <style disabled="disabled" id="mozGrooveCSS">
 	/* Mozilla does not understand disabled stylesheets but
@@ -131,6 +166,7 @@
 <div id="CommandSQLWindowContainer">
 
 			<div class="main" id="commandTerm" name="commandTerm">	</div>
+            <div id="autoCompletion" name="autoCompletion"></div>
 
 
     <footer id="foot_outputDiv" class="footer">
@@ -466,6 +502,7 @@
 								term.echo (data[i].join(' '));
 							}
 						}
+                        if (data.length - 1 > 5) term.echo( data.length - 1 + " rows selected ");
 						term.echo("");
 
 						// 最后做一些其他状态设置
@@ -512,10 +549,20 @@
 		}, {
 			greetings: greetingsTitle,
 			prompt: "SQL> ",
-            keypress: function (event) {
-                document.getElementById('positionCurr').innerText = (this.last_index() + 2) + ":" + (this.before_cursor().length + 2);
+            keydown: function (event) {
+			    setTimeout(function() {
+			        return  keyUpInterfaceForCommand(event, 0, 0, 0, 0, 96, 'commandTerm');
+                }, 100);
             },
 			keymap: {
+                ARROWUP: function(e, original) {
+                    if (document.getElementById("autoCompletion").style.display == "none")  {
+                        this.set_command(this.history().previous());
+                    }
+                },
+                ARROWDOWN: function(e, original) {
+                    if (document.getElementById("autoCompletion").style.display == "none")  this.set_command(this.history().next());
+                },
 				ENTER: function(e, original) {
 				    if (this.get_command().trim() == "" || this.get_command().trim().toLowerCase() == "clear") {
                         original();
@@ -523,7 +570,8 @@
                         if (balance(this.get_command()) === 0) {
                             original();
                         } else {
-                            this.insert('\n');
+                            if (document.getElementById("autoCompletion").style.display == "none")
+                                this.insert('\n');
                         }
                     }
 
@@ -639,6 +687,392 @@
 			// ws.close();
 		}
 	}
+
+
+
+    // 自动补全功能的入口  2020-11-22 by phanrider
+    function keyUpInterfaceForCommand(e,sx,sy,ch,cw,th,on) {
+
+        var s = '';
+        var titleUserObject = parent.parent.parent.topFrame.UserObject;
+        var autoUl = document.getElementById("auto_ul");
+        var regE = RegExp('^' + "", "i");
+        var autoCompletionObj = document.getElementById("autoCompletion");
+        var autoUlObj = $("auto_ul");
+        var tmpstr = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById(on);
+        var currstr = '', currstrpos = '', currline = '';
+        // var currstr = tmpstr.last_selection.curr_line;
+        // var currstrpos = tmpstr.last_selection.curr_pos;
+        // var currline = tmpstr.last_selection.line_start;
+        var stmp = [];
+        var s_after = '';
+        var s_before = '';
+        var gs_after = '';
+        var titlegrid = '';
+        var currentA = 0;
+        var aArray = [];
+        var autoElemCss={ focus:{'color':'#fff','background':'#0078d7', '-moz-outline-style': 'none', 'outline': 'none' }, blur:{'color':'#000','background':'#fff'} };
+        var startX = 45;
+        var startY = 14;
+        var cNumHeight = 16;
+        var cNumWidth = 6.60938;  // 每个字符的宽度
+        // textarea 滚动计算
+        var tclientHeight = 0, tScrollTop = 0, tScrollHeight = 0;
+        // var tclientHeight = tmpstr.result.clientHeight;  // 当前可视域的高度
+        // var tScrollTop = tmpstr.result.scrollTop;	// 滚动了多少px
+        // var tScrollHeight = tmpstr.result.scrollHeight; // 当前 textarea 最大高度，含不可见视域
+
+        var tHeight = 16;  // 行高
+        var tScrollRow = "";
+
+        // startX = sx, startY = sy, cNumHeight = ch, cNumWidth = cw, tHeight = th;
+
+        var currstrStyle = tmpstr.getAttribute("style");
+        var cterm = currstrStyle.split(';');
+
+        var ctermX = 14;
+
+        var ctermY = cterm[3].trim().split(':')[1];
+
+        cNumWidth = cterm[0].trim().split(':')[1];
+
+        tclientHeight = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('CommandSQLWindowContainer').clientHeight;
+
+        currstr = term.get_command(), currstrpos = term.get_position(), currline = 1;
+
+        ctermX = ctermX + cNumWidth*currstrpos;
+        ctermY = parseInt(ctermY);
+        tclientHeight = parseInt(tclientHeight);
+
+        if (!isNaN(ctermY)) ctermY = ctermY + tHeight;
+
+        if (ctermY + th >= tclientHeight) ctermY = ctermY - th - tHeight * 2;
+
+        tScrollTop = 0, tScrollHeight = 370;
+
+
+        tScrollRow =  Math.round(tScrollTop / tHeight);
+        currline =  currline - tScrollRow;
+
+
+        document.getElementById('positionCurr').innerText = (term.last_index() + 2) + ":" + (term.get_position() + 1);
+
+        // 测试数据
+        // titleUserObject = [['abc','table'],['abcd','table'],['abce','view'],['bbcc','table']];
+
+        GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
+
+        // 大写转小写
+        for( var i = 0; i < titleUserObject.length; i++ ){
+            titleUserObject[i][0] = titleUserObject[i][0].toLowerCase();
+            titleUserObject[i][1] = titleUserObject[i][1].toLowerCase();
+        }
+
+        if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
+            getTmpStr();
+        } else {
+            setTimeout(getTmpStr,50);
+        }
+
+
+        function getTmpStr() {
+            //
+            // currstr = tmpstr.last_selection.curr_line;
+            // currstrpos = tmpstr.last_selection.curr_pos;
+
+            currstr = term.get_command();
+            currstrpos = term.get_position();
+
+            s_before = currstr.substr(currstrpos-1, 1);
+            s_after = currstr.substr(currstrpos, 1);
+            stmp = currstr.substr(0, currstrpos).trim().split(" ");
+            if ((s_after == "" || s_after == " ") && e.keyCode != 32 && s_before != " " ) {
+                s = stmp[stmp.length - 1].trim();
+                if ( e.keyCode != 38 && e.keyCode != 40 && e.keyCode != 13  && e.keyCode != 16  && e.keyCode != 17 && e.keyCode != 18 && e.keyCode != 19  ) {
+                    if (e.keyCode >= 112 && e.keyCode <= 123) {
+                        return e;
+                    } else {
+                        // 当前输入超过 2 个字符才开始提示
+                        if ( s != "*" && s.length > 2) {
+                            regE = RegExp('^' + s, "i");
+                            autoMacth(regE, s, titleUserObject);
+                        }
+                    }
+
+                }
+
+            } else {
+                clearAutoCompletion();
+            }
+
+            if (GtitleShowFlag) {
+                // down key
+                if ( e.keyCode == 40 ) {
+
+                    if (autoCompletionObj.style.display == "") {
+                        aClear(0);
+                        term.disable();
+                        autoCompletionObj.getElementsByTagName('a')[1].focus();
+                    } else {
+                        term.enable();
+                        term.focus();
+                    }
+                    e.returnValue = false;
+                }
+                // up key
+                else if ( e.keyCode == 38 ) {
+
+                    if(autoCompletionObj.style.display == ""){
+                        aClear(0);
+                        term.disable();
+                        autoCompletionObj.getElementsByTagName('a')[autoCompletionObj.getElementsByTagName('a').length-1].focus();
+                    }else{     //如果“提示”列表未显示,则把焦点依旧留在文本框中
+                        term.enable();
+                        term.focus();
+                    }
+                    e.returnValue = false;
+                }
+                // tab key
+                else if ( e.keyCode == 9 ) {
+                    clearAutoCompletion();
+                    e.returnValue = false;
+
+                } else if ( e.keyCode == 27  || e.keyCode == 8 || e.keyCode== 32 || e.keyCode == 38 ) {  // ESC key
+                    clearAutoCompletion();
+                    e.returnValue = false;
+
+                } else if ( e.keyCode == 13 ) { // Enter key
+                    if (autoCompletionObj.style.display == "") {
+                        replaceCurrPostionStr( autoCompletionObj.getElementsByTagName('a')[0].text );
+                        autoCompletionObj.getElementsByTagName('a')[0].focus();
+                    }
+                    clearAutoCompletion();
+                    e.returnValue = false;
+
+                }
+
+            } else {
+                e.returnValue = true;
+
+            }
+
+        }
+
+        // r为正则 RegExp('^'+ value, 'i')
+        // v为value
+        // s为关键词数组
+        function autoMacth(r, v, s) {
+            var sa = [];
+            if ( v.length > 0 ) {
+                for ( var i = 0 ; i < s.length; i++ ) {
+                    //检验数据是否为空并且用正则取数据，并且去掉完全匹配的数据
+                    if( v.length > 0 && r.exec(s[i][0]) != null && v.length < s[i][0].length ){
+                        sa.push(s[i]);
+                    }
+                }
+                sa.length > 0 ? setAutoCompletion(sa) : clearAutoCompletion();
+
+            } else {
+                clearAutoCompletion();
+            }
+
+        }
+
+        //显示提示框、传入的参数即为匹配出来的结果组成的数组
+        function setAutoCompletion(c){
+            var trtmp = '';
+            var tdtmp = '';
+            var tabletmp = '';
+
+            clearAutoCompletion();  //先清除旧的提示
+
+            tabletmp = document.createElement('table');
+            tabletmp.id ='autoSelector';
+            tabletmp.style.width = '100%';
+            tabletmp.style.border = '0px';
+
+            for(var i = 0 ; i < c.length ; i++ ){
+
+                //创建 table 中的提示内容
+                trtmp = document.createElement('tr');
+                tdtmp = document.createElement('td');
+                tdtmp.innerHTML = '<a href="#" style="color:#000; text-decoration: none; -moz-outline-style: none; outline: none;">'+ c[i][0] + '</a>';
+                trtmp.appendChild(tdtmp);
+
+                tdtmp = document.createElement('td');
+                tdtmp.innerHTML = '<span>'+ c[i][1] + '</span>';
+                trtmp.appendChild(tdtmp);
+
+
+                tabletmp.appendChild(trtmp);
+
+                autoCompletionObj.appendChild(tabletmp);
+
+                //检验table下面的 tr 标签的数量，以此确定是否将“提示”列表显示
+                if (autoCompletionObj.getElementsByTagName('tr').length){
+                    var tmpTopHeight = currline * cNumHeight;
+                    tmpTopHeight = ctermY;
+                    tmpTopHeight < 0 ? tmpTopHeight = cNumHeight : tmpTopHeight;
+                    autoCompletionObj.style.left = startX + currstrpos* cNumWidth + "px";
+                    autoCompletionObj.style.top = tmpTopHeight + "px";
+                    autoCompletionObj.style.display = "";
+                    autoCompletionObj.className = "show";
+                    parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag = true;
+                    GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
+                    autoCompletionObj.focus();
+                } else {
+                    autoCompletionObj.style.display = "none";
+                }
+
+
+            }
+
+            aArray = autoCompletionObj.getElementsByTagName('a');
+            var trTmpObj = autoCompletionObj.getElementsByTagName('tr');
+            for(var i = 0; i < aArray.length; i++ ){
+                aArray[i].onfocus = aFocus;
+                aArray[i].onblur = aBlur;
+                aArray[i].onkeydown = aKeydown;
+                trTmpObj[i].onclick = replaceCurrPostionStrFromTr;
+                if ( i == 0) {
+                    for(var k in autoElemCss.focus){
+                        trTmpObj[i].style[k] = autoElemCss.focus[k];
+                        trTmpObj[i].style[k] = autoElemCss.focus[k];
+                    }
+                    aArray[i].style["color"] = "#FFF";
+                }
+            }
+
+            term.enable();
+            term.focus();
+
+        }
+
+        //清除提示内容
+        function clearAutoCompletion(){
+            // table 中 tr 移动位置重置
+            currentA = 0;
+            // div 滚动位置重置,有些浏览器有滚动记忆
+            autoCompletionObj.scrollTop = 0;
+            autoCompletionObj.innerHTML = '';
+            autoCompletionObj.style.display = "none";
+            document.getElementById("autoCompletion").className = "hide";
+            parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag = false;
+            GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
+
+            term.enable();
+            term.focus();
+        }
+
+        // 在当前光标位置插入关键词的后几个字符串（按键或当前 A 标签点击）
+        function replaceCurrPostionStr(rstr) {
+            gs_after = rstr.substr(s.length);
+            // parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags(gMyTextArea, gs_after, "");
+            term.insert(gs_after);
+            term.enable();
+            term.focus();
+        }
+
+        // 在当前光标位置插入关键词的后几个字符串（当前 Tr 位置点击）
+        function replaceCurrPostionStrFromTr() {
+            gs_after = this.childNodes[0].childNodes[0].childNodes[0].data.substr(s.length);
+            // parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.insertTags(gMyTextArea, gs_after, "");
+            term.insert(gs_after);
+            clearAutoCompletion();
+        }
+
+
+
+
+
+        function aFocus() {
+            aArray = autoCompletionObj.getElementsByTagName('a');
+            var aSelect = document.getElementById("autoSelector");
+
+            for(var i = aArray.length -1 ; i >= 0; i--){
+                //this是a，this.parentNode是td，aSelect.children[i].children[0]是table.tr.td
+                if( this.parentNode == aSelect.childNodes[i].childNodes[0] ) {
+                    //如果是同一个td，则将current的值置为焦点所在位置的值
+                    currentA = i;
+                    break;
+                }
+            }
+            //添加有焦点的效果
+            for(var k in autoElemCss.focus){
+                this.parentElement.parentElement.style[k] = autoElemCss.focus[k];
+                this.style[k] = autoElemCss.focus[k];
+
+            }
+        }
+
+        function aBlur() {
+            for(var k in autoElemCss.blur) {
+                this.parentElement.parentElement.style[k] = autoElemCss.blur[k];
+                this.style[k] = autoElemCss.blur[k];
+            }
+        }
+
+
+        function aClear(n) {
+            var aArray = autoCompletionObj.getElementsByTagName('a');
+            var trTmpObj = autoCompletionObj.getElementsByTagName('tr');
+            for(var k in autoElemCss.blur){
+                trTmpObj[n].style[k] = autoElemCss.blur[k];
+                trTmpObj[n].style[k] = autoElemCss.blur[k];
+            }
+            aArray[n].style["color"] = "#000";
+        }
+
+        function aKeydown(event) {
+            e = event || window.event;
+
+            // console.log(this.childNodes[0].data);
+            //如果在选择数据项时按了tab键，此时的情况与“百度首页”的处理情况一样
+            aArray = autoCompletionObj.getElementsByTagName('a');
+            var aSelect = document.getElementById("autoSelector");
+
+            if (e.keyCode == 9 || e.keyCode === 27) {
+                autoCompletionObj.innerHTML = '';
+                autoCompletionObj.style.display = 'none';
+                term.enable();
+                term.focus();
+            }
+            //如果按了down键
+            else if (e.keyCode == 40){
+                //向下移动，准备移动焦点
+                currentA ++;
+                //如果当前焦点在最后一个数据项上，用户用按了down键，则循环向上，回到文本框上
+                if(currentA > aArray.length - 1){
+
+                    currentA = 0;
+                    aSelect.getElementsByTagName('a')[currentA].focus();
+
+                }else{
+                    aSelect.getElementsByTagName('a')[currentA].focus();
+                }
+            }
+            //如果按了up键
+            else if (e.keyCode == 38){
+                //向上移动，准备移动焦点
+                currentA--;
+                //如果当前焦点在文本框上，用户用按了up键，则循环向下，回到最后一个数据项上
+                if(currentA < 0){
+                     currentA = aArray.length - 1;
+                    aSelect.getElementsByTagName('a')[currentA].focus();
+                }else{
+                    aSelect.getElementsByTagName('a')[currentA].focus();
+                }
+
+
+            }
+            else if ( e.keyCode == 8 ) {
+                replaceCurrPostionStr( this.childNodes[0].data );
+                clearAutoCompletion();
+            }
+        }
+
+        return e;
+    }
 
 	function initOnload() {};
 	function detectCtrlKey(e) {};

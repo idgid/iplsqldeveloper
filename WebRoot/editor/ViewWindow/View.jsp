@@ -513,7 +513,7 @@
 
 				function open_newtabforname()
 				{
-					var texttmp = "<%=DBUtilities.showObjectView(request.getSession(), type, name).toString().replaceAll("[\\n]","")%>";
+					var texttmp = "<%=DBUtilities.showObjectView(request.getSession(), type, name).toString().replaceAll("[\\n]","").replaceAll("\"","\\\\\"")%>";
 					texttmp = texttmp.replace(/<br\/>/g,"\n");
 					titlename = '<%=name %>';
 					imgPath = "../../tree/dbimages/";
