@@ -112,6 +112,39 @@
 			background-color: ButtonFace;
 			border: 0px;
 		}
+        #autoCompletion{
+            position: absolute;
+            background-color: #fff;
+            width: 350px;
+            height: 96px;
+            overflow-y: auto;
+            font-size: 12px;
+            font-family: "Courier New", Courier, mono;
+            z-index: -1;
+        }
+        #autoCompletion.show{
+            border: 2px solid #a0a0a0;
+            z-index: 999999;
+        }
+        #autoCompletion.hide{
+            border: none;
+        }
+        #autoSelector {
+            font-size: 12px;
+        }
+
+        ul{
+            list-style: none;
+            margin: 0px; padding: 0px;
+        }
+        li.mouseOver{
+            background-color: #004a7e;
+            color: #FFFFFF;
+        }
+        li.mouseOut{
+            background-color: #FFFFFF;
+            color: #004a7e;
+        }
 	</style>
 	<style disabled="disabled" id="mozGrooveCSS">
 	/* Mozilla does not understand disabled stylesheets but
@@ -128,10 +161,10 @@
 		<div id="FunSQLWindowContainer">
 
 			<div class="main">
-						<textarea id="myTextarea" class="editor" name="myTextarea_editor">
+						<textarea id="myTextarea" class="editor" name="myTextarea_editor"></textarea>
+                            <div id="autoCompletion" name="autoCompletion"></div>
 
-						</textarea>
-			</div>
+            </div>
 			<footer id="foot_outputDiv" class="footer">
 
 				<table border="0" id="toolBar_footer" style="background: ButtonFace;"

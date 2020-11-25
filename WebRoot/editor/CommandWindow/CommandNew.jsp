@@ -177,7 +177,7 @@
                     <img id='execIsRunButton' src="../../images/exec_norun.gif"
                          align="absmiddle">
                 </td>
-                <td tabIndex="1" onclick="changeAutorefresh('autorefreshButton')">
+                <td tabIndex="1" onclick="">
                     <img id='autorefreshButton' src="../../images/autorefresh.gif"
                          title="Auto refresh timer (5 sec)"
                          alt="Auto refresh timer (5 sec)" align="absmiddle">
@@ -248,19 +248,19 @@
                         parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
                         dFlag = 0;
                     } else if (parent.parent.editorToolFrame.getIfDesc(command, 1)) {
-                        var c1 = command.split(" ")[command.trim().split(" ").length-1];
+                        var c1 = command.trim().split(" ")[command.trim().split(" ").length-1];
                         var ca = c1.split(".");
                         var sql = "";
                         var otmp = parent.parent.topFrame.UserObject;
                         var otype = "";
                         for ( var i = 0; i < otmp.length; i++ ) {
                             if ( ca.length ==1 ) {
-                                if (ca[0].toUpperCase() == otmp[i][0]) {
+                                if (ca[0].toLowerCase() == otmp[i][0].toLowerCase()) {
                                     otype = otmp[i][1];
                                     i = otmp.length;
                                 }
                             } else if ( ca.length ==2 )  {
-                                if (ca[1].toUpperCase() == otmp[i][0]) {
+                                if (ca[1].toLowerCase() == otmp[i][0].toLowerCase()) {
                                     otype = otmp[i][1];
                                     i = otmp.length;
                                 }
@@ -301,13 +301,18 @@
                             breakRun('');
                             parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
                         } else {
-                            otype.toUpperCase() == "TABLE" ? DbObjectBean.getOther2(sql, ['Name','Type','Nullable','Default','Comments'], callbackCommandadd) :
-                                DbObjectBean.getOther2(sql, ['Parameter','Type','Mode','Default?'], callbackCommandadd);
+                            otype.toUpperCase() == "TABLE" ? DbObjectBean.getOther2(sql, ['Name_$$$_VARCHAR2_$$$_4','Type_$$$_VARCHAR2_$$$_4','Nullable_$$$_VARCHAR2_$$$_8','Default_$$$_VARCHAR2_$$$_7','Comments_$$$_VARCHAR2_$$$_8'], callbackCommandadd) :
+                                DbObjectBean.getOther2(sql, ['Parameter_$$$_VARCHAR2_$$$_9','Type_$$$_VARCHAR2_$$$_4','Mode_$$$_VARCHAR2_$$$_4','Default?_$$$_VARCHAR2_$$$_8'], callbackCommandadd);
                         }
 
 
                         dFlag = 0;
                     } else if (parent.parent.editorToolFrame.getIfShow(command, 1)) {
+                        // 以空格截取字符串最后一个子串
+                        var c1 = command.trim().split(" ")[command.trim().split(" ").length-1];
+                        sql = "select name,decode(type, 1, 'boolean', 2, 'string', 3, 'integer', 4, 'parameter file', 5, 'reserved', 6, 'big integer', '' ) type, display_value value from v$parameter where name like " + c1 + " order by name asc";
+
+                        DbObjectBean.getOther2(sql, ['Name_$$$_VARCHAR2_$$$_4','Type_$$$_VARCHAR2_$$$_4','Value_$$$_VARCHAR2_$$$_5'], callbackCommandadd);
 
 
                         dFlag = 0;
@@ -386,7 +391,9 @@
                                 command.match(/^create *\S* /i) != undefined ? (vc = command.match(/^create *\S* /i)[0].trim().split(" "),vc[0] = "created") :
                                     command.match(/^alter *\S* /i) != undefined ? (vc = command.match(/^alter *\S* /i)[0].trim().split(" "), vc[0] = "altered" ):
                                         command.match(/^drop *\S* /i) != undefined ? (vc = command.match(/^drop *\S* /i)[0].trim().split(" "), vc[0] = "dropped" ):
-                                            command.match(/^rename *\S* /i) != undefined ? (vc = command.match(/^rename *\S* /i)[0].trim().split(" "), vc[0] = "renamed" ): vc = "Unknow";
+                                            command.match(/^rename *\S* /i) != undefined ? (vc = command.match(/^rename *\S* /i)[0].trim().split(" "), vc[0] = "renamed" ):
+                                                command.match(/^grant *\S* /i) != undefined ? (vc = command.match(/^grant *\S* /i)[0].trim().split(" "), vc[1] = "grant", vc[0] = "succeeded" ):
+                                                    command.match(/^revoke *\S* /i) != undefined ? (vc = command.match(/^revoke *\S* /i)[0].trim().split(" "), vc[1] = "revoke", vc[0] = "succeeded" ): vc = "Unknow";
                                 var ts = vc[0];
                                 var te = vc[vc.length -1];
                                 var tt = "";
@@ -502,7 +509,7 @@
 								term.echo (data[i].join(' '));
 							}
 						}
-                        if (data.length - 1 > 5) term.echo( data.length - 1 + " rows selected ");
+						if (parent.parent.editorToolFrame.getIfSelect(command, 1) && (data.length - 1) > 5 ) term.echo( data.length - 1 + " rows selected ");
 						term.echo("");
 
 						// 最后做一些其他状态设置
@@ -701,9 +708,6 @@
         var autoUlObj = $("auto_ul");
         var tmpstr = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById(on);
         var currstr = '', currstrpos = '', currline = '';
-        // var currstr = tmpstr.last_selection.curr_line;
-        // var currstrpos = tmpstr.last_selection.curr_pos;
-        // var currline = tmpstr.last_selection.line_start;
         var stmp = [];
         var s_after = '';
         var s_before = '';
@@ -712,7 +716,8 @@
         var currentA = 0;
         var aArray = [];
         var autoElemCss={ focus:{'color':'#fff','background':'#0078d7', '-moz-outline-style': 'none', 'outline': 'none' }, blur:{'color':'#000','background':'#fff'} };
-        var startX = 45;
+        var startX = 43;  // padding 10px + "SQL> " 长度 33px
+        var startPadding = 10;  // padding 10px
         var startY = 14;
         var cNumHeight = 16;
         var cNumWidth = 6.60938;  // 每个字符的宽度
@@ -730,7 +735,7 @@
         var currstrStyle = tmpstr.getAttribute("style");
         var cterm = currstrStyle.split(';');
 
-        var ctermX = 14;
+        var ctermX = startX;
 
         var ctermY = cterm[3].trim().split(':')[1];
 
@@ -738,9 +743,9 @@
 
         tclientHeight = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('CommandSQLWindowContainer').clientHeight;
 
-        currstr = term.get_command(), currstrpos = term.get_position(), currline = 1;
+        currstr = term.before_cursor(), currstrpos = term.get_position(), currline = 1;
 
-        ctermX = ctermX + cNumWidth*currstrpos;
+        ctermX = startX + cNumWidth * (currstrpos + 1);
         ctermY = parseInt(ctermY);
         tclientHeight = parseInt(tclientHeight);
 
@@ -776,12 +781,23 @@
 
 
         function getTmpStr() {
-            //
-            // currstr = tmpstr.last_selection.curr_line;
-            // currstrpos = tmpstr.last_selection.curr_pos;
 
-            currstr = term.get_command();
+            var currBrTmp = 0;
+            currstr = term.before_cursor();
             currstrpos = term.get_position();
+
+            // 去掉换行后的字符串
+            currstr = currstr.split('\n');
+            // 先取得换了几行
+            currBrTmp = currstr.length;
+            ctermY += (currBrTmp - 1) * startY;
+
+
+            currstr = currstr[currstr.length-1];
+            // 再取得该行有几个字符串
+            currBrTmp > 1 ? ctermX = cNumWidth * (currstr.length + 1) + startPadding : ctermX = cNumWidth * (currstr.length + 1) + startX ;
+
+
 
             s_before = currstr.substr(currstrpos-1, 1);
             s_after = currstr.substr(currstrpos, 1);
@@ -913,8 +929,8 @@
                     var tmpTopHeight = currline * cNumHeight;
                     tmpTopHeight = ctermY;
                     tmpTopHeight < 0 ? tmpTopHeight = cNumHeight : tmpTopHeight;
-                    autoCompletionObj.style.left = startX + currstrpos* cNumWidth + "px";
-                    autoCompletionObj.style.top = tmpTopHeight + "px";
+                    autoCompletionObj.style.left = ctermX + "px";
+                    autoCompletionObj.style.top = ctermY + "px";
                     autoCompletionObj.style.display = "";
                     autoCompletionObj.className = "show";
                     parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag = true;

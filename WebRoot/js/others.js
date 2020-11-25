@@ -1889,7 +1889,9 @@ function getIfDDL(textareaname, cflag) {
 	if (tempStr.trim().test("^alter ","i") ||
 		tempStr.trim().test("^drop ","i") ||
 		tempStr.trim().test("^create ","i") ||
-        tempStr.trim().test("^rename ","i") ) {
+        tempStr.trim().test("^rename ","i") ||
+		tempStr.trim().test("^grant ","i") ||
+		tempStr.trim().test("^revoke ","i") ) {
 		Flag = true;
 	} else {
 		Flag = false;
@@ -1920,7 +1922,7 @@ function getIfShow(textareaname, cflag) {
     var tempStr;
     cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
     var Flag = false;
-    if (tempStr.trim().test("^show ","i")) {
+    if (tempStr.trim().test("^show parameter ","i")) {
         Flag = true;
     } else {
         Flag = false;
@@ -1957,6 +1959,22 @@ function getIfRollback(textareaname, cflag) {
         Flag = false;
     }
     return Flag;
+}
+
+//得到sql语句是否为 grant or revoke
+//返回值： true or false
+// 2020-11-24
+function getIfGrantOrRevoke(textareaname, cflag) {
+	var tempStr;
+	cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+	var Flag = false;
+	if (tempStr.trim().test("^grant *$","i") ||
+		tempStr.trim().test("^revoke ","i") ) {
+		Flag = true;
+	} else {
+		Flag = false;
+	}
+	return Flag;
 }
 
 //设置commit按钮的可用或不可用
@@ -3118,9 +3136,10 @@ function createNewSql(windowType, textareaname) {
 
 	var f =  false;
 	// 是否为查看
-	textareaname.search('View.jsp') > 0 ? f = false : f = false;
-	textareaname.search('Edit.jsp') > 0 ? f = true : f = false;
-	textareaname.search('New.jsp') > 0 ? f = true : f = false;
+	textareaname.search('View.jsp') > 0 ? f = false :
+		textareaname.search('Edit.jsp') > 0 ? f = true :
+			textareaname.search('New.jsp') > 0 ? f = true : f = false ;
+
 
 
 	// var prevWindowType = getWindowType();
