@@ -206,9 +206,25 @@
 	var term;
 	var greetingsTitle = "Connected to <%=ub.getDbversion()%> " + "\n" + "Connected as <%=ub.getUsername()%>@<%=ub.getServername()%>\n";
 	var defaultClobLen = 100;
+    var titleUserObject = parent.parent.parent.topFrame.UserObject;
+    var commandTimeS = new Date().getTime();
+    var commandTimeE = 0;
 
 
-	jQuery(function($) {
+
+
+    function initCommandTitle(c) {
+        // 大写转小写
+        for( var i = 0; i < c.length; i++ ){
+            c[i][0] = c[i][0].toLowerCase();
+            c[i][1] = c[i][1].toLowerCase();
+        }
+    }
+
+    initCommandTitle(titleUserObject);
+
+
+    jQuery(function($) {
 		var id = 1;
 		term = $('#commandTerm').terminal(function(command, term) {
             command = command.trim().replaceAll(/\n/g,' ').replace(/[;]*$/, '');
@@ -268,7 +284,7 @@
                         }
                         if ( ca.length >= 1 ) {
                             if (ca.length == 1) {
-                                if ( otype.toUpperCase() == "TABLE" ) {
+                                if ( otype.toUpperCase() == "TABLE" || otype.toUpperCase() == "VIEW" || otype.toUpperCase() == "MATERIALIZED VIEW" ) {
                                     sql = "select a.column_name, a.data_type||decode(a.char_col_decl_length,'',null,'('||a.char_col_decl_length||')') type, a.nullable, "  +
                                         "a.data_default \"DEFAULT\", b.comments from user_tab_columns a, user_col_comments b " +
                                         "where a.table_name='" + ca[0].toUpperCase() + "' " +
@@ -279,15 +295,15 @@
                                     sql = "select argument_name,data_type,in_out,default_value from user_arguments where package_name is null and object_name='" + ca[0].toUpperCase() + "'";
                                 }
                             } else if (ca.length == 2) {
-                                if ( otype.toUpperCase() == "TABLE" ) {
+                                if ( otype.toUpperCase() == "TABLE" || otype.toUpperCase() == "VIEW" || otype.toUpperCase() == "MATERIALIZED VIEW" ) {
                                     headStr="Columns";
                                     sql = "select a.column_name, a.data_type||decode(a.char_col_decl_length,'',null,'('||a.char_col_decl_length||')') type, a.nullable, " +
-                                        "a.data_default \"DEFAULT\", b.comments from user_tab_columns a, user_col_comments b " +
+                                        "a.data_default \"DEFAULT\", b.comments from all_tab_columns a, all_col_comments b " +
                                         "where a.table_name='" + ca[1].toUpperCase() + "' " +
-                                        "and a.onwer = '" + ca[0].toUpperCase() + "' " +
+                                        "and a.owner = '" + ca[0].toUpperCase() + "' " +
                                         "and a.table_name = b.table_name " +
                                         "and a.column_name = b.column_name " +
-                                        "and a.onwer = b.onwer " +
+                                        "and a.owner = b.owner " +
                                         "order by a.column_id asc";
                                 } else {
                                     sql = "select argument_name,data_type,in_out,default_value from all_arguments where package_name is null and object_name='" +ca[1].toUpperCase()+"' and owner='"+ca[0].toUpperCase()+"'";
@@ -301,7 +317,7 @@
                             breakRun('');
                             parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
                         } else {
-                            otype.toUpperCase() == "TABLE" ? DbObjectBean.getOther2(sql, ['Name_$$$_VARCHAR2_$$$_4','Type_$$$_VARCHAR2_$$$_4','Nullable_$$$_VARCHAR2_$$$_8','Default_$$$_VARCHAR2_$$$_7','Comments_$$$_VARCHAR2_$$$_8'], callbackCommandadd) :
+                            (otype.toUpperCase() == "TABLE" || otype.toUpperCase() == "VIEW" || otype.toUpperCase() == "MATERIALIZED VIEW" ) ? DbObjectBean.getOther2(sql, ['Name_$$$_VARCHAR2_$$$_4','Type_$$$_VARCHAR2_$$$_4','Nullable_$$$_VARCHAR2_$$$_8','Default_$$$_VARCHAR2_$$$_7','Comments_$$$_VARCHAR2_$$$_8'], callbackCommandadd) :
                                 DbObjectBean.getOther2(sql, ['Parameter_$$$_VARCHAR2_$$$_9','Type_$$$_VARCHAR2_$$$_4','Mode_$$$_VARCHAR2_$$$_4','Default?_$$$_VARCHAR2_$$$_8'], callbackCommandadd);
                         }
 
@@ -313,6 +329,21 @@
                         sql = "select name,decode(type, 1, 'boolean', 2, 'string', 3, 'integer', 4, 'parameter file', 5, 'reserved', 6, 'big integer', '' ) type, display_value value from v$parameter where name like " + c1 + " order by name asc";
 
                         DbObjectBean.getOther2(sql, ['Name_$$$_VARCHAR2_$$$_4','Type_$$$_VARCHAR2_$$$_4','Value_$$$_VARCHAR2_$$$_5'], callbackCommandadd);
+
+
+                        dFlag = 0;
+                    } else if (parent.parent.editorToolFrame.getIfExec(command, 1)) {
+                        // 以'('截取字符串最后一个子串
+                        var c1 = command.trim().split("(")[0];
+                        var c1Len = c1.length;
+                        c1 = c1[c1Len - 1].split(" ");
+                        c1 = c1[c1.length - 1];
+                        sql = command;
+
+                        sql = sql.replace(/^exec /i,'call ');
+                        //sql = "select name,decode(type, 1, 'boolean', 2, 'string', 3, 'integer', 4, 'parameter file', 5, 'reserved', 6, 'big integer', '' ) type, display_value value from v$parameter where name like " + c1 + " order by name asc";
+
+                        DbObjectBean.getOtherForProcedure(sql, ['Execute Status_$$$_VARCHAR2_$$$_13'], callbackCommandadd);
 
 
                         dFlag = 0;
@@ -558,7 +589,8 @@
 			prompt: "SQL> ",
             keydown: function (event) {
 			    setTimeout(function() {
-			        return  keyUpInterfaceForCommand(event, 0, 0, 0, 0, 96, 'commandTerm');
+                    commandTimeE = new Date().getTime();
+			        return keyUpInterfaceForCommand(event, 0, 0, 0, 0, 96, 'commandTerm');
                 }, 100);
             },
 			keymap: {
@@ -701,7 +733,6 @@
     function keyUpInterfaceForCommand(e,sx,sy,ch,cw,th,on) {
 
         var s = '';
-        var titleUserObject = parent.parent.parent.topFrame.UserObject;
         var autoUl = document.getElementById("auto_ul");
         var regE = RegExp('^' + "", "i");
         var autoCompletionObj = document.getElementById("autoCompletion");
@@ -767,11 +798,7 @@
 
         GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
 
-        // 大写转小写
-        for( var i = 0; i < titleUserObject.length; i++ ){
-            titleUserObject[i][0] = titleUserObject[i][0].toLowerCase();
-            titleUserObject[i][1] = titleUserObject[i][1].toLowerCase();
-        }
+
 
         if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
             getTmpStr();
@@ -800,7 +827,7 @@
 
 
             s_before = currstr.substr(currstrpos-1, 1);
-            s_after = currstr.substr(currstrpos, 1);
+            s_after = term.get_command().substr(currstrpos, 1);
             stmp = currstr.substr(0, currstrpos).trim().split(" ");
             if ((s_after == "" || s_after == " ") && e.keyCode != 32 && s_before != " " ) {
                 s = stmp[stmp.length - 1].trim();
@@ -809,10 +836,11 @@
                         return e;
                     } else {
                         // 当前输入超过 2 个字符才开始提示
-                        if ( s != "*" && s.length > 2) {
-                            regE = RegExp('^' + s, "i");
+                        if ( s != "*" && s.length > 2 ) {
+                            regE = RegExp('^' + s.replace('$', '\\\\$'), "i");  //为了匹配$符号，要有4个反斜杠
                             autoMacth(regE, s, titleUserObject);
                         }
+
                     }
 
                 }
@@ -879,12 +907,15 @@
         // s为关键词数组
         function autoMacth(r, v, s) {
             var sa = [];
+            //最多显示条数
+            var maxTitleRow = 200;
             if ( v.length > 0 ) {
                 for ( var i = 0 ; i < s.length; i++ ) {
                     //检验数据是否为空并且用正则取数据，并且去掉完全匹配的数据
                     if( v.length > 0 && r.exec(s[i][0]) != null && v.length < s[i][0].length ){
                         sa.push(s[i]);
                     }
+                    if (sa.length > maxTitleRow) i = s.length;
                 }
                 sa.length > 0 ? setAutoCompletion(sa) : clearAutoCompletion();
 
@@ -908,8 +939,7 @@
             tabletmp.style.border = '0px';
 
             for(var i = 0 ; i < c.length ; i++ ){
-
-                //创建 table 中的提示内容
+                // 创建 table 中的提示内容
                 trtmp = document.createElement('tr');
                 tdtmp = document.createElement('td');
                 tdtmp.innerHTML = '<a href="#" style="color:#000; text-decoration: none; -moz-outline-style: none; outline: none;">'+ c[i][0] + '</a>';

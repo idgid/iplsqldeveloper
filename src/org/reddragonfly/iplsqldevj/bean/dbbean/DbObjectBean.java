@@ -160,6 +160,36 @@ public class DbObjectBean {
 	}
 
 
+	public List getOtherForProcedure(String sql, Vector v1) throws Exception {
+		// String[] columnName=column.split(",");
+		HttpServletRequest request = WebContextFactory.get()
+				.getHttpServletRequest();
+		HttpSession session = request.getSession();
+		UserBean ub = (UserBean) session.getAttribute("user");
+		Database db = ub.getDb();
+
+		List list = new ArrayList();
+		list.add(v1);
+		ResultSet rs = null;
+		String value = "";
+		Vector v = new Vector();
+
+		try {
+			boolean a = db.execSqlForProcedure(sql);
+			value = Boolean.toString(a);
+			v.add(value);
+			list.add(v);
+			return list;
+		} catch (Exception e) {
+			v.add(e.getMessage());
+			list.add(v);
+			throw e;
+		} finally {
+			return list;
+		}
+	}
+
+
 	public StringBuffer getKeyID(String sql, Database db) throws Exception {
 		StringBuffer KeyValue = new StringBuffer();
 		ResultSet rs = null;
@@ -303,12 +333,23 @@ public class DbObjectBean {
 	 * <p>该方法得到当前库中所有用户对象名称与类型
 	 */
 	public List getUserObject(){
-		String sql = "select object_name,object_type from user_objects order by object_name,object_type asc";
+
 		HttpServletRequest request = WebContextFactory.get()
 		.getHttpServletRequest();
 		HttpSession session = request.getSession();
 		UserBean ub = (UserBean) session.getAttribute("user");
 		Database db = ub.getDb();
+
+		String sql = "select object_name,object_type from ( " +
+				"select decode(synonym_name,'', decode(owner,'',object_name,owner||'.'||object_name), object_name) object_name, object_type from ( " +
+				"select aob.object_name,aob.object_type, decode(aob.owner,'"+ub.getUsername().toUpperCase()+"','',aob.owner) owner,ayn.synonym_name from all_objects aob, " +
+				"( select table_owner, synonym_name from all_synonyms where synonym_name not like '%/%') ayn " +
+				" where aob.owner <> 'PUBLIC' " +
+				"  and aob.object_type not in ('INDEX', 'INDEX PARTITION', 'JAVA DATA', 'JAVA SOURCE', 'JAVA CLASS') " +
+				"  and aob.object_name not like '%/%' " +
+				"  and aob.owner = ayn.table_owner(+) " +
+				"  and aob.OBJECT_NAME = ayn.synonym_name(+) " +
+				"  )) order by object_name asc";
 
 		List list = new ArrayList();
 		try {

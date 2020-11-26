@@ -102,7 +102,7 @@ public class DbMaterializedViewBean extends DbBean {
 		returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 		returnVal.append("myMenu.add(new WFXMI(\"Properties\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Properties','500px','312px');\"));");
-		returnVal.append("myMenu.add(new WFXMI(\"Describe\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Describe','500px','312px');\"));");
+		returnVal.append("myMenu.add(new WFXMI(\"Describe\",\"javascript:showCommon('"+TYPE+"','"+name+"','','Describe','620px','312px');\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 		returnVal.append("myMenu.add(new WFXMI(\"View\",\"javascript:showViewObject('"+TYPE+"','"+name+"','','View');\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Edit\",\"javascript:showEditObject('"+TYPE+"','"+name+"','Materialized_views','Edit');\"));");

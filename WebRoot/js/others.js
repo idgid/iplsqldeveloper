@@ -1968,13 +1968,28 @@ function getIfGrantOrRevoke(textareaname, cflag) {
 	var tempStr;
 	cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
 	var Flag = false;
-	if (tempStr.trim().test("^grant *$","i") ||
+	if (tempStr.trim().test("^grant ","i") ||
 		tempStr.trim().test("^revoke ","i") ) {
 		Flag = true;
 	} else {
 		Flag = false;
 	}
 	return Flag;
+}
+
+//得到sql语句是否为 exec
+//返回值： true or false
+// 2020-11-24
+function getIfExec(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^exec ","i") ) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
 }
 
 //设置commit按钮的可用或不可用

@@ -150,6 +150,35 @@ public class Database {
 	    }
 
 
+		/**
+		 * 执行 EXEC 存储过程
+		 * @param sql - sql语句 {sql}
+		 * @throws Exception
+		 * @return int
+		 */
+		public boolean execSqlForProcedure(String sql) throws Exception {
+			CallableStatement call = null;
+			sql = "{ " + sql + " }";
+			try {
+				boolean executeResult = false;
+				call = this.conn.prepareCall(sql);
+				executeResult = call.execute();
+				call.close();
+				return executeResult;
+			}
+			catch (Exception e) {
+				throw new Exception(e.getMessage());
+			}
+			finally {
+				try {
+					call.close();
+				}
+				catch (Exception e) {
+				}
+			}
+		}
+
+
 
 	    public ResultSet getDesc(String sql) throws Exception {
 	        Statement stmt = null;
