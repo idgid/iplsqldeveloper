@@ -467,7 +467,10 @@
 						errOracleMsg = data[0][1];
 						term.echo(command);
 						term.error(errOracleMsg);
-					} else {
+					} if ( parent.parent.editorToolFrame.getIfExec(command, 1) == true ) {
+					    var messagetmp = "PL/SQL procedure successfully completed\n";
+					    data[1][0] == "true" ? term.echo(messagetmp) : '';
+                    } else {
 						var splitStr = "_$$$_";
 						var strCelllMax = [];
 						var strCellRealMax = [];

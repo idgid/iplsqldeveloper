@@ -311,7 +311,7 @@ public class DbTableBean extends DbBean {
 				if (nameStr.length == 2)  objectName =  CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 
 				String field = FIELDS_PRI + "." + objectName;
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+this.name.replaceAll("#","%23")+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
@@ -357,7 +357,7 @@ public class DbTableBean extends DbBean {
 
 
 				String field = FIELDS_PRI + "." + objectName;
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+this.name.replaceAll("#","%23")+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
@@ -402,7 +402,7 @@ public class DbTableBean extends DbBean {
 				if (nameStr.length == 2)  objectName =  CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 
 				String field = FIELDS_PRI + "." + objectName;
-				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
+				sb.append("<tree text=\""+objectName+"\" src=\"showTree.action?type="+subType+"&amp;name="+this.name.replaceAll("#","%23")+"&amp;field=" + field + "\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','"+ FIELDS_PRI +"',event)\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
 		}catch(Exception e){
@@ -501,7 +501,7 @@ public class DbTableBean extends DbBean {
 				i = 1;
 				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
 				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
-				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
+				else foreignTable = " (" + CharSet.nullToEmpty(rs.getString(3)) + ")";
 				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
@@ -645,7 +645,7 @@ public class DbTableBean extends DbBean {
 				i = 1;
 				columnIcon = getColumnTypeIcon(CharSet.nullToEmpty(rs.getString(2)));
 				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
-				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
+				else foreignTable = " (" + CharSet.nullToEmpty(rs.getString(3)) + ")";
 				sb.append("<tree text=\"" + CharSet.nullToEmpty(rs.getString(1)) + foreignTable + "\" icon=\""+ columnIcon +"\"  openIcon=\""+ columnIcon +"\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
@@ -696,7 +696,7 @@ public class DbTableBean extends DbBean {
 				if (CharSet.nullToEmpty(rs.getString(1)).equals(ub.getUsername().toUpperCase())) objectName = CharSet.nullToEmpty(rs.getString(2));
 				else objectName = CharSet.nullToEmpty(rs.getString(1)) + "." + CharSet.nullToEmpty(rs.getString(2));
 				if(CharSet.nullToEmpty(rs.getString(3)).equals("")) foreignTable = "";
-				else foreignTable = "(" + CharSet.nullToEmpty(rs.getString(3)) + ")";
+				else foreignTable = " (" + CharSet.nullToEmpty(rs.getString(3)) + ")";
 				sb.append("<tree text=\"" + objectName + foreignTable + "\" icon=\""+ icon +"\"  openIcon=\""+ icon +"\" />");
 			}
 			if (i == 0) sb.append("<tree text=\"Nodata\" />");
@@ -785,9 +785,10 @@ public class DbTableBean extends DbBean {
 			else obj = "user_synonyms";
 			if (nameStr.length == 2) {
 				obj = "all_synonyms";
-				sql = "select synonym_name from " + obj + " where table_name='" + nameStr[1] + "' and table_owner='" + nameStr[0] + "'";
+				sql = "select owner||'.'||synonym_name synonym_name from " + obj + " where table_name='" + nameStr[1] + "' and table_owner='" + nameStr[0] + "'";
 			} else {
-				sql = "select synonym_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
+				obj = "all_synonyms";
+				sql = "select owner||'.'||synonym_name synonym_name from " + obj + " where table_name='" + name + "' and table_owner='" + ub.getUsername().toUpperCase() + "'";
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;
@@ -827,7 +828,7 @@ public class DbTableBean extends DbBean {
 				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
 			} else {
 				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and (grantee in (select username from all_users) and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name))";
 			}
 
 			if (nameStr.length == 2) {
@@ -835,7 +836,7 @@ public class DbTableBean extends DbBean {
 				sql = "select distinct grantee from " + obj + " where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "'";
 			} else {
 				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and (grantee in (select username from all_users) and not exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name))";
 
 			}
 
@@ -876,15 +877,15 @@ public class DbTableBean extends DbBean {
 				obj = "all_tab_privs";
 				sql = "select distinct grantee from " + obj + " where table_name='" + name + "' and grantor='" + ub.getUsername().toUpperCase() + "'";
 			} else {
-				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and (grantee not in (select username from all_users) or exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name))";
 			}
 			if (nameStr.length == 2) {
 				obj = "all_tab_privs";
 				sql = "select distinct grantee from " + obj + " where table_name='" + nameStr[1] + "' and grantor='" + nameStr[0] + "'";
 			} else {
-				obj = "user_tab_privs";
-				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name)";
+				obj = "all_tab_privs";
+				sql = "select distinct grantee from " + obj + " userp where table_name='" + name + "' and (grantee not in (select username from all_users) or exists (select 1 from " + roleObj + " rolep where rolep.role = userp.grantee and rolep.table_name = userp.table_name))";
 			}
 			rs = ub.getDb().getRS(sql);
 			int i = 0;

@@ -31,6 +31,8 @@ public class DbObjectBean {
 	private static String getClusterColumns = null;
 	private static String getComment = null;
 
+	private List errList = new ArrayList();
+
 	public List getObject(String sql, Vector v1) {
 		HttpServletRequest request = WebContextFactory.get()
 				.getHttpServletRequest();
@@ -175,17 +177,22 @@ public class DbObjectBean {
 		Vector v = new Vector();
 
 		try {
-			boolean a = db.execSqlForProcedure(sql);
+			boolean a = true;
+			db.execSqlForProcedure(sql);
 			value = Boolean.toString(a);
 			v.add(value);
 			list.add(v);
-			return list;
 		} catch (Exception e) {
+			v.add("ReddragonflyErrorFlag*");
 			v.add(e.getMessage());
-			list.add(v);
+			errList.add(v);
 			throw e;
 		} finally {
-			return list;
+			if (errList.isEmpty()) {
+				return list;
+			} else {
+				return errList;
+			}
 		}
 	}
 

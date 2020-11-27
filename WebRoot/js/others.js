@@ -112,6 +112,9 @@ if (dAlertTop == null)     var dAlertTop = 120;
 
 //设置提示 --已改
 function setFootView(errNo, ename) {
+	var strlen = 200;
+	ename = ename.replaceAll("\n", "");
+	ename.length > 200 ? ename = ename.substring(0, strlen) + "..." : ename = ename ;
 	if (errNo == 0) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Initializing...');
 	else if (errNo == 1) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText ='Executing...';
 	else if (errNo == 2) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Compiling...';
