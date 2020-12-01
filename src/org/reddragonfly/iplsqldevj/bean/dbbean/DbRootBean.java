@@ -87,7 +87,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'FUNCTION' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'FUNCTION' and owner = '" + name + "' order by object_name asc) ";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'FUNCTION' and owner = '" + name + "' order by object_name asc) ";
 			} else {
 				sql = "select object_name,status from user_objects where object_type = 'FUNCTION' order by object_name asc";
 			}
@@ -99,7 +99,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'PROCEDURE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'PROCEDURE' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'PROCEDURE' and owner = '"+name+"' order by object_name asc)";
 			} else sql = "select object_name,status from user_objects where object_type = 'PROCEDURE' order by object_name asc";
 			validIcon = DbProcedureBean.ICON_VALID;
 			inValidIcon = DbProcedureBean.ICON_INVALID;
@@ -119,7 +119,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'PACKAGE BODY' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'PACKAGE BODY' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'PACKAGE BODY' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'PACKAGE BODY' order by object_name asc";
 			validIcon = DbPackagebodyBean.ICON_VALID;
 			inValidIcon = DbPackagebodyBean.ICON_INVALID;
@@ -129,7 +129,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TYPE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TYPE' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'TYPE' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'TYPE' order by object_name asc";
 			validIcon = DbTypeBean.ICON_VALID;
 			inValidIcon = DbTypeBean.ICON_INVALID;
@@ -139,7 +139,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TYPE BODY' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TYPE BODY' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'TYPE BODY' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'TYPE BODY' order by object_name asc";
 			validIcon = DbTypebodyBean.ICON_VALID;
 			inValidIcon = DbTypebodyBean.ICON_INVALID;
@@ -149,7 +149,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TRIGGER' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TRIGGER' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'TRIGGER' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'TRIGGER' order by object_name asc";
 			validIcon = DbTriggerBean.ICON_VALID;
 			inValidIcon = DbTriggerBean.ICON_INVALID;
@@ -159,7 +159,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'JAVA SOURCE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'JAVA SOURCE' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'JAVA SOURCE' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'JAVA SOURCE' order by object_name asc";
 			validIcon = DbJavaSourceBean.ICON_VALID;
 			inValidIcon = DbJavaSourceBean.ICON_INVALID;
@@ -167,7 +167,7 @@ public class DbRootBean extends DbBean{
 		}else if(fieldName.equals(FIELDS[10])){  //Jobs
 			if(ub.getDbglobal()) sql = "select job,'VALID' from dba_jobs order by job asc";
 			else if (!name.equals("")) {
-				sql = "select * from (select priv_user||'.'||job,'VALID' from dba_jobs where 1=1 and priv_user = '"+name+"' order by job asc)";
+				sql = "select * from (select priv_user||'.'||job,'VALID' from all_jobs where 1=1 and priv_user = '"+name+"' order by job asc)";
 			}else sql = "select job,'VALID' from user_jobs order by job asc";
 			validIcon = DbJobBean.ICON_VALID;
 			inValidIcon = DbJobBean.ICON_INVALID;
@@ -177,7 +177,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'QUEUE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'QUEUE' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'QUEUE' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'QUEUE' order by object_name asc";
 			validIcon = DbQueueBean.ICON_VALID;
 			inValidIcon = DbQueueBean.ICON_INVALID;
@@ -187,7 +187,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'QUEUE TABLE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'QUEUE TABLE' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'QUEUE TABLE' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'QUEUE TABLE' order by object_name asc";
 			validIcon = DbQueueTableBean.ICON_VALID;
 			inValidIcon = DbQueueTableBean.ICON_INVALID;
@@ -197,7 +197,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'LIBRARY' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'LIBRARY' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'LIBRARY' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'LIBRARY' order by object_name asc";
 			validIcon = DbLibraryBean.ICON_VALID;
 			inValidIcon = DbLibraryBean.ICON_INVALID;
@@ -205,7 +205,7 @@ public class DbRootBean extends DbBean{
 		}else if(fieldName.equals(FIELDS[14])){  //Directories
 			if(ub.getDbglobal()) sql = "select object_name,status from dba_objects where object_type = 'DIRECTORY' order by object_name asc";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'DIRECTORY' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'DIRECTORY' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select * from (select object_name,status from user_objects where object_type = 'DIRECTORY' order by object_name asc) " +
 					"union all " +
 					"select * from (select object_name,status from all_objects where object_type = 'DIRECTORY' order by object_name asc)";
@@ -217,7 +217,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TABLE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'TABLE' and owner = '"+name+"' order by owner asc, object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'TABLE' and owner = '"+name+"' order by owner asc, object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'TABLE' order by object_name asc";
 			validIcon = DbTableBean.ICON_VALID;
 			inValidIcon = DbTableBean.ICON_INVALID;
@@ -247,7 +247,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'VIEW' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'VIEW' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'VIEW' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'VIEW' order by object_name asc";
 			validIcon = DbViewBean.ICON_VALID;
 			inValidIcon = DbViewBean.ICON_INVALID;
@@ -257,7 +257,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'MATERIALIZED VIEW' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'MATERIALIZED VIEW' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'MATERIALIZED VIEW' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'MATERIALIZED VIEW' order by object_name asc";
 			validIcon = DbMaterializedViewBean.ICON_VALID;
 			inValidIcon = DbMaterializedViewBean.ICON_INVALID;
@@ -267,7 +267,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'SEQUENCE' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'SEQUENCE' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'SEQUENCE' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'SEQUENCE' order by object_name asc";
 			validIcon = DbSequenceBean.ICON_VALID;
 			inValidIcon = DbSequenceBean.ICON_INVALID;
@@ -296,7 +296,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'SYNONYM' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'SYNONYM' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'SYNONYM' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'SYNONYM' order by object_name asc";
 			validIcon = DbSynonymBean.ICON_VALID;
 			inValidIcon = DbSynonymBean.ICON_INVALID;
@@ -319,7 +319,7 @@ public class DbRootBean extends DbBean{
 					"union all " +
 					"select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'CLUSTER' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from dba_objects where object_type = 'CLUSTER' and owner = '"+name+"' order by object_name asc)";
+				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'CLUSTER' and owner = '"+name+"' order by object_name asc)";
 			}else sql = "select object_name,status from user_objects where object_type = 'CLUSTER' order by object_name asc";
 			validIcon = DbClusterBean.ICON_VALID;
 			inValidIcon = DbClusterBean.ICON_INVALID;

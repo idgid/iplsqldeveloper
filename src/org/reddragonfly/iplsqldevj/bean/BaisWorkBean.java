@@ -577,7 +577,7 @@ public class BaisWorkBean {
 
 	//phanrider 2009-11-25
 	//新增统一执行OBJECT是否成功方法
-	public List execObject(String sqlNum) {
+	public List execObject(String sqlNum, String objName) {
 		String success = "Compiled successfully";
 		this.sql = sqlNum;
 		Database db = null;
@@ -596,10 +596,26 @@ public class BaisWorkBean {
 			v.add("ReddragonflySuccessFlag*");
 			if(rs.getStatement().getWarnings() != null) {
 				v.add(rs.getStatement().getWarnings().getMessage().replaceAll("java.sql.SQLWarning: ", ""));
+				execObjectList.add(v);
+				if (!objName.equals("")) {
+					String errSql = "select line,text from USER_ERRORS where NAME = upper('" + objName + "') order by sequence asc";
+					ResultSet rsE =  db.getRS(errSql);
+					while (rsE.next()) {
+						Vector ve = new Vector();
+						for (int j = 1; j <= rsE.getMetaData().getColumnCount(); j++) {
+							String value = null;
+							value = CharSet.nullToEmpty(rsE.getString(j));
+							ve.add(value);
+						}
+						execObjectList.add(ve);
+					}
+				}
+
+
 			} else {
 				v.add(success);
+				execObjectList.add(v);
 			}
-			execObjectList.add(v);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Vector v = new Vector();

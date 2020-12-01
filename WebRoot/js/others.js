@@ -105,7 +105,8 @@ if (GtitleShowFlag == null)     var GtitleShowFlag = false;
 // 提示信息 TOP
 if (dAlertTop == null)     var dAlertTop = 120;
 
-
+// GERRORPROCINFO 属性
+if (GERRORPROCINFO ==  null)  var GERRORPROCINFO = [];
 
 
 
@@ -1015,7 +1016,6 @@ function executeSQL(textareaname) {
 
 //FUN执行控制
 function executeFUN(sqlString,currWindoType) {
-	parent.parent.editorToolFrame.execObject(sqlString);
 	//设置TAB页面的Title, 去掉editor标记
 	var c = parent.parent.editorFrame.GGETFRAME;
 	var tmps = c.editAreaLoader.setFileEditedMode(gMyTextArea, 'funEditorId', false);
@@ -1036,7 +1036,16 @@ function executeFUN(sqlString,currWindoType) {
              tmpv = tmpv.match(/type[\s]*body([\s\S]*?)is/i)[1].trim();
          }
 	}
-	// tmpv = tmpv.split('(')[0].trim().split(' ');
+
+	// 从窗口最大化恢复，只做一次
+	if (parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen) {
+		parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.execCommand('toggle_full_screen');
+		parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen = false;
+		GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
+	}
+    parent.parent.editorToolFrame.execObject(sqlString, tmpv);
+
+    // tmpv = tmpv.split('(')[0].trim().split(' ');
 	tmpv += "&nbsp;&nbsp;";
 
 	var t = c.document.getElementById('frame_myTextarea').contentWindow;
@@ -4329,6 +4338,21 @@ function keyDownInterface(e) {
 }
 
 
+function chcolor(e) {
+    var thisbk = "width: 100%; background-color: #0078d7; color: #eee;";
+    var thatbk = "width: 100%; color: #ad0039;";
+    var o = e.currentTarget.parentElement;
+    var eobj = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea;
+
+    for ( var i = 0; i < o.childElementCount ; i++ ) {
+        o.children[i].style = thatbk;
+    }
+    e.currentTarget.style = thisbk;
+    eobj.go_to_line(e.currentTarget.children[0].innerText);
+	eobj.selection_field.setAttribute('class','show_colors_e');
+	eobj.focus();
+    // console.log(e);
+}
 
 
 

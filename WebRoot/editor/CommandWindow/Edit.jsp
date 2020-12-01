@@ -25,6 +25,10 @@
 
 	</head>
 	<style>
+        * {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
 		html,body {
 			background: ButtonFace;
 			margin: 0px;
@@ -62,7 +66,7 @@
 			scrollbar-shadow-color: buttonface;
 			width: 100%;
 			height:100%;
-			float: left;
+			/*float: left;*/
 
 		}
 		.dynamic-tab-pane-control .tab-page {
@@ -145,6 +149,24 @@
             background-color: #FFFFFF;
             color: #004a7e;
         }
+		#errorInfo{
+			flex: 0 0 112px;
+			background-color: #fff;
+			width: 100%;
+			height: 112px;
+			overflow-y: auto;
+			font-size: 12px;
+			font-family: "Courier New", Courier, mono;
+			bottom: 26px;
+			z-index: -1;
+		}
+		#errorInfo.show{
+			border: 2px solid #a0a0a0;
+			z-index: 9;
+		}
+		#errorInfo.hide{
+			border: none;
+		}
 	</style>
 	<style disabled="disabled" id="mozGrooveCSS">
 	/* Mozilla does not understand disabled stylesheets but
@@ -164,7 +186,10 @@
 						<textarea id="myTextarea" class="editor" name="myTextarea_editor"></textarea>
                             <div id="autoCompletion" name="autoCompletion"></div>
 
+
             </div>
+			<div id="errorInfo" name="errorInfo" class="show">
+			</div>
 			<footer id="foot_outputDiv" class="footer">
 
 				<table border="0" id="toolBar_footer" style="background: ButtonFace;"
@@ -205,7 +230,7 @@
 				,language: "en"
 				,syntax: "sql"
 				,show_line_colors: true
-				,fullscreen: false
+				,fullscreen: true
 				,EA_load_callback: "editAreaLoaded"
 				,save_callback: "winsave"
 			});

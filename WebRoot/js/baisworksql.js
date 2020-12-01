@@ -422,12 +422,12 @@ function execResultFromSql(localsql,insertordelflag, callfun) {
 }
 
 //executeFUN 最终调用此函数据 by phanrider
-function execObject(localsql) {
+function execObject(localsql, oname) {
 	//置空
 	setFootView(1, "");
 	var oldtime = $time();
 
-	BaisWorkBean.execObject(localsql, callexecobjectback);
+	BaisWorkBean.execObject(localsql, oname, callexecobjectback);
 
 	function callexecobjectback(intdata){
 	var newtime = ($time() - oldtime) / 1000;
@@ -446,8 +446,36 @@ function execObject(localsql) {
 			text : intdata[0][1]
 		});
 	} else if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
+		var o =  parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('errorInfo');
+		o.innerHTML = '';
 		rows = intdata[0][1];
-		//alert(intdata[0][1]);
+		parent.parent.parent.editorFrame.GGETFRAME.GERRORPROCINFO = [];
+
+		if (intdata.length > 1) {
+			var bk = "";
+			for ( var i = 1; i < intdata.length; i++ ) {
+				parent.parent.parent.editorFrame.GGETFRAME.GERRORPROCINFO[i-1] = intdata[i][0];
+				i == 1 ? bk = "width: 100%; background-color: #0078d7; color: #eee;" : bk = "width: 100%; color: #ad0039;";
+				o.innerHTML += "<div style='" + bk + "' onclick='parent.parent.parent.editorFrame.GGETFRAME.chcolor(event)'><span style='width: 5%; display: inline-block;'>" + intdata[i][0] + "</span><span style='width: 95%'>" + intdata[i][1] + "</span> </div>";
+			}
+			// 直接定位到第一个问题代码处
+			var eobj = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea;
+			eobj.go_to_line(intdata[1][0]);
+			eobj.selection_field.setAttribute('class','show_colors_e');
+			eobj.editor_area.onclick = function() {
+				var cline = eobj.last_selection.line_start;
+				var geinfo = parent.parent.parent.editorFrame.GGETFRAME.GERRORPROCINFO;
+				eobj.selection_field.setAttribute('class','show_colors');
+				for ( var i = 0; i < geinfo.length; i++ ) {
+					if ( cline == geinfo[i] ) {
+						eobj.selection_field.setAttribute('class','show_colors_e');
+						i = geinfo.length;
+					}
+				}
+			}
+			eobj.focus();
+
+		}
 	}
 
 	breakRun("myTextarea");
@@ -476,6 +504,8 @@ function execObject(localsql) {
             parent.parent.editorToolFrame.nodeType = "root";
 		}
 	}
+
+
 	}
 }
 
@@ -483,7 +513,7 @@ function execObject(localsql) {
 function execOtherObject(localsql) {
 
 
-	BaisWorkBean.execObject(localsql, callexecOtherobjectback);
+	BaisWorkBean.execObject(localsql, "", callexecOtherobjectback);
 
 	function callexecOtherobjectback(intdata) {
 

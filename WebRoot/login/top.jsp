@@ -21,7 +21,7 @@ UserBean ub = (UserBean) session.getAttribute("user");
 		<script type='text/javascript' src='../dwr/engine.js'></script>
 		<style>
 			.topSS {
-				background-repeat: repeat;background-image: url('../images/log.png')!important;background-image:url('');
+				background-repeat: repeat;background-image: url('../images/log1.png')!important;background-image:url('');
 			}
 			*html .topSS {filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=scale, src="../images/log.png");
 			}

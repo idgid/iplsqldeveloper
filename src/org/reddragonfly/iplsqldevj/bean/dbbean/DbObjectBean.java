@@ -157,7 +157,17 @@ public class DbObjectBean {
 			}
 			return list;
 		} catch (Exception e) {
+			Vector v = new Vector();
+			v.add("ReddragonflyErrorFlag*");
+			v.add(e.getMessage());
+			errList.add(v);
 			throw e;
+		} finally {
+			if (errList.isEmpty()) {
+				return list;
+			} else {
+				return errList;
+			}
 		}
 	}
 
