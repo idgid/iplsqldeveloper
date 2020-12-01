@@ -285,10 +285,9 @@ public class BaisWorkBean {
 							}
 						}
 
-
 					} else if ( "LONG".equals( rs.getMetaData().getColumnTypeName(j)) ) {
-						value = "&lt;long&gt;";
-
+						value = db.getLong(rs, j);
+						//value = "&lt;long&gt;";
 					}
 					else  value = CharSet.nullToEmpty(rs.getString(j));
 

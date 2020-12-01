@@ -141,11 +141,30 @@ public class DbObjectBean {
 						if (rsm.getColumnType(i) == java.sql.Types.NUMERIC) {
 							value = CharSet.nullToEmpty(rs.getString(i));
 
-							if (value.startsWith("."))
-								value = "0" + value;
+							if (value.startsWith("."))	value = "0" + value;
+						}else if ("BLOB".equals(rsm.getCatalogName(i)) ||
+								"CLOB".equals( rsm.getColumnTypeName(i))
+								||"BLOB".equals( rsm.getColumnTypeName(i)) ) {
+
+							if ("CLOB".equals( rsm.getColumnType(i)))  {
+								value = CharSet.nullToEmpty(db.getClob(rs, i));
+							}
+
+							if ( "BLOB".equals(rsm.getCatalogName(i)) ||"BLOB".equals( rsm.getColumnTypeName(i))  ) {
+								byte[] blobTmp = db.getBlob(rs , i );
+								if (blobTmp.length == 0) value="<BLOB>";
+								else {
+									value = new String(blobTmp);  // 暂时测试string
+								}
+							}
+
+						} else if ( "LONG".equals( rsm.getColumnTypeName(i)) ) {
+							value = db.getLong(rs, i);
+							//value = "&lt;long&gt;";
 						} else {
 							value = CharSet.nullToEmpty(rs.getString(i));
 						}
+
 						if (i == 1 && value.equals("")) {
 							value = "(Result)";
 						}

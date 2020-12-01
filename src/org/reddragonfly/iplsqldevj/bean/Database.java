@@ -337,6 +337,35 @@ public class Database {
 	      return this.getBlob( ( (OracleResultSet) rs).getBLOB(columnIndex));
 	    }
 
+
+		/**
+		 * 得到Long字段
+		 * @param rs
+		 * @param columnIndex
+		 * @return
+		 * @throws Exception
+		 */
+		public String getLong(ResultSet rs, int columnIndex) throws Exception {
+			StringBuffer strbuffer=new StringBuffer();
+
+			Reader reader=rs.getCharacterStream(columnIndex);
+			if (reader != null) {
+				BufferedReader buffreader=new BufferedReader(reader);
+				String line="";
+				try{
+					while((line=buffreader.readLine())!=null){
+						strbuffer.append(line);
+						strbuffer.append("\n");
+					}
+					reader.close();
+				}catch(Exception e){
+					throw new Exception(e.getMessage());
+				}
+			}
+
+			return strbuffer.toString();
+		}
+
 	    /**
 	     * 获得Blob
 	     * @param rs

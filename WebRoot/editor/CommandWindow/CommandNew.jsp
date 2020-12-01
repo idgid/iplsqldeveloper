@@ -24,12 +24,11 @@
 	<script type="text/javascript" src="../../js/cb2.js"></script>
 	<script type="text/javascript" src="../../js/others.js"></script>
 	<script type="text/javascript" src="../../js/baisworksql.js"></script>
-	<script type="text/javascript" src="../../js/jsterm/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="../../js/tabpane.js"></script>
+    <script type="text/javascript" src="../../js/jsterm/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/jquery.terminal.min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/jquery.mousewheel-min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/keyboard.js"></script>
-
-
 
 	<!--以下是dwr的必备js  -->
 	<script type='text/javascript' src='../../dwr/interface/BaisWorkBean.js'></script>
@@ -77,7 +76,37 @@
 		height:100%;
 		float: left;
 	}
+    .dynamic-tab-pane-control .tab-page {
+        height:		100%;
+        display: block;
 
+    }
+    .dynamic-tab-pane-control .tab-page::after {
+        height:		100%;
+        display: block;
+        height: 16px;
+        content:'';
+        visibility: hidden;
+    }
+
+    .dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
+        height:		100px;
+        display: block;
+
+    }
+    .dynamic-tab-pane-control h2 {
+        text-align:	center;
+        width:		auto;
+    }
+
+    .dynamic-tab-pane-control h2 a {
+        display:	inline;
+        width:		auto;
+    }
+
+    .dynamic-tab-pane-control a:hover {
+        background: transparent;
+    }
 	p {
 		margin: 0px;
 	}
@@ -164,11 +193,20 @@
 </style>
 <body ondragstart="return false" oncontextmenu="return false">
 <div id="CommandSQLWindowContainer">
+    <div class="tab-pane" id="tabPanel" style=" min-height:90%; _height:90%; ">
+        <div class="tab-page" id="tabpage_1" style=" min-height:90%; _height:100%;">
+            <h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>Dialog</span></h2>
 
-			<div class="main" id="commandTerm" name="commandTerm">	</div>
+            <div class="main" id="commandTerm" name="commandTerm">	</div>
             <div id="autoCompletion" name="autoCompletion"></div>
+        </div>
+        <div class="tab-page" id="tabpage_2" style=" min-height:90%; _height:100%;">
+            <h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Editor</span></h2>
 
+            <span>test</span>
+        </div>
 
+    </div>
     <footer id="foot_outputDiv" class="footer">
         <table border="0" id="toolBar_footer" style="background: ButtonFace;"
                cellspacing="1" width="100%">
@@ -540,6 +578,9 @@
 								term.echo (dataHeader.join(' '));
                                 term.echo (strCellSplit.join(' '));
 							} else  {
+							    for(var j = 0; j < data[i].length; j++) {
+                                    if(data[i][j] != '') data[i][j] = data[i][j].replaceAll(/\n/g,'');
+                                }
 								term.echo (data[i].join(' '));
 							}
 						}

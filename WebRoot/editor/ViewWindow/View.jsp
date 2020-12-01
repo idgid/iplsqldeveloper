@@ -41,7 +41,7 @@
 				+ ownerName[0]
 				+ "' "
 				+ " and constraint_type in ('U', 'P', 'F')";
-		checksql = "select '' a,'' b, '' c, '' d, '' e, '' f from dual where 1=2";
+		checksql = "select CONSTRAINT_NAME,SEARCH_CONDITION,DECODE(STATUS,'ENABLED','Y','N') ENABLED,DEFERRABLE,DEFERRED,DECODE(VALIDATED,'VALIDATED','Y','N') VALIDATED,LAST_CHANGE from user_constraints  where table_name='" + ownerName[0] + "' and constraint_type = 'C'";
 		indexsql = "select owner,index_name,decode(uniqueness,'UNIQUE','Unique','Normal') uniqueness,compression, prefix_length, '' reverse, "
 				+ "'tablespace '||lower(tablespace_name)||' pctfree '|| pct_free || ' initrans ' || ini_trans || ' maxtrans ' || max_trans || "
 				+ "' storage ( initial ' || initial_extent/1024 || 'k minextents ' ||min_extents|| ' maxextents ' || decode(max_extents,2147483645,'unlimited',max_extents) || ' )' "
@@ -69,6 +69,7 @@
 				+ "and a.table_name = b.table_name "
 				+ "and a.column_name = b.column_name "
 				+ "and a.owner = b.owner " + "order by a.column_id asc";
+		checksql = "select CONSTRAINT_NAME,SEARCH_CONDITION,DECODE(STATUS,'ENABLED','Y','N') ENABLED,DEFERRABLE,DEFERRED,DECODE(VALIDATED,'VALIDATED','Y','N') VALIDATED,LAST_CHANGE from user_constraints  where table_name='" + ownerName[1] + "' and owner='" + ownerName[0] + "' and constraint_type = 'C'";
 		privilegesql = "select grantee,privilege,grantable,hierarchy from DBA_TAB_PRIVS where table_name='"
 				+ ownerName[1] + "' and owner= '" + ownerName[0] + "'";
 		tablePropertysql = "select tt.tablespace_name, tt.initial_extent, tt.pct_free, tt.next_extent, tt.pct_used, tt.pct_increase, "
@@ -84,21 +85,27 @@
 		} else {
 			maxExtent = tbp.getGetMaxExtent();
 		}
-		if (Long.parseLong(CharSet.nullToEmpty(tbp.getGetInitExtent())) >= 1024
-				&& Long.parseLong(CharSet.nullToEmpty(tbp
-						.getGetInitExtent())) < 1048576) {
-			strInitExtent = String.valueOf((Long.parseLong(CharSet
-					.nullToEmpty(tbp.getGetInitExtent())) / 1024));
-			strInitExtentUnit = "KB";
-		} else if (Long.parseLong(CharSet.nullToEmpty(tbp
-				.getGetInitExtent())) >= 1048576) {
-			strInitExtent = String.valueOf((Long.parseLong(CharSet
-					.nullToEmpty(tbp.getGetInitExtent())) / 1048576));
-			strInitExtentUnit = "MB";
+		if ( (CharSet.nullToEmpty(tbp.getGetInitExtent())).equals("") ) {
+			strInitExtent = "";
+			strInitExtentUnit = "";
 		} else {
-			strInitExtent = CharSet.nullToEmpty(tbp.getGetInitExtent());
-			strInitExtentUnit = "Byte";
+			if (Long.parseLong(CharSet.nullToEmpty(tbp.getGetInitExtent())) >= 1024
+					&& Long.parseLong(CharSet.nullToEmpty(tbp
+					.getGetInitExtent())) < 1048576) {
+				strInitExtent = String.valueOf((Long.parseLong(CharSet
+						.nullToEmpty(tbp.getGetInitExtent())) / 1024));
+				strInitExtentUnit = "KB";
+			} else if (Long.parseLong(CharSet.nullToEmpty(tbp
+					.getGetInitExtent())) >= 1048576) {
+				strInitExtent = String.valueOf((Long.parseLong(CharSet
+						.nullToEmpty(tbp.getGetInitExtent())) / 1048576));
+				strInitExtentUnit = "MB";
+			} else {
+				strInitExtent = CharSet.nullToEmpty(tbp.getGetInitExtent());
+				strInitExtentUnit = "Byte";
+			}
 		}
+
 	}
 %>
 
@@ -384,7 +391,7 @@
 						<div id='resultdiv_checks' style="background-color:#E3E3E3; overflow:hidden; height:700px; width:95%">
 		                 	<script>
 		                 		var checksqls="<%=checksql%>";
-		                 		DbObjectBean.getOther2(checksqls,['Name','Condition','Enabled','Deferrable','Deferred', 'Last_change'], showDataHtmlChecks);
+		                 		DbObjectBean.getOther2(checksqls,['Name','Condition','Enabled','Deferrable','Deferred','Validated','Last_change'], showDataHtmlChecks);
 		                 	</script>
 		                 </div>
 					</div>
