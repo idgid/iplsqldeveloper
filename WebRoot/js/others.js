@@ -111,12 +111,14 @@ if (GERRORPROCINFO ==  null)  var GERRORPROCINFO = [];
 
 
 
+
+
 //设置提示 --已改
 function setFootView(errNo, ename) {
 	var strlen = 200;
 	ename = ename.replaceAll("\n", "");
 	ename.length > 200 ? ename = ename.substring(0, strlen) + "..." : ename = ename ;
-	if (errNo == 0) parent.parent.parent.editorFrame.GGETFRAME.$('footview').set('text','Initializing...');
+	if (errNo == 0) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Initializing...';
 	else if (errNo == 1) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText ='Executing...';
 	else if (errNo == 2) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Compiling...';
 	else if (errNo == 3) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Compiled succesfully';
@@ -3577,13 +3579,16 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 
 		} else {
 			var tmpv = "";
+			var eFlagStr = "";
 			if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 				|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB") {
 				tmpv = titleStr.split('(')[0].trim().split(' ');
-			}
+                eFlagStr = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.is_editable;
+            }
 			// tmpv = titleStr.split('(')[0].trim().split(' ');
 			tmpv = tmpv[tmpv.length-1];
-			initStr = "Program Window - Edit source of " + strTmp + tmpv;
+            eFlagStr == true ? eFlagStr = "Edit" : eFlagStr = "View";
+			initStr = "Program Window - " + eFlagStr + " source of " + strTmp + tmpv;
 			tmpStr = initStr;
 			tmpStrA = initStr;
 
@@ -4040,7 +4045,7 @@ function keyDownInterface(e) {
 		titleUserObject[i][1] = titleUserObject[i][1].toLowerCase();
 	}
 
-    if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
+    if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13 || e.keyCode == 119 || e.keyCode == 120 || e.keyCode == 121 || e.keyCode == 122 ) {
         getTmpStr();
     } else {
         setTimeout(getTmpStr,50);
@@ -4057,7 +4062,8 @@ function keyDownInterface(e) {
 			s = stmp[stmp.length - 1].trim();
 			if ( e.keyCode != 38 && e.keyCode != 40 && e.keyCode != 13  && e.keyCode != 16  && e.keyCode != 17 && e.keyCode != 18 && e.keyCode != 19  ) {
 				if (e.keyCode >= 112 && e.keyCode <= 123) {
-					return e;
+                    clearAutoCompletion();
+                    return e;
 				} else {
 					// 当前输入超过 2 个字符才开始提示
 					if ( s != "*" && s.length > 2) {
@@ -4100,7 +4106,7 @@ function keyDownInterface(e) {
 				clearAutoCompletion();
 				e.returnValue = false;
 
-			} else if ( e.keyCode == 27  || e.keyCode == 8 || e.keyCode== 32) {  // ESC key
+			} else if ( e.keyCode == 27  || e.keyCode == 8 || e.keyCode== 32 ) {  // ESC or F8 - F12
 				clearAutoCompletion();
 				e.returnValue = false;
 

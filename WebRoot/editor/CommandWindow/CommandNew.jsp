@@ -79,12 +79,12 @@
     .dynamic-tab-pane-control .tab-page {
         height:		100%;
         display: block;
-
+        overflow: auto;
     }
     .dynamic-tab-pane-control .tab-page::after {
         height:		100%;
         display: block;
-        height: 16px;
+        height: 26px;
         content:'';
         visibility: hidden;
     }
@@ -92,6 +92,7 @@
     .dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
         height:		100px;
         display: block;
+        overflow: auto;
 
     }
     .dynamic-tab-pane-control h2 {
@@ -193,20 +194,22 @@
 </style>
 <body ondragstart="return false" oncontextmenu="return false">
 <div id="CommandSQLWindowContainer">
-    <div class="tab-pane" id="tabPanel" style=" min-height:90%; _height:90%; ">
-        <div class="tab-page" id="tabpage_1" style=" min-height:90%; _height:100%;">
-            <h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>Dialog</span></h2>
+    <div class="main" id="commandTerm" name="commandTerm">	</div>
+    <div id="autoCompletion" name="autoCompletion"></div>
+    <%--<div class="tab-pane" id="tabPanel" style=" min-height:90%; _height:90%; ">--%>
+        <%--<div class="tab-page" id="tabpage_1" style=" min-height:90%; _height:100%;">--%>
+            <%--<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>Dialog</span></h2>--%>
 
-            <div class="main" id="commandTerm" name="commandTerm">	</div>
-            <div id="autoCompletion" name="autoCompletion"></div>
-        </div>
-        <div class="tab-page" id="tabpage_2" style=" min-height:90%; _height:100%;">
-            <h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Editor</span></h2>
+            <%--<div class="main" id="commandTerm" name="commandTerm">	</div>--%>
+            <%--<div id="autoCompletion" name="autoCompletion"></div>--%>
+        <%--</div>--%>
+        <%--<div class="tab-page" id="tabpage_2" style=" min-height:90%; _height:100%;">--%>
+            <%--<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Editor</span></h2>--%>
 
-            <span>test</span>
-        </div>
+            <%--<span>test</span>--%>
+        <%--</div>--%>
 
-    </div>
+    <%--</div>--%>
     <footer id="foot_outputDiv" class="footer">
         <table border="0" id="toolBar_footer" style="background: ButtonFace;"
                cellspacing="1" width="100%">

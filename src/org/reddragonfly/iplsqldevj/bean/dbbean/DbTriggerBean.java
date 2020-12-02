@@ -71,7 +71,7 @@ public class DbTriggerBean extends DbBean {
 		StringBuffer returnVal = new StringBuffer();
 		String name =  this.name.replaceAll("#","%23");
 		returnVal.append("myMenu.width = 200;");
-		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"\"));");
+		returnVal.append("myMenu.add(new WFXMI(\"New...\", \"javascript:showRoot('"+TYPE+"','"+name+"','Triggers','New...','550px','300px');\"));");
 		returnVal.append("myMenu.add(new WebFXMenuSeparator());");
 		returnVal.append("myMenu.add(new WFXMI(\"Refresh\", \"javascript:tree.getSelected().reload();\"));");
 		returnVal.append("myMenu.add(new WFXMI(\"Copy comma separated\"));");
