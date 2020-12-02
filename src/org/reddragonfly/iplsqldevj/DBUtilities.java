@@ -183,8 +183,8 @@ public abstract class DBUtilities {
 				queryViewSql = "select query from " + viewSource + " where mview_name = upper('" + name + "') ";
 			}
 		} else {
-			String source = "dba_source";
-			String viewSource = "dba_views";
+			String source = "all_source";
+			String viewSource = "all_views";
 			if (type.equals("MATERIALIZED VIEW")) viewSource = "dba_mviews";
 			// ---------------------------------------------------------------------
 			// 获得某个存储过程、包、函数代码脚本
