@@ -800,8 +800,8 @@ terminal .terminal-output > div {
     .terminal .terminal-output span[data-text]:not(.far):not(.fa):not(.fas):not(.emoji) span::selection,
     .terminal .terminal-output .raw div::selection,
     .cmd span[data-text]:not(.far):not(.fa):not(.fas):not(.emoji) span::selection {
-        background-color: var(--color, rgba(170, 170, 170, 0.99)) !important;
-        color: var(--background, #000) !important;
+        background-color: var(--color, rgba(0, 0, 128, 0.99)) !important;
+        color: var(--background, #fff) !important;
     }
     .terminal .terminal-output div div a::selection {
         background-color: var(--link-color, rgba(15, 96, 255, 0.99)) !important;

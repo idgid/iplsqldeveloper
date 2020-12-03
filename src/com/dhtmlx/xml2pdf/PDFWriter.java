@@ -2,6 +2,7 @@ package com.dhtmlx.xml2pdf;
 
 import com.pdfjet.*;
 
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -361,10 +362,17 @@ public class PDFWriter {
 
 	private void outputPDF(HttpServletResponse resp) throws Throwable {
 		pdf.wrap();
-        resp.setContentType("application/pdf");
-		OutputStream ot =  resp.getOutputStream();
-		ot.flush();
-        pdf.getData().writeTo(ot);
+        //resp.setContentType("application/pdf");
+		//OutputStream ot =  resp.getOutputStream();
+		//ot.flush();
+        //pdf.getData().writeTo(ot);
+		byte[] bytes = pdf.getData().toByteArray();
+		resp.setContentType("application/pdf");
+		resp.setHeader("Content-Length", String.valueOf(bytes.length));
+		BufferedOutputStream bfs = null;
+		bfs = new BufferedOutputStream(resp.getOutputStream());
+		bfs.write(bytes);
+		bfs.close();
 	}
 
 	private String textWrap(String text, double width, Font f) {
