@@ -2947,7 +2947,8 @@ function createWindowList(windowType, str, eFlag) {
 	} else if (windowType == "TAB") {
 		initStr = "View table ";
 		newStr = str.split('=')[1].split('&')[0];
-	} else if (windowType == "CSQ") {
+        img = "../images/view_table.png";
+    } else if (windowType == "CSQ") {
 		initStr = "Command Window - ";
 		newStr = "New";
 	}
