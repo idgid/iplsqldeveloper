@@ -32,6 +32,6 @@ public class PDFGeneratorAction extends BaseAction {
         xml = req.getParameter("grid_xml");
         xml = URLDecoder.decode(xml, "UTF-8");
         (new PDFWriter()).generate(xml, resp);
-        return xml;
+        return null;
     }
 }

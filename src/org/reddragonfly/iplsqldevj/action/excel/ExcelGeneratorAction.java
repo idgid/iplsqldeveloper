@@ -34,7 +34,7 @@ public class ExcelGeneratorAction extends BaseAction {
 		String xml = req.getParameter("grid_xml");
 		xml = URLDecoder.decode(xml, "UTF-8");
 		(new ExcelWriter()).generate(xml, resp);
-		return xml;
+		return null;
 	}
 
 }
