@@ -2579,6 +2579,11 @@ function showDataHtmlPrivileges(data) {
 	showDataHtmlReal(data, keydivname);
 }
 
+function showDataHtmlTriggers(data) {
+	var keydivname = 'resultdiv_triggers';
+	showDataHtmlReal(data, keydivname);
+}
+
 //真正调用本地及服务器参数的回调函数
 //data： 服务器返回的数据
 //divname：本地参数，各个DIV名称或ID
@@ -3988,11 +3993,11 @@ function execQueryObjData(textareaname,objname) {
 	parent.parent.editorToolFrame.executeRun(textareaname);
 }
 
-function execQueryTable(tablename, textareaname) {
+function execQueryTable(textareaname, tablename) {
 	var texttmp = "select * from " + tablename + " t";
 	parent.parent.editorToolFrame.createNewSql('SQL','myTextarea');
-	setDivValueText (textareaname,texttmp);
-
+	parent.parent.editorFrame.setDivValueText (textareaname,texttmp);
+	parent.parent.editorToolFrame.executeRun(textareaname);
 }
 
 function getUserObject(data) {

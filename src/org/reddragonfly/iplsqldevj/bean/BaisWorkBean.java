@@ -358,7 +358,7 @@ public class BaisWorkBean {
                     if ( addValues[i][0].equals(Integer.toString(j))) {
                         rs.absolute(j);
                         // 更新该行的所有列
-                        for( int k = 1; k < colNum; k++ ) {
+	                        for( int k = 1; k < colNum; k++ ) {
                         	if (rs.getMetaData().getColumnTypeName(k).equals("TIMESTAMP")) {
 								Timestamp ts = Timestamp.valueOf(addValues[i][k]);
 								rs.updateTimestamp(k, ts);
@@ -392,6 +392,8 @@ public class BaisWorkBean {
 									outStream.flush();
 								}
 
+							} else if (rs.getMetaData().getColumnTypeName(k).equals("NUMBER")) {
+								rs.updateLong(k, Long.parseLong(addValues[i][k]));
 							} else {
 								rs.updateString(k, addValues[i][k]);
 							}
@@ -461,7 +463,11 @@ public class BaisWorkBean {
                                         OutputStream outStream = blob.getBinaryOutputStream();
                                         outStream.write(c, 0, c.length);
                                         outStream.flush();
-                                    }								} else {
+                                    }
+								} else if (rs.getMetaData().getColumnTypeName(k).equals("NUMBER")) {
+									if ( !(CharSet.nullToEmpty(addValues[i][k])).equals("") )
+										rs.updateLong(k, Long.parseLong(addValues[i][k]));
+								} else {
 									rs.updateString(k, addValues[i][k]);
 
 								}

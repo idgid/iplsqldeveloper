@@ -209,7 +209,7 @@ body.full-screen-terminal .terminal {
 .cmd,
 .cmd span:not(.fas):not(.far):not(.fa) {
     /*font-family: FreeMono, monospace; this don't work on Android */
-    font-family: monospace;
+    font-family: "Courier New", Courier, monospace, mono;
 }
 .terminal,
 .cmd {
@@ -733,7 +733,7 @@ terminal .terminal-output > div {
     }
     .cmd .cmd-cursor.cmd-blink {
         color: var(--color, #aaa);
-        background-color: var(--background, #000);
+        /*background-color: var(--background, #000);*/
     }
     .cmd .cmd-cursor.cmd-blink > span[data-text]:not(.emoji):not(.fa):not(.far):not(.fas) span,
     .cmd .cmd-cursor.cmd-blink a {

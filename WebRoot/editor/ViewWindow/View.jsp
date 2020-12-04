@@ -13,7 +13,7 @@
 	String name = CharSet.nullToEmpty(request.getParameter("name"))
 			.toUpperCase();
 	String[] ownerName = name.split("\\.", 2);
-	String sql = "", keysql = "", checksql = "", indexsql = "", privilegesql = "", tablePropertysql = "";
+	String sql = "", keysql = "", checksql = "", indexsql = "", privilegesql = "", tablePropertysql = "", viewTablesql="", triggersql="";
 	String owner = "";
 	String objName = "";
 	String maxExtent = "";
@@ -55,6 +55,9 @@
 		tablePropertysql = "select tt.tablespace_name, tt.initial_extent, tt.pct_free, tt.next_extent, tt.pct_used, tt.pct_increase, "
 				+ "tt.ini_trans, tt.min_extents, tt.max_trans, tt.max_extents, (select comments from user_tab_comments where table_name=tt.table_name) comments from user_tables tt where table_name='"
 				+ ownerName[0] + "'";
+		viewTablesql = "SELECT DBMS_METADATA.GET_DDL('TABLE','" + ownerName[0] + "') tsql FROM DUAL";
+		triggersql = "select '"+ub.getUsername().toUpperCase()+"' owner, tri.trigger_name, tri.trigger_type, tri.triggering_event, decode(tri.status,'ENABLED','Y','') t_status from user_triggers tri where tri.table_name='" + ownerName[0] + "' order by tri.trigger_name asc";
+
 	} else {
 		owner = ownerName[0];
 		objName = ownerName[1];
@@ -75,6 +78,9 @@
 		tablePropertysql = "select tt.tablespace_name, tt.initial_extent, tt.pct_free, tt.next_extent, tt.pct_used, tt.pct_increase, "
 				+ "tt.ini_trans, tt.min_extents, tt.max_trans, tt.max_extents, (select comments from dba_tab_comments where table_name=tt.table_name and owner = tt.owner) comments  from dba_tables tt where table_name='"
 				+ ownerName[1] + "' and owner= '" + ownerName[0] + "'";
+		viewTablesql = "SELECT DBMS_METADATA.GET_DDL('TABLE','" + ownerName[1] + "', '" + ownerName[0] + "') tsql FROM DUAL";
+		triggersql = "select tri.owner, tri.trigger_name, tri.trigger_type, tri.triggering_event, decode(tri.status,'ENABLED','Y','') t_status from all_triggers tri where tri.table_name='" + ownerName[1] + "' and tri.table_owner='" + ownerName[0]+ "' order by tri.trigger_name asc";
+
 	}
 	DbObjectBean tbp = new DbObjectBean();
 	if (type.equals("TABLE")) {
@@ -135,6 +141,7 @@
 		* {
 			box-sizing: border-box;
 			-moz-box-sizing: border-box;
+			font-size: 12px;
 		}
 		html,body {
 			background: ButtonFace;
@@ -149,6 +156,9 @@
 		.smallfont{
 		    font-size: 12px;
 		    text-align: right;
+		}
+		.smallfontlab{
+			font-size: 12px;
 		}
 		.editorout {
 		    border-left: 1px ridge #999999;
@@ -173,8 +183,6 @@
 			scrollbar-shadow-color: buttonface;
 			width: 100%;
 			height:100%;
-			float: left;
-
 		}
 		.dynamic-tab-pane-control .tab-page {
 			height:			100%;
@@ -255,11 +263,14 @@
 	<%
 		if (type.equals("TABLE")) {
 	%>
+	<div id="viewTableSqlId" style="overflow: no; background-color: #FEFEFE; width: 100%; height: 90%; display: none;">
+		<textarea id="myTextarea" class="editor" name="myTextarea_editor"></textarea>
+	</div>
 		<div id="SQLWindow" style="min-height:100%; _height:100%; border: 2px; overflow: no; background-color: ButtonFace;">
 			<div class="tab-pane" id="tabPanel" style=" min-height:100%; _height:100%; ">
 
 					<div class="tab-page" id="tabpage_1" style=" min-height:100%; _height:100%;">
-						<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>General</span></h2>
+						<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='../../tree/dbimages/profiles.png' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>General</span></h2>
 						<div id='resultdiv_general' style="background-color:#FFFFFF; overflow:hidden; height:700px; width:95%">
 						<table style="border:0;">
 		                    <tr>
@@ -267,7 +278,7 @@
 		                    <label class="smallfont">&nbsp;&nbsp;Owner</label>
 		                    </td>
 		                    <td>
-		                    <input name="name" id="name" type="text" size="38" style="background:#f2f2f2" value="<%=owner%>" readonly />
+		                    <input name="name" id="name" type="text" size="38" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=owner%>" readonly />
 		                    </td>
 		                    </tr>
 		                    <tr>
@@ -275,11 +286,11 @@
 		                    <label class="smallfont">&nbsp;&nbsp;Name</label>
 		                    </td>
 		                    <td>
-		                    <input name="parameters" id="parameters" type="text" size="38" style="background:#f2f2f2" value="<%=objName%>"  readonly />
+		                    <input name="parameters" id="parameters" type="text" size="38" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=objName%>"  readonly />
 		                 	</td>
 		                 	</tr>
 		                 	</table>
-		                 	<fieldset>
+		                 	<fieldset class="smallfontlab">
 								<legend>Storage</legend>
 									<table style="border:0;">
 		                    			<tr>
@@ -287,10 +298,10 @@
 												 <label class="smallfont">&nbsp;&nbsp;Tablespace</label>
 									 		</td>
 									 		<td>
-		                    		 			<label class="smallfont">&nbsp;<input name="name2" id="name2" type="text" size="20" style="background:#f2f2f2" value="<%=tbp.getGetTablespace()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name2" id="name2" type="text" size="20" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetTablespace()%>" readonly /></label>
 		                    		 			<label class="smallfont">&nbsp;&nbsp;Initial Extent</label>
-		                    		 			<label class="smallfont">&nbsp;<input name="name3" id="name3" type="text" size="10" style="background:#f2f2f2" value="<%=strInitExtent%>" readonly /></label>
-		                    		 			<label class="smallfont">&nbsp;<input name="name4" id="name4" type="text" size="10" style="background:#f2f2f2" value="<%=strInitExtentUnit%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name3" id="name3" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=strInitExtent%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name4" id="name4" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=strInitExtentUnit%>" readonly /></label>
 		                    		 		</td>
 		                    		 	</tr>
 		                    		 	<tr>
@@ -298,10 +309,10 @@
 												 <label class="smallfont">&nbsp;&nbsp;%Free</label>
 									 		</td>
 									 		<td>
-		                    		 			<label class="smallfont">&nbsp;<input name="name5" id="name5" type="text" size="20" style="background:#f2f2f2" value="<%=tbp.getGetFree()%>" readonly /></label>
-		                    		 			<label class="smallfont">&nbsp;&nbsp;&nbsp;&nbsp;Next Extent</label>
-		                    		 			<label class="smallfont">&nbsp;<input name="name6" id="name6" type="text" size="10" style="background:#f2f2f2" value="<%=tbp.getGetNextExtent()%>" readonly /></label>
-		                    		 			<label class="smallfont">&nbsp;<input name="name7" id="name7" type="text" size="10" style="background:#f2f2f2" value="Bytes" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name5" id="name5" type="text" size="20" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetFree()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;&nbsp;&nbsp;Next Extent</label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name6" id="name6" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetNextExtent()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name7" id="name7" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" value="Bytes" readonly /></label>
 		                    		 		</td>
 		                    		 	</tr>
 		                    		 	<tr>
@@ -309,9 +320,9 @@
 												 <label class="smallfont">&nbsp;&nbsp;%Used</label>
 									 		</td>
 									 		<td>
-		                    		 			<label class="smallfont">&nbsp;<input name="name8" id="name8" type="text" size="20" style="background:#f2f2f2" value="<%=tbp.getGetUsed()%>" readonly /></label>
-		                    		 			<label class="smallfont">&nbsp;&nbsp;&nbsp;&nbsp;%Increase</label>
-		                    		 			<label class="smallfont">&nbsp;<input name="name9" id="name9" type="text" size="10" style="background:#f2f2f2" value="<%=tbp.getGetIncrease()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name8" id="name8" type="text" size="20" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetUsed()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;&nbsp;&nbsp;&nbsp; %Increase</label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name9" id="name9" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetIncrease()%>" readonly /></label>
 		                    		 		</td>
 		                    		 	</tr>
 		                    		 	<tr>
@@ -319,9 +330,9 @@
 												 <label class="smallfont">&nbsp;&nbsp;Ini Trans</label>
 									 		</td>
 									 		<td>
-		                    		 			<label class="smallfont">&nbsp;<input name="name10" id="name10" type="text" size="20" style="background:#f2f2f2" value="<%=tbp.getGetIniTrans()%>" readonly /></label>
-		                    		 			<label class="smallfont">&nbsp;&nbsp;&nbsp;&nbsp;Min Extents</label>
-		                    		 			<label class="smallfont">&nbsp;<input name="name11" id="name11" type="text" size="10" style="background:#f2f2f2" value="<%=tbp.getGetMinExtent()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name10" id="name10" type="text" size="20" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetIniTrans()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;&nbsp;&nbsp;Min Extents</label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name11" id="name11" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetMinExtent()%>" readonly /></label>
 		                    		 		</td>
 		                    		 	</tr>
 		                    		 	<tr>
@@ -329,47 +340,49 @@
 												 <label class="smallfont">&nbsp;&nbsp;Max Trans</label>
 									 		</td>
 									 		<td>
-		                    		 			<label class="smallfont">&nbsp;<input name="name12" id="name12" type="text" size="20" style="background:#f2f2f2" value="<%=tbp.getGetMaxTrans()%>" readonly /></label>
-		                    		 			<label class="smallfont">&nbsp;&nbsp;&nbsp;&nbsp;Max Extents</label>
-		                    		 			<label class="smallfont">&nbsp;<input name="name13" id="name13" type="text" size="10" style="background:#f2f2f2" value="<%=maxExtent%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name12" id="name12" type="text" size="20" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=tbp.getGetMaxTrans()%>" readonly /></label>
+		                    		 			<label class="smallfont">&nbsp;&nbsp;Max Extents</label>
+		                    		 			<label class="smallfont">&nbsp;<input name="name13" id="name13" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" value="<%=maxExtent%>" readonly /></label>
 		                    		 			<input type="checkbox" <%=strchk%>>Unlimited</input>
 		                    		 		</td>
 		                    		 	</tr>
 		                    		 </table>
 							</fieldset>
-							<fieldset>
+							<fieldset class="smallfontlab">
 								<legend>Cluster</legend>
-									<label class="smallfont">&nbsp;&nbsp;Name</label><input name="name14" id="name14" type="text" size="30" style="background:#f2f2f2" readonly />
-		                    		<label class="smallfont">&nbsp;&nbsp;Columns</label><input name="name15" id="name15" type="text" size="10" style="background:#f2f2f2" readonly />
+									<label class="smallfont">&nbsp;&nbsp;Name</label><input name="name14" id="name14" type="text" size="30" style="background:#f2f2f2; border-color: #eaeaea;" readonly />
+		                    		<label class="smallfont">&nbsp;&nbsp;Columns</label><input name="name15" id="name15" type="text" size="10" style="background:#f2f2f2; border-color: #eaeaea;" readonly />
 		                    		</label>
 
 							</fieldset>
-							<table style="border:0; width:480px;">
+							<table style="border:0; width:550px;">
 							<tr>
-							<td style="width:70%; ">
-							<fieldset style="width:100%" align="left">
+							<td style="width:60%; ">
+							<fieldset style="width:100%; font-size: 12px;" align="left">
 
 								<legend>Duration</legend>
 									<input type="checkbox">Temporary</input> <input type="checkbox">Preserve rows on commit</input>
 
 							</fieldset>
 							</td>
-							<td style="width:30%;">
-							<fieldset style="width:100%" align="right">
+							<td style="width:40%;">
+							<fieldset style="width:100%; font-size: 12px;" align="left">
 								<legend>Organization</legend>
-									<input type="checkbox" checked readonly>Heap</input> <input type="checkbox">Index</input>
+									<input type="checkbox" checked readonly>Heap</input>
+									<input type="checkbox">Index</input>
+									<input type="checkbox">External</input>
 							</fieldset>
 							</td>
 							</tr>
 							</table>
 							<a align="right" width="20px" height="25" class="smallfont">&nbsp;&nbsp;Comments</a>
-		                    <input name="name16" id="name16" type="text" size="50" style="background:#f2f2f2" value="<%=tbp.getGetComment()%>" readonly />
+		                    <input name="name16" id="name16" type="text" size="50" style="background:#f2f2f2; width: 480px; border-color: #eaeaea;" value="<%=tbp.getGetComment()%>" readonly />
 						</div>
 					</div>
 
 
 					<div class="tab-page" id="tabpage_2" style=" min-height:100%; _height:100%;">
-						<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Columns</span></h2>
+						<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='../../tree/dbimages/col.png' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Columns</span></h2>
 						<div id='resultdiv_columns' style="background-color:#FFFFFF; overflow:hidden; height:700px; width:95%">
 
 						<table style="border:0;">
@@ -378,13 +391,13 @@
 		                    		<label class="smallfont">&nbsp;&nbsp;Type owner</label>
 		                    	</td>
 		                    	<td>
-		                    		<input name="name17" id="name17" type="text" size="38" style="background:#f2f2f2;" value="" readonly />
+		                    		<input name="name17" id="name17" type="text" size="38" style="background:#f2f2f2; border-color: #eaeaea;" value="" readonly />
 		                    	</td>
 		                        <td align="right" style="width: 80px;">
 		                    		<label class="smallfont">&nbsp;&nbsp;Name</label>
 		                    	</td>
 		                    	<td>
-		                    		<input name="parameters2" id="parameters2" type="text" size="38" style="background:#f2f2f2;" value="" readonly />
+		                    		<input name="parameters2" id="parameters2" type="text" size="38" style="background:#f2f2f2; border-color: #eaeaea;" value="" readonly />
 		                 		</td>
 		                 	</tr>
 		                 </table>
@@ -400,7 +413,7 @@
 
 					</div>
 					<div class="tab-page" id="tabpage_3" style=" min-height:100%; _height:100%;">
-						<h2 class="tab" id="tabTitle_3"><img style="border:none" id='objIcoId_3' src='' align='absmiddle' /><span id="tmpImg_3" style="display:none"></span> <span id='objTitle_3'>Keys</span></h2>
+						<h2 class="tab" id="tabTitle_3"><img style="border:none" id='objIcoId_3' src='../../tree/dbimages/key.png' align='absmiddle' /><span id="tmpImg_3" style="display:none"></span> <span id='objTitle_3'>Keys</span></h2>
 						<div id='resultdiv_keys' style="background-color:#f2f2f2; overflow:hidden; height:700px; width:95%">
 		                 	<script>
 		                 		var keysqls="<%=keysql%>";
@@ -409,7 +422,7 @@
 		                 </div>
 					</div>
 					<div class="tab-page" id="tabpage_4" style=" min-height:100%; _height:100%;">
-						<h2 class="tab" id="tabTitle_4"><img style="border:none" id='objIcoId_4' src='' align='absmiddle' /><span id="tmpImg_4" style="display:none"></span> <span id='objTitle_4'>Checks</span></h2>
+						<h2 class="tab" id="tabTitle_4"><img style="border:none" id='objIcoId_4' src='../../tree/dbimages/key.png' align='absmiddle' /><span id="tmpImg_4" style="display:none"></span> <span id='objTitle_4'>Checks</span></h2>
 						<div id='resultdiv_checks' style="background-color:#f2f2f2; overflow:hidden; height:700px; width:95%">
 		                 	<script>
 		                 		var checksqls="<%=checksql%>";
@@ -418,7 +431,7 @@
 		                 </div>
 					</div>
 					<div class="tab-page" id="tabpage_5" style=" min-height:100%; _height:100%;">
-						<h2 class="tab" id="tabTitle_5"><img style="border:none" id='objIcoId_5' src='' align='absmiddle' /><span id="tmpImg_5" style="display:none"></span> <span id='objTitle_5'>Indexes</span></h2>
+						<h2 class="tab" id="tabTitle_5"><img style="border:none" id='objIcoId_5' src='../../tree/dbimages/index.png' align='absmiddle' /><span id="tmpImg_5" style="display:none"></span> <span id='objTitle_5'>Indexes</span></h2>
 						<div id='resultdiv_indexs' style="background-color:#f2f2f2; overflow:hidden; height:700px; width:95%">
 		                 	<script>
 		                 		var indexsqls="<%=indexsql%>";
@@ -427,13 +440,22 @@
 		                 </div>
 					</div>
 					<div class="tab-page" id="tabpage_6" style=" min-height:100%; _height:100%;">
-						<h2 class="tab" id="tabTitle_6"><img style="border:none" id='objIcoId_6' src='' align='absmiddle' /><span id="tmpImg_6" style="display:none"></span> <span id='objTitle_6'>Privileges</span></h2>
+						<h2 class="tab" id="tabTitle_6"><img style="border:none" id='objIcoId_6' src='../../tree/dbimages/roles.png' align='absmiddle' /><span id="tmpImg_6" style="display:none"></span> <span id='objTitle_6'>Privileges</span></h2>
 						<div id='resultdiv_privileges' style="background-color:#f2f2f2; overflow:hidden; height:700px; width:95%">
 		                 	<script>
 		                 		var privilegesqls="<%=privilegesql%>";
 		                 		DbObjectBean.getOther2(privilegesqls,['Grantee','Privilege','Grantable','Hierarchy'], showDataHtmlPrivileges);
 		                 	</script>
 		                 </div>
+					</div>
+					<div class="tab-page" id="tabpage_7" style=" min-height:100%; _height:100%;">
+						<h2 class="tab" id="tabTitle_7"><img style="border:none" id='objIcoId_7' src='../../tree/dbimages/ena_triggers.png' align='absmiddle' /><span id="tmpImg_7" style="display:none"></span> <span id='objTitle_7'>Triggers</span></h2>
+						<div id='resultdiv_triggers' style="background-color:#f2f2f2; overflow:hidden; height:700px; width:95%">
+							<script>
+								var triggersqls="<%=triggersql%>";
+								DbObjectBean.getOther2(triggersqls,['Owner','Name','Type','Event','Enabled'], showDataHtmlTriggers);
+							</script>
+						</div>
 					</div>
 			</div>
 				<%
@@ -481,19 +503,129 @@
 			<%
 				if (type.equals("TABLE")) {
 			%>
-			<table align="center" style="border:0;" width="98%" cellpadding="0" cellspacing="0">
-							<tr>
-								<td align="left" height="30px" valign="bottom">
-									<input type="button" value="  Apply  " onclick="" disabled>
-									<input type="button" value="Refresh" onclick="" disabled>
-									<input type="button" value=" Close  " onclick="closeWindowList();">
-									<input type="button" value="Help" onclick="" disabled>
-									<input type="button" value=" Query... " onclick="execQueryTable('<%=name%>','myTextarea')" disabled>
-								</td>
-							</tr>
-			</table>
+
+
+
+			<div>
+				<table align="center" style="border:0;" width="98%" cellpadding="0" cellspacing="0">
+					<tr>
+						<td align="left" height="30px" valign="bottom">
+							<input type="button" value="  Apply  " onclick="" disabled>
+							<input type="button" value="Refresh" onclick="" disabled>
+							<input type="button" value=" Close  " onclick="closeWindowList();">
+							<input type="button" value="Help" onclick="" disabled>
+							<input type="button" value=" Query... " onclick="execQueryTable('myTextarea', '<%=name%>')">
+						</td>
+						<td align="right" height="30px" valign="bottom">
+							<input type="button" value=" View SQL " onclick="initEditAreaFromTable('<%=name%>','myTextarea')">
+						</td>
+					</tr>
+				</table>
 			</div>
 
+			</div>
+			<script>
+				var initEditAreaFromTableFlag = false;
+				function initEditAreaFromTable(tn, en) {
+
+					$("tabPanel").style.display == "" ? $("tabPanel").style.display = "none" : $("tabPanel").style.display = "";
+					$("viewTableSqlId").style.display == "none" ? $("viewTableSqlId").style.display = "" : $("viewTableSqlId").style.display = "none";
+
+					if ( !initEditAreaFromTableFlag ) {
+						editAreaLoader.init({
+							id: en					// id of the textarea to transform
+							,start_highlight: true	// if start with highlight
+							,allow_resize: "both"
+							,allow_toggle: false
+							,word_wrap: false
+							,language: "en"
+							,syntax: "sql"
+							,show_line_colors: true
+							,fullscreen: false
+							,EA_load_callback: "editAreaLoaded"
+							,save_callback: "winsave"
+						});
+
+						initEditAreaFromTableFlag = true;
+
+					}
+
+					var cframe = parent.parent.editorFrame.GGETFRAME;
+					var getsql = "";
+					var viewTablesql="<%=viewTablesql%>";
+
+					DbObjectBean.getOther2(viewTablesql, ['ViewTable'], callViewTableSql);
+
+
+					function callViewTableSql(data) {
+						if(data[0][0] == "ReddragonflyErrorFlag*") {
+							errOracleMsg = data[0][1];
+							parent.parent.editorFrame.dhtmlx.alert({
+								title : "ERROR",
+								top: dAlertTop,
+								type : "alert-error",
+								text : data[0][1]
+							});
+						} else {
+							getsql =  data[1];
+							cframe.editAreaLoader.setValue(en, getsql);
+
+						}
+					}
+
+				}
+
+				function editAreaLoaded(id){
+
+					var editorFlag = false;
+
+
+					if (!editorFlag ) {
+						editAreaLoader.execCommand(id,'set_editable',editorFlag);
+					} else {
+						editAreaLoader.execCommand(id,'set_editable',editorFlag);
+						//self.setInterval(showPosition(frame, trRow),200);
+					}
+
+
+				}
+
+				function showPosition() {
+					//self.setInterval("console.log(1)",50);
+					document.getElementById('positionCurr').innerText = document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.line_start + ":" +
+							document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.curr_pos;
+
+				}
+
+				function winsave() {
+					f = "tmp.sql";
+					c = document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.full_text;
+					try {
+						save_record(f, c);
+					} catch (e) {
+						console.log(e);
+					}
+
+					function save_record(f, c) {
+						if (document.getElementById("downloada")) {
+							a = document.getElementById('downloada');
+							a.setAttribute('href','data:text/paint;utf-8,'+ c);
+							a.click();
+						} else {
+							var a = document.createElement('a');
+							a.setAttribute('href','data:text/paint;utf-8,'+ c);
+							a.setAttribute('download',f);
+							a.setAttribute('id','downloada');
+							//a.setAttribute('target','_blank');
+							a.style.display="none";
+							document.body.appendChild(a);
+							a.click();
+						}
+
+					}
+				}
+
+			</script>
 
 		<%
             } else {
@@ -637,9 +769,7 @@
 
 			function initOnload() {};
 			function detectCtrlKey(e) {};
-			function hiddenBaisworkMenu(e) {};
-			function showBaisworkMenu(t,m,e) {};
-			function addMyTextAreaKeyDown(c) {};
+
 
 		</script>
 
@@ -648,6 +778,11 @@
             }
         %>
 
+		<script>
+			function hiddenBaisworkMenu(e) {};
+			function showBaisworkMenu(t,m,e) {};
+			function addMyTextAreaKeyDown(c) {};
+		</script>
 
 
 
