@@ -372,7 +372,8 @@ function execResultFromSql(localsql,insertordelflag, callfun) {
 	// var oldtime = $time(); // mootools
 	var oldtime = new Date().getTime(); // 非 mootools 方法 $time()
 
-	BaisWorkBean.intOfInsertDelete(localsql, callfun);
+	( callfun == '') ? BaisWorkBean.intOfInsertDelete(localsql, callinsertdelback) : BaisWorkBean.intOfInsertDelete(localsql, callfun);
+
 
 	function callinsertdelback(intdata){
 	var newtime = (new Date().getTime() - oldtime) / 1000;
@@ -496,6 +497,7 @@ function execObject(localsql, oname) {
 	//左边树的选中节点重新加载，只有执行成功才重新加载
 	if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
 		if(parent.parent.editorToolFrame.nodeType == "root") {
+			if (!(parent.parent.leftFrame.tree.getSelected() == null))
             parent.parent.leftFrame.tree.getSelected().reload();
 		} else  {
 			selectedNote = parent.leftFrame.tree.getSelected();

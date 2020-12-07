@@ -973,7 +973,7 @@ function executeSQL(textareaname) {
 			var msge = "Don't show this message again";
 			if (!getIfwhere(textareaname, 0)) {
 				if (confirm(msg,"yes","no")) {
-					execResultFromSql(tempSql,deleteFlag, callinsertdelback);
+					execResultFromSql(tempSql,deleteFlag, '');
 				} else {
 					//处理一下点no时的按钮状态
 					breakRun("myTextarea");
@@ -981,10 +981,10 @@ function executeSQL(textareaname) {
 					setRollback(false);
 				}
 			} else {
-				execResultFromSql(tempSql,deleteFlag, callinsertdelback);
+				execResultFromSql(tempSql,deleteFlag, '');
 			}
 		} else {
-			execResultFromSql(tempSql,deleteFlag, callinsertdelback);
+			execResultFromSql(tempSql,deleteFlag, '');
  		}
  		//alert("delete or insert");
 		} else {
@@ -1013,6 +1013,9 @@ function executeSQL(textareaname) {
 		//changeExecute();
 
 		}
+
+
+        function callinsertdelback(d) {};
 
 }
 
@@ -1409,32 +1412,12 @@ function showDataHtml(rows,data) {
 
 	var strHeaderWidth = "";
 	var size = 100;
-	for(var i = 0; i < tcell; i++) {
-		var word = 8; //初定8个单词长度
-	    for( var ii = 0; ii < tlow ;  ii++) {
-	    	if ( data[ii][i].length > word ) word = data[ii][i].length;
-	    }
-
-	    if (word > 8 && word <= 15 ) size = 120;
-					else if  (word > 15 && word <= 20 ) size = 160;
-					else if  (word > 20 && word <= 30 ) size = 240;
-					else if  (word > 30 ) size = 300;
-    	if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
-    	else strHeaderWidth = strHeaderWidth + size + "," ;
-    }
-
-    var i = tlow;
-    var leftwidth = 20;
-    if ( i < 99 ) leftwidth = 20;
-    else if ( i < 999 && i >= 100 ) leftwidth = 36;
-    else if ( i < 9999 && i >= 1000 ) leftwidth = 52;
-    else if ( i < 99999 && i >= 10000 ) leftwidth = 68;
-    else if ( i < 999999 && i >= 100000 ) leftwidth = 84;
-
-    strHeaderWidth = leftwidth + "," + strHeaderWidth;
+    var strCelllMax = [];
+    var strCellRealMax = [];
+    // 定义默认扩展宽度
+    var def_wid = 20;
 
 
-	mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
 
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
     	errOracleMsg = data[0][1];
@@ -1445,6 +1428,48 @@ function showDataHtml(rows,data) {
 			text : data[0][1]
 		});
     } else {
+
+        for(var i = 0; i < tcell; i++) {
+            var word = 8; //初定8个单词长度
+            strCelllMax[i] = GGRIDHEADATTR[i][2];
+            strCellRealMax[i] = [];
+
+            for (var j = 0; j < data.length - 1; j++ ) {
+                strCellRealMax[i][j] = strLengthCorE(data[j+1][i]);
+            }
+
+            // 从大小到排序，最终第一列为最大值
+            strCellRealMax[i].sort(sortNumberDesc);
+
+            strCellRealMax[i] == '' ?  strCellRealMax[i][0] = strCelllMax[i][0] : strCellRealMax[i] = strCellRealMax[i];
+
+
+            // 如果最大值（某列空值就为0）仍然小于 column name 的长度，取 column name 的长度
+            strCellRealMax[i][0] < strLengthCorE(GGRIDHEADATTR[i][0]) ? strCellRealMax[i][0] = strLengthCorE(GGRIDHEADATTR[i][0]) : strCellRealMax[i][0] = strCellRealMax[i][0];
+
+            // 最后 Cell 宽度为 每个字符宽度8 * 当前结果集中字符串的最大长度 + 默认宽度
+            size  = word * strCellRealMax[i][0] + 10;
+
+            if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
+            else strHeaderWidth = strHeaderWidth + size + "," ;
+        }
+
+
+
+
+
+        var i = tlow;
+        var leftwidth = 20;
+        if ( i < 99 ) leftwidth = 20;
+        else if ( i < 999 && i >= 100 ) leftwidth = 36;
+        else if ( i < 9999 && i >= 1000 ) leftwidth = 52;
+        else if ( i < 99999 && i >= 10000 ) leftwidth = 68;
+        else if ( i < 999999 && i >= 100000 ) leftwidth = 84;
+
+        strHeaderWidth = leftwidth + "," + strHeaderWidth;
+
+
+        mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
 
     	mygrid.init();  //进行初始化
         mygrid.setEditable(false);
@@ -2006,6 +2031,22 @@ function getIfExec(textareaname, cflag) {
     return Flag;
 }
 
+
+//得到sql语句是否为 view edit
+//返回值： true or false
+// 2020-12-5
+function getIfViewOrEdit(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^view ","i") || tempStr.trim().test("^edit ","i")) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
+}
+
 //设置commit按钮的可用或不可用
 //true: 可用
 //false: 不可用
@@ -2557,8 +2598,8 @@ function showDataHtmlD(data) {
     }
 }
 
-//phanrider add by 2011-04-12
-//每个DIV调用的回调函数，会带上本地DIV名称调用真正显示函数 showDataHtmlReal
+// phanrider add by 2011-04-12
+// View Table 调用每个DIV调用的回调函数，会带上本地DIV名称调用真正显示函数 showDataHtmlReal
 function showDataHtmlKeys(data) {
 	var keydivname = 'resultdiv_keys';
 	showDataHtmlReal(data, keydivname);
@@ -2748,9 +2789,10 @@ function showNewObject(type,name,parameters,returnType,operate,nodetype,tablelis
 //field: 1 为 右键菜单 调用，其他调用为空   by  phanrider 2011-4-21
 //operate: 用户对象的操作，即View、Edit
 function showViewObject(type,name,field,operate) {
-	if (field == '') selectedNote = tree.getSelected();
 
-    //this.id = parent.parent.leftFrameList.GTDID
+	// if (field == '') selectedNote = tree.getSelected();
+
+    // this.id = parent.parent.leftFrameList.GTDID
 
 	var url = "../editor/ViewWindow/";
 	url = url + operate + ".jsp" + "?name=" + name + "&type=" + type ;
@@ -4066,6 +4108,7 @@ function keyDownInterface(e) {
 		stmp = currstr.substr(0, currstrpos-1).trim().split(" ");
 		if ((s_after == "" || s_after == " ") && e.keyCode != 32 && s_before != " " ) {
 			s = stmp[stmp.length - 1].trim();
+			s = s.replaceAll('\$', '\\$');
 			if ( e.keyCode != 38 && e.keyCode != 40 && e.keyCode != 13  && e.keyCode != 16  && e.keyCode != 17 && e.keyCode != 18 && e.keyCode != 19  ) {
 				if (e.keyCode >= 112 && e.keyCode <= 123) {
                     clearAutoCompletion();
@@ -4139,13 +4182,16 @@ function keyDownInterface(e) {
 	// s为关键词数组
 	function autoMacth(r, v, s) {
 		var sa = [];
+        //最多显示条数
+        var maxTitleRow = 200;
 		if ( v.length > 0 ) {
 			for ( var i = 0 ; i < s.length; i++ ) {
 				//检验数据是否为空并且用正则取数据，并且去掉完全匹配的数据
 				if( v.length > 0 && r.exec(s[i][0]) != null && v.length < s[i][0].length ){
 					sa.push(s[i]);
  				}
-			}
+                if (sa.length > maxTitleRow) i = s.length;
+            }
 			sa.length > 0 ? setAutoCompletion(sa) : clearAutoCompletion();
 
 		} else {
@@ -4364,6 +4410,23 @@ function chcolor(e) {
 	eobj.selection_field.setAttribute('class','show_colors_e');
 	eobj.focus();
     // console.log(e);
+}
+
+
+// 计算 column 实际长度
+function  strLengthCorE(s) {
+    var rst = /[\u0000-\u00FF]|[\uFF61-\uFF9F]|[\uFFE8-\uFFEE]/;    // 英文匹配
+    var sl = 0;
+    for ( var i = 0; i < s.length; i++ ) {
+        rst.test(s.charAt(i)) == true ? sl = sl + 1 : sl = sl + 2;    // 中文算两个长度
+    }
+    return sl;
+}
+
+// 从大到小排序
+function sortNumberDesc(a,b)
+{
+    return b - a;
 }
 
 

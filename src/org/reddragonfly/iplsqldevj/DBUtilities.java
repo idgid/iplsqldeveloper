@@ -217,8 +217,14 @@ public abstract class DBUtilities {
 				rs = db.getRS(querySql);
 			}
 			while (rs.next()) {
-				for (int i=1; i<=rs.getMetaData().getColumnCount(); i++)
-				ret.append(rs.getString(i));
+				for (int i=1; i<=rs.getMetaData().getColumnCount(); i++) {
+					if ( "LONG".equals( rs.getMetaData().getColumnTypeName(i)) ) {
+						ret.append( db.getLongForView(rs, i) ) ;
+					} else {
+						ret.append( CharSet.nullToEmpty(rs.getString(i)));
+					}
+				}
+
 				ret.append("<br/>");
 			}
 			//System.out.println(ret);

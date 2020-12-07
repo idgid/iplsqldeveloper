@@ -373,6 +373,22 @@
 
 
                         dFlag = 0;
+                    } else if (parent.parent.editorToolFrame.getIfViewOrEdit(command, 1)) {
+                        // 未调用回调函数，直接清除状态
+                        breakRun('');
+                        parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+
+                        // 以空格截取字符串最后一个子串
+                        var c1 = command.trim().split(" ")[command.trim().split(" ").length-1];
+                        var c0 = command.trim().split(" ")[0];
+                        for ( var i = 0; i < titleUserObject.length ; i++) {
+                            if ( c1.toLowerCase() == titleUserObject[i][0]) {
+                                parent.parent.editorToolFrame.showViewObject(titleUserObject[i][1], c1, '', c0.replace(c0[0],c0[0].toUpperCase()));
+                                i = titleUserObject.length;
+                            }
+                        }
+
+                        dFlag = 0;
                     } else if (parent.parent.editorToolFrame.getIfExec(command, 1)) {
                         // 以'('截取字符串最后一个子串
                         var c1 = command.trim().split("(")[0];
@@ -801,9 +817,6 @@
         var cNumWidth = 6.60938;  // 每个字符的宽度
         // textarea 滚动计算
         var tclientHeight = 0, tScrollTop = 0, tScrollHeight = 0;
-        // var tclientHeight = tmpstr.result.clientHeight;  // 当前可视域的高度
-        // var tScrollTop = tmpstr.result.scrollTop;	// 滚动了多少px
-        // var tScrollHeight = tmpstr.result.scrollHeight; // 当前 textarea 最大高度，含不可见视域
 
         var tHeight = 16;  // 行高
         var tScrollRow = "";
