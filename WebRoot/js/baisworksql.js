@@ -452,6 +452,7 @@ function execObject(localsql, oname) {
 		rows = intdata[0][1];
 		parent.parent.parent.editorFrame.GGETFRAME.GERRORPROCINFO = [];
 
+		// 警告信息显示与定位
 		if (intdata.length > 1) {
 			var bk = "";
 			for ( var i = 1; i < intdata.length; i++ ) {

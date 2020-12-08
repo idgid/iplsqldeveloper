@@ -1020,25 +1020,28 @@ function executeSQL(textareaname) {
 }
 
 //FUN执行控制
-function executeFUN(sqlString,currWindoType) {
+function executeFUN(sqlString,currWindowType) {
 	//设置TAB页面的Title, 去掉editor标记
 	var c = parent.parent.editorFrame.GGETFRAME;
 	var tmps = c.editAreaLoader.setFileEditedMode(gMyTextArea, 'funEditorId', false);
 	var tmpv = c.editAreaLoader.getValue(gMyTextArea);
-	if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
-		|| currWindoType == "PAB" || currWindoType == "TYP" || windowType == "TYB") {
+	if (currWindowType == "FUN" || currWindowType == "PRO" || currWindowType == "PAC"
+		|| currWindowType == "PAB" || currWindowType == "TYP" || currWindowType == "TYB"
+        || currWindowType == "TRI" ) {
 
-	     if (currWindoType == "FUN" || currWindoType == "PRO" ) {
+	     if (currWindowType == "FUN" || currWindowType == "PRO" ) {
              tmpv = tmpv.split('(')[0].trim().split(' ');
              tmpv = tmpv[tmpv.length-1];
-         } else if ( currWindoType == "PAC") {
+         } else if ( currWindowType == "PAC") {
              tmpv = tmpv.match(/package([\s\S]*?)is/i)[1].trim();
-         } else if (windowType == "PAB") {
+         } else if (currWindowType == "PAB") {
              tmpv = tmpv.match(/package[\s]*body([\s\S]*?)is/i)[1].trim();
-         } else if ( currWindoType == "TYP") {
+         } else if ( currWindowType == "TYP") {
              tmpv = tmpv.match(/type([\s\S]*?)as/i)[1].trim();
-         } else if (windowType == "TYB") {
+         } else if (currWindowType == "TYB") {
              tmpv = tmpv.match(/type[\s]*body([\s\S]*?)is/i)[1].trim();
+         } else if (currWindowType == "TRI") {
+             tmpv = tmpv.match(/trigger [\s]*([\s\S]*?) /i)[1].trim();
          }
 	}
 
@@ -2900,11 +2903,12 @@ function recompile(objectType, objectName, debugFlag) {
 
 	//左边树的选中节点重新加载，只有执行成功才重新加载
 	if(tcell == 2 && intdata[0][0] == "ReddragonflySuccessFlag*") {
-			parent.parent.editorFrame.dhtmlx.alert({
-				type: "alert-warning",
-				top: dAlertTop,
-				text: oracleTitle
-			});
+	        if (rows != "")
+                parent.parent.editorFrame.dhtmlx.alert({
+                    type: "alert-warning",
+                    top: dAlertTop,
+                    text: oracleTitle
+                });
 			parent.leftFrame.tree.getSelected().getParent().reload();  //父节点刷新
 		}
 	}
@@ -3629,7 +3633,8 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 			var tmpv = "";
 			var eFlagStr = "";
 			if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
-				|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB") {
+				|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
+                || windowType == "TRI") {
 				tmpv = titleStr.split('(')[0].trim().split(' ');
                 eFlagStr = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.is_editable;
             }

@@ -3,7 +3,10 @@ package org.reddragonfly.iplsqldevj.bean.dbbean;
 import java.sql.ResultSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import jxl.biff.drawing.Chart;
 import org.apache.struts2.ServletActionContext;
+import org.reddragonfly.iplsqldevj.bean.CharSet;
 import org.reddragonfly.iplsqldevj.bean.UserBean;
 import com.opensymphony.xwork2.ActionContext;
 
@@ -74,11 +77,12 @@ public class DbRootBean extends DbBean{
 		String sql = null;
 		String validIcon = null;
 		String inValidIcon = null;
+		String validIconDisable = null;
+		String inValidIconDisable = null;
 		String subType = null;
 		//phanrider 修改 object_name 由owner||'.'||object_name组成，这样properties与describe处理ALL OBJECTS时才能正常显示 2009-07-20
 		//对于as sysoper 这一问题有bug
-		//对于Triggers会有status的区别，如果是disable，则显示灰化的图标 --这一处还未能修改，即未实现
-		//可以从dba_triggers或者user_triggers视图中的status是否为Disable或Enable得到
+
 		String ubname = ub.getUsername().toUpperCase();
 		String[] ownerName=ubname.split("\\ ",2);
 		ubname = ownerName[0];
@@ -145,14 +149,16 @@ public class DbRootBean extends DbBean{
 			inValidIcon = DbTypebodyBean.ICON_INVALID;
 			subType = DbTypebodyBean.TYPE;
 		}else if(fieldName.equals(FIELDS[8])){   //Triggers
-			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'TRIGGER' order by object_name asc) " +
+			if(ub.getDbglobal()) sql = "select * from (select object_name,status,(select status from user_triggers utr where utr.trigger_name=uob.object_name and rownum=1) isenable  from user_objects uob where object_type = 'TRIGGER' order by object_name asc) " +
 					"union all " +
-					"select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'TRIGGER' and owner != '"+ubname+"' order by object_name asc)";
+					"select * from (select owner||'.'||object_name object_name,status,(select status from all_triggers atr where atr.trigger_name=aob.object_name and atr.owner = aob.owner and rownum=1) isenable from all_objects aob where object_type = 'TRIGGER' and owner != '"+ubname+"' order by object_name asc)";
 			else if (!name.equals("")) {
-				sql = "select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'TRIGGER' and owner = '"+name+"' order by object_name asc)";
-			}else sql = "select object_name,status from user_objects where object_type = 'TRIGGER' order by object_name asc";
+				sql = "select * from (select owner||'.'||object_name object_name,status,(select status from all_triggers atr where atr.trigger_name=aob.object_name and atr.owner = aob.owner and rownum=1) isenable from all_objects aob where object_type = 'TRIGGER' and owner != '"+name+"' order by object_name asc)";
+			}else sql = "select object_name,status,(select status from user_triggers utr where utr.trigger_name=uob.object_name and rownum=1) isenable  from user_objects uob where object_type = 'TRIGGER' order by object_name asc";
 			validIcon = DbTriggerBean.ICON_VALID;
 			inValidIcon = DbTriggerBean.ICON_INVALID;
+			validIconDisable = DbTriggerBean.ICON_VALID_DISABLE;
+			inValidIconDisable = DbTriggerBean.ICON_INVALID_DISABLE;
 			subType = DbTriggerBean.TYPE;
 		}else if(fieldName.equals(FIELDS[9])){   //Java sources
 			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'JAVA SOURCE' order by object_name asc) " +
@@ -333,10 +339,19 @@ public class DbRootBean extends DbBean{
 				int i = 0;
 				while(rs.next()){
 					i = 1;
-					String objectName = rs.getString(1);
-					String status = rs.getString(2);
+					String objectName =  CharSet.nullToEmpty(rs.getString(1));
+					String status =  CharSet.nullToEmpty(rs.getString(2));
 					String icon = validIcon;
 					if("INVALID".equals(status)) icon = inValidIcon;
+
+					// 2020-12-6 增加对 trigger 的 disabled/enabled 的图标显示处理
+					if (fieldName.equals(FIELDS[8])) {
+						String disFlag =  CharSet.nullToEmpty(rs.getString(3));
+						if (disFlag.equals("DISABLED")) {
+							if("INVALID".equals(status)) icon = inValidIconDisable;
+							else icon = validIconDisable;
+						}
+					}
 					//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
 					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName.replaceAll("#","%23")+"','',event)\"/>");
 				}
@@ -365,11 +380,11 @@ public class DbRootBean extends DbBean{
 		String sql = null;
 		String validIcon = null;
 		String inValidIcon = null;
+		String validIconDisable = null;
+		String inValidIconDisable = null;
 		String subType = null;
 		//phanrider 修改 object_name 由owner||'.'||object_name组成，这样properties与describe处理ALL OBJECTS时才能正常显示 2009-07-20
 		//对于as sysoper 这一问题有bug
-		//对于Triggers会有status的区别，如果是disable，则显示灰化的图标 --这一处还未能修改，即未实现
-		//可以从dba_triggers或者user_triggers视图中的status是否为Disable或Enable得到
 		String ubname = ub.getUsername().toUpperCase();
 		String[] ownerName=ubname.split("\\ ",2);
 		ubname = ownerName[0];
@@ -422,12 +437,14 @@ public class DbRootBean extends DbBean{
 			inValidIcon = DbTypebodyBean.ICON_INVALID;
 			subType = DbTypebodyBean.TYPE;
 		}else if(fieldName.equals(FIELDS[8])){   //Triggers
-			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'TRIGGER' and object_name = '" + name + "' order by object_name asc) " +
+			if(ub.getDbglobal()) sql = "select * from (select object_name,status,(select status from user_triggers utr where utr.trigger_name=uob.object_name and rownum=1) isenable  from user_objects uob where object_type = 'TRIGGER' and object_name = '" + name + "' order by object_name asc) " +
 					"union all " +
-					"select * from (select owner||'.'||object_name object_name,status from all_objects where object_type = 'TRIGGER' and owner != '"+ubname+"' and object_name = '" + name + "' order by object_name asc)";
-			else sql = "select object_name,status from user_objects where object_type = 'TRIGGER' order by object_name asc";
+					"select * from (select owner||'.'||object_name object_name,status,(select status from all_triggers atr where atr.trigger_name=aob.object_name and atr.owner = aob.owner and rownum=1) isenable from all_objects aob where object_type = 'TRIGGER' and owner != '"+ubname+"' and object_name = '" + name + "' order by object_name asc)";
+			else sql = "select object_name,status,(select status from user_triggers utr where utr.trigger_name=uob.object_name and rownum=1) isenable  from user_objects uob where object_type = 'TRIGGER' order by object_name asc";
 			validIcon = DbTriggerBean.ICON_VALID;
 			inValidIcon = DbTriggerBean.ICON_INVALID;
+			validIconDisable = DbTriggerBean.ICON_VALID_DISABLE;
+			inValidIconDisable = DbTriggerBean.ICON_INVALID_DISABLE;
 			subType = DbTriggerBean.TYPE;
 		}else if(fieldName.equals(FIELDS[9])){   //Java sources
 			if(ub.getDbglobal()) sql = "select * from (select object_name,status from user_objects where object_type = 'JAVA SOURCE' and object_name = '" + name + "' order by object_name asc) " +
@@ -562,6 +579,14 @@ public class DbRootBean extends DbBean{
 					String status = rs.getString(2);
 					String icon = validIcon;
 					if("INVALID".equals(status)) icon = inValidIcon;
+					// 2020-12-6 增加对 trigger 的 disabled/enabled 的图标显示处理
+					if (fieldName.equals(FIELDS[8])) {
+						String disFlag =  CharSet.nullToEmpty(rs.getString(3));
+						if (disFlag.equals("DISABLED")) {
+							if("INVALID".equals(status)) icon = inValidIconDisable;
+							else icon = validIconDisable;
+						}
+					}
 					//客户端脚本已经重写了onmouseover事件，事实上在客户端为onmouseup事件，这是出于鼠标右键的考虑
 					sb.append("<tree text=\"" + objectName + "\" src=\"showTree.action?type="+subType+"&amp;name="+objectName.replaceAll("#","%23")+"&amp;field=\" icon=\""+ icon +"\" openIcon=\""+ icon +"\" onblur=\"hideMenu()\" onmouseover=\"showAppointedMenu('"+subType+"','"+objectName+"','',event)\"/>");
 				}

@@ -644,14 +644,25 @@ public class BaisWorkBean {
 
 	public List execObjectCompile(String objectType, String objectName, int debugFlag) {
 		String success = "";
-		if (debugFlag == 1) {
+		if (debugFlag == 0) { // recompile
+			this.sql = "ALTER " + objectType + " " + objectName + " COMPILE";
+			if (objectType.equals("package body"))
+				this.sql = "ALTER PACKAGE " + objectName + " COMPILE BODY";
+			if (objectType.equals("type body"))
+				this.sql = "ALTER TYPE " + objectName + " COMPILE BODY";
+			success = "Compiled succesfully";
+		} else if (debugFlag == 1){ // add debug info
 			this.sql = "ALTER " + objectType + " " + objectName + " COMPILE DEBUG";
 			if (objectType.equals("package body"))
 				this.sql = "ALTER PACKAGE " + objectName + " COMPILE DEBUG BODY";
 			if (objectType.equals("type body"))
 				this.sql = "ALTER TYPE " + objectName + " COMPILE DEBUG BODY";
 			success = "Debug information added";
-		} else {
+		} else if (debugFlag == 2){ // // trigger enable
+			this.sql = "ALTER " + objectType + " " + objectName + " ENABLE";
+		} else if (debugFlag == 3){ // // trigger disable
+			this.sql = "ALTER " + objectType + " " + objectName + " DISABLE";
+		} else { // old recompile
 			this.sql = "ALTER " + objectType + " " + objectName + " COMPILE";
 			if (objectType.equals("package body"))
 				this.sql = "ALTER PACKAGE " + objectName + " COMPILE BODY";
