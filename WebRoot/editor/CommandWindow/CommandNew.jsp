@@ -23,14 +23,16 @@
 
 	<script type="text/javascript" src="../../js/cb2.js"></script>
 	<script type="text/javascript" src="../../js/others.js"></script>
-	<script type="text/javascript" src="../../js/baisworksql.js"></script>
+    <script type="text/javascript" src="../../js/baisworksql.js"></script>
     <script type="text/javascript" src="../../js/tabpane.js"></script>
     <script type="text/javascript" src="../../js/jsterm/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/jquery.terminal.min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/jquery.mousewheel-min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/keyboard.js"></script>
+    <script type="text/javascript" src="../../js/edit_area/edit_area_full.js"></script>
 
-	<!--以下是dwr的必备js  -->
+
+    <!--以下是dwr的必备js  -->
 	<script type='text/javascript' src='../../dwr/interface/BaisWorkBean.js'></script>
     <script type='text/javascript' src='../../dwr/interface/DbObjectBean.js'></script>
     <script type='text/javascript' src='../../dwr/engine.js'></script>
@@ -77,24 +79,25 @@
 		float: left;
 	}
     .dynamic-tab-pane-control .tab-page {
-        height:		100%;
-        display: block;
-        overflow: auto;
+        height:	100%;
+        padding: 0px;
     }
-    .dynamic-tab-pane-control .tab-page::after {
-        height:		100%;
-        display: block;
-        height: 26px;
-        content:'';
-        visibility: hidden;
-    }
+    /*.dynamic-tab-pane-control .tab-page::after {*/
+        /*height:		500px;*/
+        /*display: block;*/
+        /*height: 26px;*/
+        /*content:'';*/
+        /*visibility: hidden;*/
+    /*}*/
 
     .dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
         height:		100px;
-        display: block;
-        overflow: auto;
-
     }
+
+    .dynamic-tab-pane-control.tab-pane {
+        margin:	0px;
+    }
+
     .dynamic-tab-pane-control h2 {
         text-align:	center;
         width:		auto;
@@ -128,7 +131,7 @@
 
         position: fixed;
         left: 0px;
-        bottom: 0px;
+        bottom: -2px;
         width: 100%;
         height: 26px;
         z-index: 9999;
@@ -142,9 +145,9 @@
 	#CommandSQLWindowContainer{
 		display: flex;
 		flex-direction: column;
-		height: 99%;
+		height: 100%;
 		overflow: no;
-		background-color: #FFF;
+		background-color: #F0F0F0;
 		border: 0px;
 	}
 
@@ -194,22 +197,38 @@
 </style>
 <body ondragstart="return false" oncontextmenu="return false">
 <div id="CommandSQLWindowContainer">
-    <div class="main" id="commandTerm" name="commandTerm">	</div>
-    <div id="autoCompletion" name="autoCompletion"></div>
-    <%--<div class="tab-pane" id="tabPanel" style=" min-height:90%; _height:90%; ">--%>
-        <%--<div class="tab-page" id="tabpage_1" style=" min-height:90%; _height:100%;">--%>
-            <%--<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>Dialog</span></h2>--%>
+    <%--<div class="main" id="commandTerm" name="commandTerm">	</div>--%>
+    <%--<div id="autoCompletion" name="autoCompletion"></div>--%>
+    <div class="tab-pane" id="commandtabPanel" style=" height:100px; ">
+        <div id="autoCompletion" name="autoCompletion" class="hide" style="display: none;"></div>
+        <div class="tab-page" id="tabpage_1" style=" height:100px;">
+            <h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>Dialog</span></h2>
 
-            <%--<div class="main" id="commandTerm" name="commandTerm">	</div>--%>
-            <%--<div id="autoCompletion" name="autoCompletion"></div>--%>
-        <%--</div>--%>
-        <%--<div class="tab-page" id="tabpage_2" style=" min-height:90%; _height:100%;">--%>
-            <%--<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Editor</span></h2>--%>
+            <div class="main" id="commandTerm" name="commandTerm">	</div>
 
-            <%--<span>test</span>--%>
-        <%--</div>--%>
+        </div>
+        <div class="tab-page" id="tabpage_2" style=" height:100px;">
+            <h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>Editor</span></h2>
 
-    <%--</div>--%>
+            <textarea id="myTextarea" class="editor" name="myTextarea_command_editor"></textarea>
+
+        </div>
+        <script type="text/javascript">
+            var ctHeightObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('CommandSQLWindowContainer');
+            var ctpageObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_1');
+            var ctpageEditorObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_2');
+
+            var deHeight = 47; // footer 24px + tabtitle 23 px
+            var ctpageHeight = ctHeightObj.clientHeight - deHeight;
+            ctpageObj.style.height = ctpageHeight + "px";
+            ctpageEditorObj.style.height = ctpageHeight + "px";
+
+            var commandTabPane = new WebFXTabPane( document.getElementById( "commandtabPanel" ), true );
+            commandTabPane.setSelectedIndex(1);
+
+        </script>
+
+    </div>
     <footer id="foot_outputDiv" class="footer">
         <table border="0" id="toolBar_footer" style="background: ButtonFace;"
                cellspacing="1" width="100%">
@@ -648,19 +667,18 @@
 			}
 
 		}, {
-			greetings: greetingsTitle,
-			prompt: "SQL> ",
+            height: ctpageHeight + 6,  // 修正底部高度 当前窗口高度 + 6px
+            greetings: greetingsTitle,
+            prompt: "SQL> ",
             keydown: function (event) {
 			    setTimeout(function() {
                     commandTimeE = new Date().getTime();
 			        return keyUpInterfaceForCommand(event, 0, 0, 0, 0, 96, 'commandTerm');
-                }, 100);
+                }, 50);
             },
 			keymap: {
                 ARROWUP: function(e, original) {
-                    if (document.getElementById("autoCompletion").style.display == "none")  {
-                        this.set_command(this.history().previous());
-                    }
+                    if (document.getElementById("autoCompletion").style.display == "none" )  this.set_command(this.history().previous());
                 },
                 ARROWDOWN: function(e, original) {
                     if (document.getElementById("autoCompletion").style.display == "none")  this.set_command(this.history().next());
@@ -676,6 +694,7 @@
                                 this.insert('\n');
                         }
                     }
+
 
 				}
 			}
@@ -812,13 +831,13 @@
         var autoElemCss={ focus:{'color':'#fff','background':'#0078d7', '-moz-outline-style': 'none', 'outline': 'none' }, blur:{'color':'#000','background':'#fff'} };
         var startX = 43;  // padding 10px + "SQL> " 长度 33px
         var startPadding = 10;  // padding 10px
-        var startY = 14;
+        var startY = 23;   // tabpage 高度 23
         var cNumHeight = 16;
         var cNumWidth = 6.60938;  // 每个字符的宽度
         // textarea 滚动计算
         var tclientHeight = 0, tScrollTop = 0, tScrollHeight = 0;
 
-        var tHeight = 16;  // 行高
+        var tHeight = 14;  // 行高
         var tScrollRow = "";
 
         // startX = sx, startY = sy, cNumHeight = ch, cNumWidth = cw, tHeight = th;
@@ -828,21 +847,23 @@
 
         var ctermX = startX;
 
-        var ctermY = cterm[3].trim().split(':')[1];
+        var ctermY = cterm[4].trim().split(':')[1];
 
-        cNumWidth = cterm[0].trim().split(':')[1];
+        cNumWidth = cterm[1].trim().split(':')[1];
 
-        tclientHeight = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('CommandSQLWindowContainer').clientHeight;
+        tclientHeight = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('commandTerm').style.height;
+        tclientHeight = tclientHeight.replace('px','');
 
         currstr = term.before_cursor(), currstrpos = term.get_position(), currline = 1;
 
         ctermX = startX + cNumWidth * (currstrpos + 1);
         ctermY = parseInt(ctermY);
-        tclientHeight = parseInt(tclientHeight);
+        tclientHeight = parseInt(tclientHeight) - 10;  // 减去底部预留大小
 
-        if (!isNaN(ctermY)) ctermY = ctermY + tHeight;
+        if (!isNaN(ctermY)) ctermY = ctermY + startY + tHeight;
 
-        if (ctermY + th >= tclientHeight) ctermY = ctermY - th - tHeight * 2;
+        // 如果超出了底部，则重新在该行上部显示
+        //if (ctermY + th >= tclientHeight) ctermY = ctermY - th - tHeight * 2;
 
         tScrollTop = 0, tScrollHeight = 370;
 
@@ -877,7 +898,10 @@
             currstr = currstr.split('\n');
             // 先取得换了几行
             currBrTmp = currstr.length;
-            ctermY += (currBrTmp - 1) * startY;
+            ctermY += (currBrTmp - 1) * tHeight;
+            // 如果超出了底部，则重新在该行上部显示
+            if (ctermY >= tclientHeight ) ctermY = tclientHeight;
+            if (ctermY + th >= tclientHeight) ctermY = ctermY - th - tHeight * 2;
 
 
             currstr = currstr[currstr.length-1];
@@ -968,7 +992,7 @@
         function autoMacth(r, v, s) {
             var sa = [];
             //最多显示条数
-            var maxTitleRow = 200;
+            var maxTitleRow = 100;
             if ( v.length > 0 ) {
                 for ( var i = 0 ; i < s.length; i++ ) {
                     //检验数据是否为空并且用正则取数据，并且去掉完全匹配的数据
@@ -1016,9 +1040,6 @@
 
                 //检验table下面的 tr 标签的数量，以此确定是否将“提示”列表显示
                 if (autoCompletionObj.getElementsByTagName('tr').length){
-                    var tmpTopHeight = currline * cNumHeight;
-                    tmpTopHeight = ctermY;
-                    tmpTopHeight < 0 ? tmpTopHeight = cNumHeight : tmpTopHeight;
                     autoCompletionObj.style.left = ctermX + "px";
                     autoCompletionObj.style.top = ctermY + "px";
                     autoCompletionObj.style.display = "";
@@ -1066,8 +1087,11 @@
             parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag = false;
             GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
 
-            term.enable();
-            term.focus();
+            setTimeout(function() {
+                term.enable();
+                term.focus();
+                }, 50);
+
         }
 
         // 在当前光标位置插入关键词的后几个字符串（按键或当前 A 标签点击）
@@ -1175,9 +1199,46 @@
                 replaceCurrPostionStr( this.childNodes[0].data );
                 clearAutoCompletion();
             }
+
         }
 
         return e;
+    }
+
+
+
+    // second tab init
+    editAreaLoader.init({
+        id: "myTextarea",	// id of the textarea to transform
+        start_highlight: true,	// if start with highlight
+        allow_resize: "both",
+        allow_toggle: false,
+        word_wrap: false,
+        language: "en",
+        syntax: "sql",
+        show_line_colors: true,
+        fullscreen: false,
+        EA_load_callback: "editAreaLoaded",
+        save_callback: "winsave"
+    });
+
+    function editAreaLoaded(id){
+
+        //self.setInterval("showPosition()",200);
+
+
+        if(id=="myTextarea")
+        {
+            commandTabPane.setSelectedIndex(0);
+             return 0;
+        }
+    }
+
+    function showPosition() {
+        //self.setInterval("console.log(1)",50);
+        document.getElementById('positionCurr').innerText = document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.line_start + ":" +
+            document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.curr_pos;
+
     }
 
 	function initOnload() {};

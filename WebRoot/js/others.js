@@ -4061,9 +4061,9 @@ function keyDownInterface(e) {
 	var titleUserObject = parent.parent.parent.topFrame.UserObject;
 	var autoUl = document.getElementById("auto_ul");
 	var regE = RegExp('^' + "", "i");
-	var autoCompletionObj = $("autoCompletion");
-	var autoUlObj = $("auto_ul");
+	var autoCompletionObj = document.getElementById("autoCompletion");
     var tmpstr = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea;
+    var commandEditorObj = parent.parent.parent.editorFrame.GGETFRAME.document.getElementsByName('myTextarea_command_editor');
     var currstr = tmpstr.last_selection.curr_line;
     var currstrpos = tmpstr.last_selection.curr_pos;
     var currline = tmpstr.last_selection.line_start;
@@ -4076,7 +4076,7 @@ function keyDownInterface(e) {
     var aArray = [];
     var autoElemCss={ focus:{'color':'#fff','background':'#0078d7', '-moz-outline-style': 'none', 'outline': 'none' }, blur:{'color':'#000','background':'#fff'} };
     var startX = 45;
-    var startY = 15;
+    var startY = 0;
     var cNumHeight = 16;
     var cNumWidth = 7.35;
 	// textarea 滚动计算
@@ -4085,10 +4085,13 @@ function keyDownInterface(e) {
 	var tScrollHeight = tmpstr.result.scrollHeight; // 当前 textarea 最大高度，含不可见视域
 	var tHeight = 15;  // 行高
 	var tScrollRow = Math.round(tScrollTop / tHeight);
+	var tabPageHeight = 23; // command 窗口 tab title padding 高度 23px
 	currline =  currline - tScrollRow;
 
     // 测试数据
     // titleUserObject = [['abc','table'],['abcd','table'],['abce','view'],['bbcc','table']];
+
+    if ( commandEditorObj.length > 0 ) startY = tabPageHeight;
 
 	GtitleShowFlag = parent.parent.parent.editorFrame.GGETFRAME.GtitleShowFlag;
 
@@ -4239,6 +4242,7 @@ function keyDownInterface(e) {
             if (autoCompletionObj.getElementsByTagName('tr').length){
             	var tmpTopHeight = currline * cNumHeight;
 				tmpTopHeight < 0 ? tmpTopHeight = cNumHeight : tmpTopHeight;
+                tmpTopHeight += startY;
             	autoCompletionObj.style.left = startX + (currstrpos - 1)* cNumWidth + "px";
 				autoCompletionObj.style.top = tmpTopHeight + "px";
 				autoCompletionObj.style.display = "";
