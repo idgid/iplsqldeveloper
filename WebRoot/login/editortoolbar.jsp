@@ -155,7 +155,7 @@ table {
 
 							var toprightcells0 = document.getElementById('topToolBar').rows[0].cells;
 
-							for (var i = 0; i < 15; i++)
+							for (var i = 0; i < 16; i++)
 							{
 								createButton(toprightcells0[i]);
 								//rightcells[i].setToggle(true);

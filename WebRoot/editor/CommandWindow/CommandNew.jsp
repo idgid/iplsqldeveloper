@@ -237,7 +237,7 @@
                     <img id='execIsRunButton' src="../../images/exec_norun.gif"
                          align="absmiddle">
                 </td>
-                <td tabIndex="1" onclick="">
+                <td tabIndex="1" onclick="changeAutorefresh('autorefreshButton')">
                     <img id='autorefreshButton' src="../../images/autorefresh.gif"
                          title="Auto refresh timer (5 sec)"
                          alt="Auto refresh timer (5 sec)" align="absmiddle">
@@ -670,6 +670,11 @@
             height: ctpageHeight + 6,  // 修正底部高度 当前窗口高度 + 6px
             greetings: greetingsTitle,
             prompt: "SQL> ",
+            onClear: function (tm) {
+                setTimeout(function() {
+                    tm.greetings();
+                },10);
+            },
             keydown: function (event) {
 			    setTimeout(function() {
                     commandTimeE = new Date().getTime();
@@ -883,6 +888,8 @@
 
         if ( e.keyCode == 9 || e.keyCode == 27 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
             getTmpStr();
+        } else if (e.keyCode >= 119 && e.keyCode <= 122)  {
+            mykeydown(e.key.toLowerCase(), 'myTextarea');
         } else {
             setTimeout(getTmpStr,50);
         }
@@ -1241,11 +1248,14 @@
 
     }
 
+    function addMyTextAreaKeyDown(keycode) {
+        mykeydown(keycode, 'myTextarea');
+    }
+
 	function initOnload() {};
 	function detectCtrlKey(e) {};
 	function hiddenBaisworkMenu(e) {};
 	function showBaisworkMenu(t,m,e) {};
-	function addMyTextAreaKeyDown(c) {};
 
 </script>
 </body>

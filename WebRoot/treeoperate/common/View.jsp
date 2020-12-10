@@ -396,7 +396,7 @@
 									<input type="button" value="Refresh" onclick="" disabled>
 									<input type="button" value=" Close  " onclick="closeWindowList();">
 									<input type="button" value="Help" onclick="" disabled>
-									<input type="button" value=" Query... " onclick="execQueryTable('<%=name%>','myTextarea')" disabled>
+									<input type="button" value=" Query... " onclick="execQueryTable('myTextarea','<%=name%>')" disabled>
 								</td>
 							</tr>
 			</table>

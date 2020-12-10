@@ -779,9 +779,11 @@
         %>
 
 		<script>
+            function addMyTextAreaKeyDown(keycode) {
+                mykeydown(keycode, 'myTextarea');
+            }
 			function hiddenBaisworkMenu(e) {};
 			function showBaisworkMenu(t,m,e) {};
-			function addMyTextAreaKeyDown(c) {};
 		</script>
 
 

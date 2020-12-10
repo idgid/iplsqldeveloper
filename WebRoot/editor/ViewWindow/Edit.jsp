@@ -356,11 +356,14 @@
 				}
 			}
 
+			function addMyTextAreaKeyDown(keycode) {
+				mykeydown(keycode, 'myTextarea');
+			}
+
 			function initOnload() {};
 			function detectCtrlKey(e) {};
 			function hiddenBaisworkMenu(e) {};
 			function showBaisworkMenu(t,m,e) {};
-			function addMyTextAreaKeyDown(c) {};
 
 		</script>
 	</body>

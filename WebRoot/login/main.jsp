@@ -9,7 +9,7 @@
 
 	<frameset rows="80,*" cols="*" frameborder="yes" border="1" framespacing="1" id='indexFrame'>
 		<frame src="./top.jsp" name="topFrame" scrolling="no" noresize="noresize" id="topFrame" title="topFrame" />
-		<frameset cols="300,*" frameborder="yes" border="1" framespacing="1">
+		<frameset cols="320,*" frameborder="yes" border="1" framespacing="1">
 			<frameset rows="70%,*" cols="*" frameborder="yes" border="1" framespacing="1" id='leftMainFrame'>
 				<frameset rows="25,*" cols="*" frameborder="yes" border="1" framespacing="1" id='leftMainFrameTop'>
 					<frame src="../tree/lefttop.jsp" name="LeftTopFrame" scrolling="no" id="LeftTopFrame" title="LeftTopFrame" />
@@ -17,7 +17,7 @@
 				</frameset>
 					<frame src="./windowlist.jsp" scrolling="auto" name="leftFrameList" id="leftFrameList" title="leftFrameList" />
 			</frameset>
-			<frameset rows="60,*" cols="*" frameborder="no" border="0" framespacing="0" id='mainFrame'>
+			<frameset rows="57,*" cols="*" frameborder="no" border="0" framespacing="0" id='mainFrame'>
 				<frame src="./editortoolbar.jsp" scrolling="no" name="editorToolFrame" id="editorToolFrame" title="editorToolFrame" />
 				<frame src="./editor.jsp" scrolling="no" name="editorFrame" id="editorFrame" title="editorFrame" />
 			</frameset>

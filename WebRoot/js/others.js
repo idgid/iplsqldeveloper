@@ -250,23 +250,25 @@ function logout() {
 function changeAutorefresh(imagesName) {
 	var imagesIcon = '../../images/autorefresh_true.gif';
 	var oldImagesIcon = '../../images/autorefresh.gif';
-	var oldImagesName = 'autorefresh.gif';
-	var autorefreshTrueImageName = "autorefresh_true.gif";
-	var Flag = parent.parent.editorFrame.GGETFRAME.$(imagesName).getProperty('src').test(oldImagesName);
+	var oldImagesName = /autorefresh.gif/g;
+	var autorefreshTrueImageName = /autorefresh_true.gif/g;
+	var Flag = parent.parent.editorFrame.GGETFRAME.document.getElementById(imagesName).src;
+	Flag = oldImagesName.test(Flag);
 
 
 
     if (Flag) {
-        parent.parent.editorFrame.GGETFRAME.$(imagesName).setProperty('src',imagesIcon);
+        parent.parent.editorFrame.GGETFRAME.document.getElementById(imagesName).src = imagesIcon;
         parent.parent.editorFrame.GGETFRAME.GINTERSQLJOB = self.setInterval( innerexecuteRun, parent.parent.editorFrame.GGETFRAME.GSETTIMEOUT);
 	} else {
-        parent.parent.editorFrame.GGETFRAME.$(imagesName).setProperty('src',oldImagesIcon);
+        parent.parent.editorFrame.GGETFRAME.document.getElementById(imagesName).src = oldImagesIcon;
         clearInterval(parent.parent.editorFrame.GGETFRAME.GINTERSQLJOB);
 	}
 
     function innerexecuteRun()  {
         // 必须是当前窗口且标识为定时刷新才有效
-        var Flag = parent.parent.editorFrame.GGETFRAME.$(imagesName).getProperty('src').test(autorefreshTrueImageName);
+        var Flag = parent.parent.editorFrame.GGETFRAME.document.getElementById(imagesName).src;
+        Flag = autorefreshTrueImageName.test(Flag);
         Flag == true ? parent.parent.editorFrame.GGETFRAME.executeRun(gMyTextArea) : '';
     }
 
@@ -919,6 +921,33 @@ function executeRun(textareaname) {
                 parent.parent.editorFrame.executeFUN(alltmpSql, currWindoType);
             }
         }
+    } else { // command window 多条命令执行入口
+        var commandTempSql = [];
+        var commandTermObj = parent.parent.editorFrame.GGETFRAME.term;
+
+        // 自动调到 tab1 页
+        parent.parent.editorFrame.GGETFRAME.commandTabPane.setSelectedIndex(0);
+        // 得到 SQL
+        tempSql = getTextareaContents(textareaname);
+        // 去除单行注释 --
+        tempSql = tempSql.replaceAll(/--.*/g,' ').trim();
+        // 去除多行注释 /**/
+        tempSql = tempSql.replaceAll(/\n/mg,' ').replaceAll(/\/\*.*?\*\//g,' ').trim();
+        // 拆分 SQL 语句，并根据 “;” 分成多条，必须先清除注释中包含的 “;”
+        commandTempSql = tempSql.split(';');
+        //空一行后开始
+        commandTermObj.echo(commandTermObj.get_prompt());
+        // 设置不显示执行的命令
+        commandTermObj.settings().echoCommand = false;
+        for ( var i = 0; i < commandTempSql.length; i++ ) {
+            // 交给原先的执行方式执行即可
+            commandTermObj.exec(commandTempSql[i]);
+        }
+        // 恢复显示执行的命令
+        commandTermObj.settings().echoCommand = true;
+        // 重新获得焦点
+        commandTermObj.focus();
+
     }
 
 }
@@ -2268,7 +2297,7 @@ function execWorkDrop(e) {
 //工作编辑区右键Query data命令执行函数
 function execQueryData(textareaname, e) {
 	hiddenBaisworkMenu(e);
-	execQueryTable(baisworkSQL, textareaname);
+	execQueryTable(textareaname, baisworkSQL);
 }
 
 //工作编辑区右键Edit data命令执行函数
