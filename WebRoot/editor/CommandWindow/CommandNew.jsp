@@ -928,7 +928,7 @@
                     } else {
                         // 当前输入超过 2 个字符才开始提示
                         if ( s != "*" && s.length > 2 ) {
-                            regE = RegExp('^' + s.replace('$', '\\\\$'), "i");  //为了匹配$符号，要有4个反斜杠
+                            regE = RegExp('^' + s.replace(/(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\\$|\^|\|)/g, "\\\$1"), "i");  //匹配特殊字符 $ 前加\\
                             autoMacth(regE, s, titleUserObject);
                         }
 

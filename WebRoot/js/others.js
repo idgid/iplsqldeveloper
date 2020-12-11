@@ -108,6 +108,11 @@ if (dAlertTop == null)     var dAlertTop = 120;
 // GERRORPROCINFO 属性
 if (GERRORPROCINFO ==  null)  var GERRORPROCINFO = [];
 
+// QueryByExample 标识
+if (GQueryByExampleFlag == null) var GQueryByExampleFlag = 0;
+
+// QueryByExample 条件
+if (GQueryByExampleArrayStr == null) var GQueryByExampleArrayStr = "";
 
 
 
@@ -425,11 +430,8 @@ function postChangeRecord() {
 
 		b = mygrid.getAllRowIds().split(',');
 		for (i = 0; i < b.length; i++) {
-			c = Object.values(mygrid.getRowData(b[i]));
-			//d = [];
-			// for (j = 0; j < c.length-1; j++)  {
-			// 	d[j] = c[j+1];
-			// }
+			// c = Object.values(mygrid.getRowData(b[i])); //ES6
+            c = Object.keys(mygrid.getRowData(b[i])).map(function (e) { return mygrid.getRowData(b[i])[e] });  //ES5
 			updaterecordtmp[i] = c;
 		}
 
@@ -473,6 +475,7 @@ function changePreviousSql(tdID) {
 //改变 querybyExample 按钮
 function changeQueryByExample(queryFlag) {
 	var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById('queryByExampleTd');
+    setQueryByExampleAndClearRecord(false) ;
     if (queryByExampleObject != null && typeof(queryByExampleObject) != "undefined") queryByExampleObject.setEnabled(queryFlag);
 }
 
@@ -639,6 +642,7 @@ function controlbuttonReset() {
 
     if (setFetchNext != null && typeof setFetchNext != undefined) setFetchNext(false);
     if (setFetchLast != null && typeof setFetchLast != undefined) setFetchLast(false);
+
 }
 
 
@@ -891,9 +895,8 @@ function executeRun(textareaname) {
 
     if (currWindoType != 'CSQ') {
         tempSql = getTextareaContents(textareaname);
-        // console.log(tempSql);
-        // alltmpSql = parent.parent.editorFrame.GGETFRAME.$(textareaname).get('text');
-        alltmpSql = parent.parent.editorFrame.GGETFRAME.getTextareaContents(textareaname);
+
+        parent.parent.editorFrame.GGETFRAME.GQueryByExampleFlag == 1 ? (parent.parent.editorFrame.GGETFRAME.GQueryByExampleFlag = 0) : (parent.parent.editorFrame.GGETFRAME.GQueryByExampleArrayStr = "", alltmpSql = parent.parent.editorFrame.GGETFRAME.getTextareaContents(textareaname));
         if(tempSql == "") {
             parent.parent.editorFrame.dhtmlx.alert({
                 title:"ERROR",
@@ -1809,6 +1812,18 @@ function setFetchLast(flag) {
 	fetchLastObject.setEnabled(flag);
 }
 
+// 设置 Query By Example 与 Clear record 按钮状态 2020-12-11
+function setQueryByExampleAndClearRecord(flag) {
+    var queryByExampleID = 'queryByExampleTd';
+    var clearRecordID = 'clearRecordTd';
+    var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(queryByExampleID);
+    var clearRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(clearRecordID);
+
+    queryByExampleObject.setValue(flag);
+    clearRecordObject.setEnabled(flag);
+}
+
+
 //按钮Fetch next page按下执行的函数
 function getFYSql() {
 	if ( fetchnextbuttonpress () ) {
@@ -2153,23 +2168,79 @@ function getIfwhere(textareaname, cflag) {
 function queryByExample() {
 	var queryByExampleID = 'queryByExampleTd';
 	var clearRecordID = 'clearRecordTd';
-	var queryByExampleObject = parent.editorFrame.document.getElementById(queryByExampleID);
-	var clearRecordObject = parent.editorFrame.document.getElementById(clearRecordID);
+	var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(queryByExampleID);
+	var clearRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(clearRecordID);
+	var qmygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+    var colid = '$ID$';
+    var queryByExampleId = 99999999;
+    var queryByExampleFlag = parent.parent.editorFrame.GGETFRAME.queryByExampleFlag;
+
+    for( i=1; i < qmygrid.getColumnCount(); i++) {
+        colid += ",";
+        colid += qmygrid.getHeaderCol(i) ;
+    }
 
 	if (!clearRecordObject.getEnabled() && queryByExampleFlag == 0 && queryByExampleObject.getEnabled())  {
-		clearRecordObject.setEnabled(true);
-		queryByExampleFlag = 1;
+        // queryByExample 按钮按下
+	    clearRecordObject.setEnabled(true);
+        parent.parent.editorFrame.GGETFRAME.queryByExampleFlag = 1;
+        setFetchNext(false);
+        setFetchLast(false);
+        qmygrid.setColumnIds(colid);
+		qmygrid.clearAll();
+		qmygrid.setEditable(true);
+		qmygrid.addRow(queryByExampleId, parent.parent.editorFrame.GGETFRAME.GQueryByExampleArrayStr,'');
 	} else  {
-		if (queryByExampleFlag == 1 && clearRecordObject.getEnabled()) {
+	    // queryByExample 按钮弹出
+		if (queryByExampleFlag == 1) {
 			clearRecordObject.setEnabled(false);
-			queryByExampleFlag = 0;
+            parent.parent.editorFrame.GGETFRAME.queryByExampleFlag = 0;
+			var queryExampleSql = parent.parent.editorFrame.GGETFRAME.alltmpSql;
+			var b = qmygrid.getRowData(queryByExampleId);  // object
+            var qandl = Object.getOwnPropertyNames(b);
+            var qandr = Object.keys(b).map(function (e) { return b[e] });
+            var qandSql = "";
+            parent.parent.editorFrame.GGETFRAME.GQueryByExampleArrayStr = ",";
+            for ( var i = 1; i < qandl.length; i++ ) {
+                // 条件值不为空才拼接
+                if (qandr[i] != "") {
+                    (qandSql != "")? qandSql += " and " : qandSql += "";
+                    qandSql += qandl[i] + " = " + "'" + qandr[i] + "'";
+                    // 不是第一行 最后一行不加 and 条件
+                    qandSql += '\n';
+                }
+                parent.parent.editorFrame.GGETFRAME.GQueryByExampleArrayStr += qandr[i] + ",";
+            }
+            // 最后拼接成新SQL
+            qandSql == "" ?  '' : queryExampleSql = "select * from ("+queryExampleSql+")"+ '\n'+" where 1 = 1 and (" + qandSql + ")";
+            // 重写当前编辑区SQL
+            parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, queryExampleSql);
+            // 通过此处调用 F8 标志
+            parent.parent.editorFrame.GGETFRAME.GQueryByExampleFlag = 1;
+            // 调用执行函数 -> 与 F8 一致
+            parent.parent.editorFrame.GGETFRAME.executeRun('myTextarea');
 		}
 	}
 }
 
-// 暂不用
+// 与 QueryByExample 相对，清除查询条件
 function clearRecord() {
-	console.log('1');
+    var queryByExampleID = 'queryByExampleTd';
+    var clearRecordID = 'clearRecordTd';
+    var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(queryByExampleID);
+    var clearRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(clearRecordID);
+    var queryByExampleId = 99999999;
+    var queryExampleSql = parent.parent.editorFrame.GGETFRAME.alltmpSql;
+    var qmygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+    if (clearRecordObject.getEnabled()) {
+        // 条件重置
+        qmygrid.clearAll();
+        // 插入固定 ID 的空行
+        qmygrid.addRow(queryByExampleId, '','');
+        // 编辑区重置
+        parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, queryExampleSql);
+    }
+
 }
 
 
@@ -3478,7 +3549,7 @@ function clearSQLWindow(windowType) {
 		parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
 
 		GGETFRAME = parent.editorFrame.GGETFRAME;
-		resetBaseWorkToolBar(false);
+		// resetBaseWorkToolBar(false);
 
 	}
 
@@ -4145,7 +4216,8 @@ function keyDownInterface(e) {
 		stmp = currstr.substr(0, currstrpos-1).trim().split(" ");
 		if ((s_after == "" || s_after == " ") && e.keyCode != 32 && s_before != " " ) {
 			s = stmp[stmp.length - 1].trim();
-			s = s.replaceAll('\$', '\\$');
+			// s = s.replaceAll('\$', '\\$');
+            s = s.replace(/(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\$|\^|\|)/g, "\\$1");
 			if ( e.keyCode != 38 && e.keyCode != 40 && e.keyCode != 13  && e.keyCode != 16  && e.keyCode != 17 && e.keyCode != 18 && e.keyCode != 19  ) {
 				if (e.keyCode >= 112 && e.keyCode <= 123) {
                     clearAutoCompletion();
