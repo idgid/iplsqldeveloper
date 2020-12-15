@@ -21,15 +21,17 @@
 	<link type="text/css" rel="StyleSheet" href="../../css/tab.winclassic.css" />
 	<link type="text/css" rel="StyleSheet" href="../../css/jsterm/jquery.terminal.css" />
 
-	<script type="text/javascript" src="../../js/cb2.js"></script>
 	<script type="text/javascript" src="../../js/others.js"></script>
     <script type="text/javascript" src="../../js/baisworksql.js"></script>
     <script type="text/javascript" src="../../js/tabpane.js"></script>
+
     <script type="text/javascript" src="../../js/jsterm/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/jquery.terminal.min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/jquery.mousewheel-min.js"></script>
 	<script type="text/javascript" src="../../js/jsterm/keyboard.js"></script>
     <script type="text/javascript" src="../../js/edit_area/edit_area_full.js"></script>
+    <script type="text/javascript" language="JavaScript1.5" src="../../js/ieemu.js"></script>
+    <script type="text/javascript" src="../../js/cb2.js"></script>
 
 
     <!--以下是dwr的必备js  -->
@@ -237,7 +239,7 @@
                     <img id='execIsRunButton' src="../../images/exec_norun.gif"
                          align="absmiddle">
                 </td>
-                <td tabIndex="1" onclick="changeAutorefresh('autorefreshButton')">
+                <td class="coolButton" onclick="changeAutorefresh('autorefreshButton')">
                     <img id='autorefreshButton' src="../../images/autorefresh.gif"
                          title="Auto refresh timer (5 sec)"
                          alt="Auto refresh timer (5 sec)" align="absmiddle">
@@ -427,7 +429,15 @@
 						setCommit(true);
 						setRollback(true);
 						dFlag = 2;
-					} else {
+					} else if (parent.parent.editorToolFrame.getIfUpdate(command, 1)) {
+                        setCommit(true);
+                        setRollback(true);
+                        dFlag = 4;
+                    } else if (parent.parent.editorToolFrame.getIfExplainPlan(command, 1)) {    //执行计划
+                        setCommit(true);
+                        setRollback(true);
+                        dFlag = 5;
+                    } else {
 
 						dFlag = 3;
 					}
@@ -467,8 +477,11 @@
 
 						if (dFlag == 1)	insertordel = "inserted";
 						if (dFlag == 2)	insertordel = "deleted";
+                        if (dFlag == 4)	insertordel = "updated";
 
-						if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
+
+
+                    if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 							errOracleMsg = intdata[0][1];
 							term.error(errOracleMsg);
 
@@ -493,25 +506,30 @@
 							} else {
 								oracleTitle = rows + " rows " + insertordel + " in " + newtime + " seconds";	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
 							}
-                            parent.parent.editorToolFrame.getIfDDL(command, 1) == true ? (function() {
-                                var vc = "";
-                                command.match(/^create *\S* /i) != undefined ? (vc = command.match(/^create *\S* /i)[0].trim().split(" "),vc[0] = "created") :
-                                    command.match(/^alter *\S* /i) != undefined ? (vc = command.match(/^alter *\S* /i)[0].trim().split(" "), vc[0] = "altered" ):
-                                        command.match(/^drop *\S* /i) != undefined ? (vc = command.match(/^drop *\S* /i)[0].trim().split(" "), vc[0] = "dropped" ):
-                                            command.match(/^rename *\S* /i) != undefined ? (vc = command.match(/^rename *\S* /i)[0].trim().split(" "), vc[0] = "renamed" ):
-                                                command.match(/^grant *\S* /i) != undefined ? (vc = command.match(/^grant *\S* /i)[0].trim().split(" "), vc[1] = "grant", vc[0] = "succeeded" ):
-                                                    command.match(/^revoke *\S* /i) != undefined ? (vc = command.match(/^revoke *\S* /i)[0].trim().split(" "), vc[1] = "revoke", vc[0] = "succeeded" ): vc = "Unknow";
-                                var ts = vc[0];
-                                var te = vc[vc.length -1];
-                                var tt = "";
+							if (parent.parent.editorToolFrame.getIfExplainPlan(command, 1)) {
+                                term.echo("Explained");
+                            } else {
+                                parent.parent.editorToolFrame.getIfDDL(command, 1) == true ? (function() {
+                                    var vc = "";
+                                    command.match(/^create *\S* /i) != undefined ? (vc = command.match(/^create *\S* /i)[0].trim().split(" "),vc[0] = "created") :
+                                        command.match(/^alter *\S* /i) != undefined ? (vc = command.match(/^alter *\S* /i)[0].trim().split(" "), vc[0] = "altered" ):
+                                            command.match(/^drop *\S* /i) != undefined ? (vc = command.match(/^drop *\S* /i)[0].trim().split(" "), vc[0] = "dropped" ):
+                                                command.match(/^rename *\S* /i) != undefined ? (vc = command.match(/^rename *\S* /i)[0].trim().split(" "), vc[0] = "renamed" ):
+                                                    command.match(/^grant *\S* /i) != undefined ? (vc = command.match(/^grant *\S* /i)[0].trim().split(" "), vc[1] = "grant", vc[0] = "succeeded" ):
+                                                        command.match(/^revoke *\S* /i) != undefined ? (vc = command.match(/^revoke *\S* /i)[0].trim().split(" "), vc[1] = "revoke", vc[0] = "succeeded" ): vc = "Unknow";
+                                    var ts = vc[0];
+                                    var te = vc[vc.length -1];
+                                    var tt = "";
 
-                                // 拼 提示字符串
-                                tt =  te + " "+  ts;
-                                // 首字母大写
-                                tt = tt.replace(tt[0],tt[0].toUpperCase());
+                                    // 拼 提示字符串
+                                    tt =  te + " "+  ts;
+                                    // 首字母大写
+                                    tt = tt.replace(tt[0],tt[0].toUpperCase());
 
-							    term.echo(tt);
-                            })() : term.echo(rows + " rows " + insertordel);
+                                    term.echo(tt);
+                                })() : term.echo(rows + " rows " + insertordel);
+                            }
+
 
 							term.echo("");
 
@@ -771,11 +789,10 @@
 			createButton(cells1[i]);
 			//cells1[i].setAlwaysUp(true)
 		}
-		cells1[1].setToggle(false);
+		cells1[1].setToggle(true);
 
-		cells1[1].setValue(false, false);
 	}
-	// initViewFootButton();
+	initViewFootButton();
 	//setupAllTabs();
 
 

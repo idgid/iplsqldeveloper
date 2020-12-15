@@ -199,7 +199,7 @@
 							<img id='execIsRunButton' src="../../images/exec_fun_norun.gif"
 								 align="absmiddle">
 						</td>
-						<td tabIndex="1" onclick="">
+						<td class="coolButton" onclick="">
 							<img id='autorefreshButton' src="../../images/compiler_preferences.png"
 								 title="compiler preferences..."
 								 alt="compiler preferences..." align="absmiddle">

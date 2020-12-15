@@ -18,9 +18,9 @@ if (moz) {	// set up ie environment for Moz
 	Event.LEFT = 1;
 	Event.MIDDLE = 2;
 	Event.RIGHT = 3;
-	
 
-	
+
+
 }
 else {
 	Event = {};
@@ -41,14 +41,19 @@ function extendEventObject() {
 	Event.prototype.__defineSetter__("returnValue", function (b) {
 		if (!b) this.preventDefault();
 	});
-	
+
 	Event.prototype.__defineSetter__("cancelBubble", function (b) {
 		if (b) this.stopPropagation();
 	});
-	
+
 	Event.prototype.__defineGetter__("srcElement", function () {
 		var node = this.target;
-		while (node.nodeType != 1) node = node.parentNode;
+		if (node != null) {
+			while (node.nodeType != 1 && node.nodeType != 'root') {
+				if (node.parentNode != null) node = node.parentNode;
+			}
+		}
+
 		return node;
 	});
 
@@ -73,7 +78,7 @@ function extendEventObject() {
 		while (node.nodeType != 1) node = node.parentNode;
 		return node;
 	});
-	
+
 	Event.prototype.__defineGetter__("offsetX", function () {
 		return this.layerX;
 	});
@@ -87,7 +92,7 @@ function extendEventObject() {
  */
 function emulateAttachEvent() {
 	window.attachEvent =
-	HTMLDocument.prototype.attachEvent = 
+	HTMLDocument.prototype.attachEvent =
 	HTMLElement.prototype.attachEvent = function (sType, fHandler) {
 		var shortTypeName = sType.replace(/on/, "");
 		fHandler._ieEmuEventHandler = function (e) {
@@ -98,7 +103,7 @@ function emulateAttachEvent() {
 	};
 
 	window.detachEvent =
-	HTMLDocument.prototype.detachEvent = 
+	HTMLDocument.prototype.detachEvent =
 	HTMLElement.prototype.detachEvent = function (sType, fHandler) {
 		var shortTypeName = sType.replace(/on/, "");
 		if (typeof fHandler._ieEmuEventHandler == "function")
@@ -113,7 +118,7 @@ function emulateAttachEvent() {
  * event to window.event
  */
 function emulateEventHandlers(eventNames) {
-	for (var i = 0; i < eventNames.length; i++) {	
+	for (var i = 0; i < eventNames.length; i++) {
 		document.addEventListener(eventNames[i], function (e) {
 			window.event = e;
 		}, true);	// using capture
@@ -124,7 +129,7 @@ function emulateEventHandlers(eventNames) {
  * Simple emulation of document.all
  * this one is far from complete. Be cautious
  */
- 
+
 function emulateAllModel() {
 	var allGetter = function () {
 		var a = this.getElementsByTagName("*");
@@ -143,7 +148,7 @@ function extendElementModel() {
 		if (this.parentNode == this.ownerDocument) return null;
 		return this.parentNode;
 	});
-	
+
 	HTMLElement.prototype.__defineGetter__("children", function () {
 		var tmp = [];
 		var j = 0;
@@ -163,11 +168,11 @@ function extendElementModel() {
 		}
 		return tmp;
 	});
-	
+
 	HTMLElement.prototype.contains = function (oEl) {
 		if (oEl == this) return true;
 		if (oEl == null) return false;
-		return this.contains(oEl.parentNode);		
+		return this.contains(oEl.parentNode);
 	};
 }
 
@@ -201,7 +206,7 @@ function emulateHTMLModel() {
 
 	// This function is used to generate a html string for the text properties/methods
 	// It replaces '\n' with "<BR"> as well as fixes consecutive white spaces
-	// It also repalaces some special characters	
+	// It also repalaces some special characters
 	function convertTextToHTML(s) {
 		s = s.replace(/\&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<BR>");
 		while (/\s\s/.test(s))
@@ -212,34 +217,34 @@ function emulateHTMLModel() {
 	HTMLElement.prototype.insertAdjacentHTML = function (sWhere, sHTML) {
 		var df;	// : DocumentFragment
 		var r = this.ownerDocument.createRange();
-		
+
 		switch (String(sWhere).toLowerCase()) {
 			case "beforebegin":
 				r.setStartBefore(this);
 				df = r.createContextualFragment(sHTML);
 				this.parentNode.insertBefore(df, this);
 				break;
-				
+
 			case "afterbegin":
 				r.selectNodeContents(this);
 				r.collapse(true);
 				df = r.createContextualFragment(sHTML);
 				this.insertBefore(df, this.firstChild);
 				break;
-				
+
 			case "beforeend":
 				r.selectNodeContents(this);
 				r.collapse(false);
 				df = r.createContextualFragment(sHTML);
 				this.appendChild(df);
 				break;
-				
+
 			case "afterend":
 				r.setStartAfter(this);
 				df = r.createContextualFragment(sHTML);
 				this.parentNode.insertBefore(df, this.nextSibling);
 				break;
-		}	
+		}
 	};
 
 	HTMLElement.prototype.__defineSetter__("outerHTML", function (sHTML) {
@@ -247,7 +252,7 @@ function emulateHTMLModel() {
 	   r.setStartBefore(this);
 	   var df = r.createContextualFragment(sHTML);
 	   this.parentNode.replaceChild(df, this);
-	   
+
 	   return sHTML;
 	});
 
@@ -281,14 +286,14 @@ function emulateHTMLModel() {
 		}
 		if (!this.canHaveChildren)
 			return str + ">";
-		
+
 		return str + ">" + this.innerHTML + "</" + this.tagName + ">";
 	});
 
 
 	HTMLElement.prototype.__defineSetter__("innerText", function (sText) {
 		this.innerHTML = convertTextToHTML(sText);
-		return sText;		
+		return sText;
 	});
 
 	var tmpGet;

@@ -394,7 +394,7 @@
                     <img id='execIsRunButton' src="../../images/exec_norun.gif"
                          align="absmiddle">
                 </td>
-                <td tabIndex="1" onclick="changeAutorefresh('autorefreshButton')">
+                <td class="coolButton" onclick="changeAutorefresh('autorefreshButton')">
                     <img id='autorefreshButton' src="../../images/autorefresh.gif"
                          title="Auto refresh timer (5 sec)"
                          alt="Auto refresh timer (5 sec)" align="absmiddle">

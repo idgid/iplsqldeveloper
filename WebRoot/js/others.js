@@ -705,6 +705,9 @@ function execSysCommand(textareaname, commandName) {
         editOnOpen();
     } else if (commandName == "printL" || commandName == "printP" )  {
 	    commandPrint(commandName, commandObj);
+    } else if (commandName == "search_next")  {
+	    var a = commandObj.contentWindow.editArea;
+        a.execCommand('show_search'),a.execCommand('area_search'),a.execCommand('hidden_search'),a.focus();
     } else if (commandName == "cut" || commandName == "copy" || commandName == "paste" || commandName == "selectComment" || commandName == "selectUncomment"
                 || commandName == "selectIndent" || commandName == "selectUnindent" )  {
         commandTextarea(commandName, commandObj);
@@ -983,11 +986,11 @@ function executeSQL(textareaname) {
         getResultFromSql(tempSql);
 		//getResultFromSql(tempSql); 有问题
 		//alert("oK");
-	} else if (getIfDelete(textareaname, 0) || getIfInsertInto(textareaname, 0) || !getIfSelect(textareaname, 0)) {
+	} else if (getIfDelete(textareaname, 0) || getIfInsertInto(textareaname, 0) || getIfUpdate(textareaname, 0) || !getIfSelect(textareaname, 0)) {
 
 		//提交给接口
 		var deleteFlag = 0;
-		if (getIfInsertInto(textareaname, 0))  {
+		if (getIfInsertInto(textareaname, 0) || getIfUpdate(textareaname, 0) )  {
 			setCommit(true);
 			setRollback(true);
 			deleteFlag = 1;
@@ -1818,9 +1821,8 @@ function setQueryByExampleAndClearRecord(flag) {
     var clearRecordID = 'clearRecordTd';
     var queryByExampleObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(queryByExampleID);
     var clearRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(clearRecordID);
-
-    queryByExampleObject.setValue(flag);
-    clearRecordObject.setEnabled(flag);
+    if (queryByExampleObject != null)    queryByExampleObject.setValue(flag);
+    if (clearRecordObject != null)  clearRecordObject.setEnabled(flag);
 }
 
 
@@ -1950,14 +1952,14 @@ function getIfDelete(textareaname, cflag) {
 	return Flag;
 }
 
-//得到sql语句是否为insert into开头或者update开头
+//得到sql语句是否为insert into开头或者 insert 开头
 //返回值： true or false
 function getIfInsertInto(textareaname, cflag) {
     var tempStr;
 	cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
 	var Flag = false;
 	if (tempStr.trim().test("^insert into ","i") ||
-		tempStr.trim().test("^update ","i") ) {
+		tempStr.trim().test("^insert ","i") ) {
 		Flag = true;
 	} else {
 		Flag = false;
@@ -1965,6 +1967,20 @@ function getIfInsertInto(textareaname, cflag) {
 	return Flag;
 }
 
+
+//得到sql语句是否为insert into开头或者update开头
+//返回值： true or false
+function getIfUpdate(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^update ","i") ) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
+}
 
 //得到sql语句是否为alter、drop、create开头
 //返回值： true or false
@@ -2094,6 +2110,22 @@ function getIfViewOrEdit(textareaname, cflag) {
     return Flag;
 }
 
+//得到sql语句是否为 explain plan
+//返回值： true or false
+// 2020-12-12
+function getIfExplainPlan(textareaname, cflag) {
+    var tempStr;
+    cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
+    var Flag = false;
+    if (tempStr.trim().test("^explain plan ","i")) {
+        Flag = true;
+    } else {
+        Flag = false;
+    }
+    return Flag;
+}
+
+
 //设置commit按钮的可用或不可用
 //true: 可用
 //false: 不可用
@@ -2101,7 +2133,16 @@ function setCommit(commitFlag) {
 	var commitId = 'commitTd';
 	var commitObject = parent.parent.editorToolFrame.document.getElementById(commitId);
 
-	commitObject.setEnabled(commitFlag);
+    var sqlddlImg = "../images/sql_window.png";
+    var sqlddlImgT = "../images/sqlforupdate.png";
+	var ctrvalue = parent.parent.leftFrameList.getWindowTr();
+    ctrvalue = parent.parent.leftFrameList.GWINDOWLIST[ctrvalue][1];
+    ctrvalue = ctrvalue.replace(/n/gi, '');
+    var sqlddlImgObj = parent.parent.leftFrameList.document.getElementById('columnButtonSql' + ctrvalue);
+    if (sqlddlImgObj != null)
+        commitFlag == true ? sqlddlImgObj.src = sqlddlImgT : sqlddlImgObj.src = sqlddlImg;
+
+    commitObject.setEnabled(commitFlag);
 
 }
 

@@ -132,6 +132,10 @@ table {
 						<img id='columnButton' src="../images/findorreplace.gif" title="Find & Replace (Ctrl+F)" alt="Find & Replace (Ctrl+F)"
 							align="absmiddle">
 					</td>
+					<td class="coolButton" onclick="execSysCommand('myTextarea','search_next');">
+						<img id='columnButton' src="../images/findnext.png" title="Find Next (Ctrl+L)" alt="Find Next (Ctrl+L)"
+							 align="absmiddle">
+					</td>
 					<td class="coolButton" onclick="execSysCommand('myTextarea','selectIndent');">
 						<img id='columnButton' src="../images/indent.gif" title="Selection Indent" alt="Selection Indent"
 							align="absmiddle">
@@ -155,7 +159,7 @@ table {
 
 							var toprightcells0 = document.getElementById('topToolBar').rows[0].cells;
 
-							for (var i = 0; i < 16; i++)
+							for (var i = 0; i < 17; i++)
 							{
 								createButton(toprightcells0[i]);
 								//rightcells[i].setToggle(true);
