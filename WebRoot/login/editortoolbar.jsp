@@ -192,9 +192,13 @@ table {
 							align="absmiddle">
 					</td>
 					<td class="coolButton" id="rollbackTd" onclick="parent.editorFrame.GGETFRAME.rollback();">
-						<img id='columnButton' src="../images/rollback.gif" title="Rollback (F12)" alt="Rollback (12)"
+						<img id='columnButton' src="../images/rollback.gif" title="Rollback (F12)" alt="Rollback (F12)"
 							align="absmiddle">
 					</td>
+                    <td class="coolButton" id="explainTd" onclick="parent.editorFrame.GGETFRAME.explain('myTextarea');">
+                        <img id='columnButton' src="../images/explain.png" title="Explain Plan (F5)" alt="Explain Plan (F5)"
+                             align="absmiddle">
+                    </td>
 					<td class="coolButton" onclick="logout();">
 						<img id='columnButton' src="../images/logout.gif" title="Log out" alt="Log out"
 							align="absmiddle">
@@ -211,7 +215,7 @@ table {
 
 							var toprightcells = document.getElementById('topToolBar').rows[1].cells;
 
-							for (var i = 0; i < 7; i++)
+							for (var i = 0; i < 8; i++)
 							{
 								createButton(toprightcells[i]);
 								//rightcells[i].setToggle(true);

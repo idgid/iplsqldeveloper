@@ -59,6 +59,31 @@ public class Database {
 	        return rs;
 	    }
 
+	public int[] getMRS(String[] sqls) throws Exception {
+		Statement stmt = null;
+		int[] rs = null;
+		if (sqls == null) {
+			return null;
+		}
+		try {
+			stmt = conn.createStatement();
+			for (int i = 0; i < sqls.length; i++) {
+				stmt.addBatch(sqls[i]);
+			}
+			rs = stmt.executeBatch();
+		}
+		catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}finally {
+			try {
+				stmt.close();
+			}
+			catch (Exception e) {
+			}
+		}
+		return rs;
+	}
+
 	    /**
 	     * 执行插入和更新语句
 	     * @param sql - sql语句
@@ -120,7 +145,7 @@ public class Database {
 	        v.add(new Integer(1));
 	        v.add(java.sql.Timestamp.valueOf("2003-03-10 13:23:00"));
 	        v.add(new String("343"));
-	        db.execPrepareSqlUpdate("insert into czh_a(a,b,c) values (?,?,?)",v);
+	        db.execPrepareSqlUpdate("insert into a(a,b,c) values (?,?,?)",v);
 	     */
 	    public int execPrepareSqlUpdate(String sql, Vector params) throws Exception {
 	      return execPrepareSqlUpdate(sql, params.toArray());

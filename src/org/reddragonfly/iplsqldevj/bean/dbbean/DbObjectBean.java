@@ -226,6 +226,58 @@ public class DbObjectBean {
 	}
 
 
+	// explain plan 2020-12-13
+	public List getOtherForExplainPlan(String sql, Vector v1) throws Exception {
+		// String[] columnName=column.split(",");
+		HttpServletRequest request = WebContextFactory.get()
+				.getHttpServletRequest();
+		HttpSession session = request.getSession();
+		UserBean ub = (UserBean) session.getAttribute("user");
+		Database db = ub.getDb();
+
+		List list = new ArrayList();
+		list.add(v1);
+		ResultSet rs = null;
+		String value = "";
+		Vector v = new Vector();
+		String[] sqls = null;
+		String expalinTmpSql = "explain plan for " + sql ;
+		sqls[0] = expalinTmpSql;
+		sqls[1] = "select * from table(dbms_xplan.display())";
+		sqls[2] = "select \n" +
+				"    id, \n" +
+				"    parent_id, \n" +
+				"    lpad(' ', 2*(level-1), ' ')||operation||' '||options as descr,\n" +
+				"    object_name,\n" +
+				"    cardinality \"ROWS\",\n" +
+				"    bytes,\n" +
+				"    cost,\n" +
+				"    time\n" +
+				"  from plan_table\n" +
+				"  start with parent_id is null \n" +
+				"  connect by prior id = parent_id";
+
+		try {
+			boolean a = true;
+			db.execSqlForProcedure(sql);
+			value = Boolean.toString(a);
+			v.add(value);
+			list.add(v);
+		} catch (Exception e) {
+			v.add("ReddragonflyErrorFlag*");
+			v.add(e.getMessage());
+			errList.add(v);
+			throw e;
+		} finally {
+			if (errList.isEmpty()) {
+				return list;
+			} else {
+				return errList;
+			}
+		}
+	}
+
+
 	public StringBuffer getKeyID(String sql, Database db) throws Exception {
 		StringBuffer KeyValue = new StringBuffer();
 		ResultSet rs = null;

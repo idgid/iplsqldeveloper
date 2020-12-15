@@ -384,8 +384,10 @@ function execResultFromSql(localsql,insertordelflag, callfun) {
 
 	if (insertordelflag == 1)	insertordel = "inserted";
 	if (insertordelflag == 2)	insertordel = "deleted";
+	if (insertordelflag == 4)	insertordel = "updated";
 
-	if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
+
+		if(tcell == 2 && intdata[0][0] == "ReddragonflyErrorFlag*") {
 		errOracleMsg = intdata[0][1];
 		parent.parent.editorFrame.dhtmlx.alert({
 			title : "ERROR",

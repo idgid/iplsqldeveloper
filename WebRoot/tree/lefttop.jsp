@@ -46,7 +46,7 @@
 
 	<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="background-color: FFFFFF" oncontextmenu="return false">
 	<div style="background-color: buttonface; overflow: no; height:25px;">
-		<table width="100%" style="height:25px;" border='0' cellpadding="0" cellspacing="0" style="background-color: buttonface" align="center" valign="middle">
+		<table width="100%" style="height:25px; background-color: buttonface;" border='0' cellpadding="0" cellspacing="0" align="center" valign="middle">
 			<tr>
 				<td valign="middle">
 				   <form name="formx" id="formx" method="post" action="">

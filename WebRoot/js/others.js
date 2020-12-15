@@ -941,7 +941,7 @@ function executeRun(textareaname) {
         tempSql = tempSql.replaceAll(/\n/mg,' ').replaceAll(/\/\*.*?\*\//g,' ').trim();
         // 拆分 SQL 语句，并根据 “;” 分成多条，必须先清除注释中包含的 “;”
         commandTempSql = tempSql.split(';');
-        //空一行后开始
+        // 空一行后开始
         commandTermObj.echo(commandTermObj.get_prompt());
         // 设置不显示执行的命令
         commandTermObj.settings().echoCommand = false;
@@ -2241,6 +2241,7 @@ function queryByExample() {
             var qandl = Object.getOwnPropertyNames(b);
             var qandr = Object.keys(b).map(function (e) { return b[e] });
             var qandSql = "";
+            queryExampleSql = queryExampleSql.replace(/;$/i,'');
             parent.parent.editorFrame.GGETFRAME.GQueryByExampleArrayStr = ",";
             for ( var i = 1; i < qandl.length; i++ ) {
                 // 条件值不为空才拼接
@@ -3074,6 +3075,7 @@ function createWindowList(windowType, str, eFlag) {
 	var maxAltLength = 36; //字符串最大长度
 	var oname = "";
     var sqlImage = "";
+    var eplimg = "../images/view_table.png";
 
 
 	eFlag == true ? eFlagStr = 'Edit' : eFlagStr = 'View';
@@ -3143,7 +3145,11 @@ function createWindowList(windowType, str, eFlag) {
     } else if (windowType == "CSQ") {
 		initStr = "Command Window - ";
 		newStr = "New";
-	}
+	} else if (windowType == "EPL") {
+        initStr = "Explain Plan Window - ";
+        newStr = "";
+        img = eplimg;
+    }
 
 	endStr = initStr + newStr;
 
@@ -3286,7 +3292,13 @@ function createWindowList(windowType, str, eFlag) {
 			var SQLWindowString = "SQLWindow" + i;
 			saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
 			initWindwoListButton(introws);
-		}
+		} else if (windowType == "EPL")  {
+
+            var i = getWindowTr();
+            var SQLWindowString = "SQLWindow" + i;
+            //saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
+            initWindwoListButton(introws);
+        }
 
 	}
 }
@@ -3397,10 +3409,18 @@ function createNewSql(windowType, textareaname) {
 		parent.parent.leftFrameList.createWindowList(windowType, this.url, f);
 		//更改右边工作区的内容
 		clearSQLWindow(windowType);
-	}
+	} else if (windowType == "EPL") {
+	    this.url = textareaname;
+        //创建windowlist工具条
+	    parent.parent.leftFrameList.createWindowList(windowType, this.url, f);
+        //更改右边工作区的内容
+	    clearSQLWindow(windowType);
+
+    }
 }
 
-//每次实时切换窗口，实际上是保存上一行的内容，并且切换到当前行
+// 每次实时切换窗口，实际上是保存上一行的内容，并且切换到当前行
+// 已弃用, 采用 doRadioNew  2020-09-23
 function doRadio(_trType, _prevTrType, _trRow) {
 		var sameWindowFlag = false;
 		//alert(_trType);
@@ -3592,7 +3612,15 @@ function clearSQLWindow(windowType) {
 		GGETFRAME = parent.editorFrame.GGETFRAME;
 		// resetBaseWorkToolBar(false);
 
-	}
+	} else if (windowType == "EPL") {
+        var url = "../editor/ExplainPlanWindow/View.jsp";
+        parent.editorFrame.createSqlForColorText(parent.leftFrameList.GTDID, url);
+        parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+
+        GGETFRAME = parent.editorFrame.GGETFRAME;
+        // resetBaseWorkToolBar(false);
+
+    }
 
 	//状态栏初始为空
 	//setFootView(9999, '　');
@@ -3625,16 +3653,14 @@ function clearOtherWindow(windowtype,url) {
 
 }
 
-//保存原先的DIV内容，有bug,如果按了工具条的按钮，按钮的效果将会在新窗口中体现
-//而工具条一旦被克隆，则所有JS及CSS失效，待解决！！！
+// 保存原先的DIV内容，有bug,如果按了工具条的按钮，按钮的效果将会在新窗口中体现
+// 而工具条一旦被克隆，则所有JS及CSS失效，待解决！！！
+// V2.0.0 后不再使用
 function saveDivValue(DivSource, DivDest, windowType, trRow) {
 	//复制元素并复制下所有的事件
-	var divObject = parent.parent.editorFrame.$(DivSource);
-
-
-	$(DivDest).append(divObject.clone(true));
+	//var divObject = parent.parent.editorFrame.$(DivSource);
+	// $(DivDest).append(divObject.clone(true));
 	//alert(divObject.get('html'));
-
 
 	//此处为接口，可为多个窗口类型
 	if (windowType == "SQL") {
@@ -3649,9 +3675,6 @@ function saveDivValue(DivSource, DivDest, windowType, trRow) {
 		// $('outResultDiv').set('id',destOutResultDiv);
 		// $('changeOutResultDiv').set('id',destChangeOutResultDiv);
 		// $('footview').set('id',destFootview);
-
-
-
 		//alert($(destMyTextarea).get('id'));
 	} else if (windowType == "JAVA") {
 		var destMyTextarea = "myTextarea" + trRow;
@@ -3689,7 +3712,8 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
-					|| windowType == "VIM" || windowType == "TAB" || windowType == "CSQ") {
+					|| windowType == "VIM" || windowType == "TAB" || windowType == "CSQ"
+                    || windowType == "EPL" ) {
 		var destMyTextarea = "myTextarea" + trRow;
 		var destobjTitle = "objTitle" + trRow;
 		var desttmpImg = "tmpImg" + trRow;
@@ -3725,6 +3749,8 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 	var imgIcon = "../images/windowlist_running.gif";
 	var maxLength = 36; //设置左边工具条最大显示的字符数
 	var maxAltLength = 200; //设置鼠标放在上面提示的最大字符数
+	var eplimg = "../images/view_table.png";
+
 
 	if(windowType == "SQL") {
 		initStr = "SQL Window - ";
@@ -3734,7 +3760,12 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
         initStr = "Command Window - ";
         tmpStr = initStr + titleStr;
         tmpStrA = initStr + titleStr;
-    }  else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
+    } else if (windowType == "EPL") {
+        initStr = "Explain Plan Window - ";
+        tmpStr = initStr + titleStr;
+        tmpStrA = initStr + titleStr;
+        imgIcon = eplimg;
+    } else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
 					|| windowType == "VIM" || windowType == "TAB") {
@@ -4581,6 +4612,25 @@ function sortNumberDesc(a,b)
 }
 
 
+// 增加 Explain Plan 功能 2020-12-13
+function explain(a) {
+    var tempSql = getTextareaContents(a);
+
+    parent.parent.leftFrameList.createNewSql('EPL','View.jsp');
+
+    // 等待 editarea 初始化完成后执行
+    setTimeout(function() {
+        parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, tempSql);
+
+		parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
+
+		tempSql = tempSql.trim().replace(/[;]*$/, '');
+
+		DbObjectBean.getOther2(tempSql, ['Description_$$$_VARCHAR2_$$$_50','Object owner_$$$_VARCHAR2_$$$_30','Object name_$$$_VARCHAR2_$$$_30', 'Cost_$$$_VARCHAR2_$$$_10', 'Cardinality_$$$_VARCHAR2_$$$_15', 'Bytes_$$$_VARCHAR2_$$$_8'], callbackCommandadd);
+
+
+	}, 500);
+}
 
 //关于我们团队
 function aboutUS() {
