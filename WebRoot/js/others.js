@@ -1486,7 +1486,7 @@ function showDataHtml(rows,data) {
             strCellRealMax[i][0] < strLengthCorE(GGRIDHEADATTR[i][0]) ? strCellRealMax[i][0] = strLengthCorE(GGRIDHEADATTR[i][0]) : strCellRealMax[i][0] = strCellRealMax[i][0];
 
             // 最后 Cell 宽度为 每个字符宽度8 * 当前结果集中字符串的最大长度 + 默认宽度
-            size  = word * strCellRealMax[i][0] + 10;
+            size  = word * strCellRealMax[i][0] + def_wid;
 
             if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
             else strHeaderWidth = strHeaderWidth + size + "," ;
@@ -2740,6 +2740,97 @@ function showDataHtmlD(data) {
 		strRow = i + "," + strRow;
     	mygrid.addRow(i,strRow);
     	}
+    }
+}
+
+// phanrider add by 2020-12-15
+// 展示执行计划的 grid
+function showDataHtmlExplain(s,data) {
+
+    var mygrid = new dhtmlXGridObject(s);
+
+    mygrid.setImagePath("../../imgs/");
+
+    tlow_flag_num = data.length; //表格展示的行数
+    tlow = data.length ;  //无标志行可去
+
+    //alert(data.length);
+    tcell = data[0].length; //表格展示的列数
+    var strHeader = "";
+    var strSort = "";
+    for(var i = 0; i < tcell; i++) {
+        if(i == (tcell - 1)) {
+            strHeader = strHeader + data[0][i];
+            strSort = strSort + "str";
+        } else  {
+            strHeader = strHeader + data[0][i] + "," ;
+            strSort = strSort + "str" + ",";
+        }
+    }
+
+
+    mygrid.setHeader(strHeader);
+    mygrid.setStyle("background-color: #FFF;text-align:left;",null,null,null);
+
+    mygrid.setColAlign("left");
+    //mygrid.setColTypes("ro,ed");
+
+    mygrid.setColSorting(strSort);
+
+
+    var strHeaderWidth = "";
+    var size = 70;
+    for(var i = 0; i < tcell; i++) {
+        var word = 8; //初定8个单词长度
+        for( var ii = 0; ii < tlow ;  ii++) {
+            if ( data[ii][i].length > word ) word = data[ii][i].length;
+        }
+
+        if (word > 8 && word <= 15 ) size = 130;
+        else if  (word > 15 && word <= 20 ) size = 180;
+        else if  (word > 20 ) size = 300;
+        if(i == (tcell - 1)) strHeaderWidth = strHeaderWidth + size;
+        else strHeaderWidth = strHeaderWidth + size + "," ;
+    }
+
+    var i = tlow;
+
+
+    strHeaderWidth =  strHeaderWidth;
+
+
+    mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
+
+    if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
+        errOracleMsg = data[0][1];
+        parent.parent.editorFrame.dhtmlx.alert({
+            title : "ERROR",
+            top: dAlertTop,
+            type : "alert-error",
+            text : data[0][1]
+        });
+    } else {
+
+        //mygrid.enableAutoHeigth(true,380);
+
+        mygrid.init();  //进行初始化
+        mygrid.setEditable(false);
+
+        for(var i = 1; i < tlow; i++) {
+            var strRow = "";
+            var trstyle = "";
+            for (var j = 0; j < tcell; j++) {
+
+                var tmpS = changeHtml(data[i][j]);
+                if(j == (tcell - 1)) strRow = strRow + tmpS;
+                else strRow = strRow + tmpS + "," ;
+
+            }
+            // trstyle="#E3E3E3"+ "," + trstyle;
+            mygrid.setColumnColor(trstyle);
+            // strRow = i + "," + strRow;
+            mygrid.addRow(i,strRow);
+        }
     }
 }
 
@@ -4626,10 +4717,14 @@ function explain(a) {
 
 		tempSql = tempSql.trim().replace(/[;]*$/, '');
 
-		DbObjectBean.getOther2(tempSql, ['Description_$$$_VARCHAR2_$$$_50','Object owner_$$$_VARCHAR2_$$$_30','Object name_$$$_VARCHAR2_$$$_30', 'Cost_$$$_VARCHAR2_$$$_10', 'Cardinality_$$$_VARCHAR2_$$$_15', 'Bytes_$$$_VARCHAR2_$$$_8'], callbackCommandadd);
+        parent.parent.parent.editorFrame.GGETFRAME.explainInit(tempSql);
 
 
-	}, 500);
+    }, 500);
+
+
+
+
 }
 
 //关于我们团队

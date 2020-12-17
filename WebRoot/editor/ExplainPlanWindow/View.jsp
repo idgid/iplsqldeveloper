@@ -195,6 +195,16 @@
 			background-color: #FFFFFF;
 			color: #004a7e;
 		}
+        .s16 {
+            border-width : 1px;
+            border-color : #CCCC99;
+            border-style: solid;color:#006699;font-size:8pt;
+        }
+        .s26 {
+            border-width : 1px;
+            border-color : #CCCC99;
+            border-style: solid;
+        }
 
 	</style>
 
@@ -366,7 +376,8 @@
 						<img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span>
 						<span id='objTitle_2'>HTML</span>
 					</h2>
-
+                    <div id="explainHtmlId" style="font-family: Arial, Courier, mono; font-size: 12px;">
+                    </div>
 				</div>
 				<div class="tab-page" id="tabpage_3" style=" min-height:100%; _height:100%;">
 					<h2 class="tab" id="tabTitle_3">
@@ -374,17 +385,7 @@
 						<span id='objTitle_3'>Text</span>
 					</h2>
 
-					<div style="font-family: Arial, Courier, mono; font-size: 12px; color: #000080">
-							<pre>
-Plan Hash Value  : 1253225340
-
------------------------------------------------------------------------------
-| Id | Operation         | Name            | Rows | Bytes | Cost | Time     |
------------------------------------------------------------------------------
-|  0 | SELECT STATEMENT  |                 |   25 |   375 |    1 | 00:00:01 |
-|  1 |   INDEX FULL SCAN | COUNTRY_C_ID_PK |   25 |   375 |    1 | 00:00:01 |
------------------------------------------------------------------------------
-							</pre>
+					<div id="explainTextId" style="font-family: Arial, Courier, mono; font-size: 12px; color: #000080">
 					</div>
 
 				</div>
@@ -577,6 +578,104 @@ Plan Hash Value  : 1253225340
         }
     }
 
+    function explainInit(s) {
+	    var sql = [];
+        sql[0] = "explain plan for "  + s ;
+        sql[1] = "select * from table(dbms_xplan.display())";
+        sql[2] = "select id,\n" +
+            "       parent_id,\n" +
+            "       (case when parent_id is null then\n" +
+            "             lpad('　', 2 * (level - 1), '　') || operation || ' ' || options ||', '||'GOAL = '||optimizer \n" +
+            "       else \n" +
+            "             lpad('　', 2 * (level - 1), '　') || operation || ' ' || options \n" +
+            "       end) descr,\n" +
+            "       object_owner,\n" +
+            "       object_name,\n" +
+            "       cost,\n" +
+            "       cardinality,\n" +
+            "       bytes,\n" +
+            "       time,\n" +
+            "       other_xml\n" +
+            "  from plan_table t\n" +
+            " start with parent_id is null\n" +
+            "connect by prior id = parent_id";
+
+
+        BaisWorkBean.intOfInsertDelete(sql[0], '');
+        DbObjectBean.getOther2(sql[1], ['Explain Info'], explainInfoCallback);
+        DbObjectBean.getOther2(sql[2], ['Id','Pid','Description','Object owner','Object name', 'Cost', 'Cardinality', 'Bytes', 'Time', 'XML'], explainTreeCallback);
+
+        //最后回滚
+        setTimeout(function(){
+            BaisWorkBean.setDbRollback();
+        },600);
+
+
+
+        function explainTreeCallback(data) {
+            // console.log(data);
+            var mdata = [];
+
+            for (var i = 0; i < data.length; i++) {
+                mdata[i] = [];
+                for (var j = 2; j < data[0].length-2; j++) {
+                    mdata[i][j-2] = data[i][j];
+                }
+            }
+            // 第一个 TAB 页 -- Tree
+            parent.parent.editorFrame.GGETFRAME.showDataHtmlExplain('outResultDiv', mdata);
+        }
+
+
+        function explainInfoCallback(data) {
+            console.log(data);
+            var s = '';
+            // 第二个TAB页面 -- HTML
+            var tabstyle = "font:normal normal 8pt Verdana,Arial;text-decoration:none;color:#000000; border:0px;";
+            var tabhtmlf = '<table style="' + tabstyle + '">';
+            for( var i = 1; i < data.length; i++) {
+                if ( i == 1 ) {
+                    var sh =  data[i].split(":");
+                    tabhtmlf += '<tr>' + '<th align="left">' + sh[0] + '</th>';
+                    tabhtmlf += '<td>:' + sh[1] + '</td> </tr>';
+                    tabhtmlf += '</table>';
+                    tabhtmlf += '<br/>';
+                    tabhtmlf += '<table bordercolor="#000000" style="font:normal normal 8pt Verdana,Arial; border:0px;">';
+                } else if ( i == 4 ) {
+                    var st = data[i];
+                    if (st.replace(/^-.*$/g, '') != "") {
+                        st = data[i].split("|");
+                        tabhtmlf += '<tr>';
+                        for ( var j = 1; j < st.length - 1; j ++ ) {
+                            st[j] = st[j].trim();
+                            tabhtmlf += '<th align="left" bgcolor="#CCCC99" class="s16">' + st[j] + '</th>';
+                        }
+                        tabhtmlf += '</tr>';
+                    }
+                } else if ( i > 4 ) {
+                    var std = data[i];
+                    if (std.replace(/^-.*$/g, '') != "") {
+                        std = data[i].split("|");
+                        tabhtmlf += '<tr bgcolor="#F7F777" valign="bottom">';
+                        for ( var j = 1; j < std.length - 1; j ++ ) {
+                            std[j] = std[j].trim();
+                            tabhtmlf += '<td class="s26" align="right">' + std[j] + '</td>';
+                        }
+                        tabhtmlf += '</tr>';
+                    }
+                }
+            }
+            tabhtmlf += '</table>';
+            $('explainHtmlId').set('html', tabhtmlf);
+
+
+            // 第三个TAB页面 -- Text
+            for( var i = 1; i < data.length; i++) s +=  data[i] + "\n";
+            s = "<pre>" + s + "</pre>";
+            $('explainTextId').set('html', s);
+        }
+
+    }
 
 </script>
 </body>
