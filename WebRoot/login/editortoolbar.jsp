@@ -179,7 +179,7 @@ table {
 						<img id='columnButton' src="../images/logon.gif" title="Log on" alt="Log on"
 						 align="absmiddle">
 					</td>
-					<td class="coolButton" id="executeTd" onclick="parent.editorFrame.GGETFRAME.executeRun('myTextarea');">
+					<td class="coolButton" id="executeTd" onclick="parent.editorFrame.GGETFRAME.initExecuteForF8('myTextarea');">
 						<img id='columnButton' src="../images/execute.gif" title="Execute (F8)" alt="Execute (F8)"
 							align="absmiddle">
 					</td>
@@ -196,16 +196,16 @@ table {
 							align="absmiddle">
 					</td>
                     <td class="coolButton" id="explainTd" onclick="parent.editorFrame.GGETFRAME.explain('myTextarea');">
-                        <img id='columnButton' src="../images/explain.png" title="Explain Plan (F5)" alt="Explain Plan (F5)"
+                        <img id='columnButton' src="../images/explain.png" title="Explain Plan (F2)" alt="Explain Plan (F2)"
                              align="absmiddle">
                     </td>
-					<td class="coolButton" onclick="logout();">
-						<img id='columnButton' src="../images/logout.gif" title="Log out" alt="Log out"
-							align="absmiddle">
-					</td>
 					<td class="coolButton" onclick="aboutUS();">
 						<img id='columnButton' src="../images/aboutus.gif" title="About US" alt="About US"
 							align="absmiddle">
+					</td>
+					<td class="coolButton" onclick="logout();">
+						<img id='columnButton' src="../images/logout.gif" title="Log out" alt="Log out"
+							 align="absmiddle">
 					</td>
 					<td class="coolButton" colspan="8" width="5%">
 						&nbsp;
