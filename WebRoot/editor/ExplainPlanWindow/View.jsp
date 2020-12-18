@@ -51,9 +51,7 @@
 			border: 2px groove;
 		}
 		.dynamic-tab-pane-control .tab-page {
-			height:			100%;
-			min-height:		800px;
-
+            height:	100%;
 		}
 
 		.dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
@@ -205,6 +203,28 @@
             border-color : #CCCC99;
             border-style: solid;
         }
+        .code-string {
+            color:#333;
+        }
+        .code-number {
+            color:#cc00cc;
+        }
+        .code-boolean {
+            color:#00ff00;
+        }
+        .code-null {
+            color:#808080;
+        }
+        .code-key {
+            color:#000080;
+            font-weight:bold;
+        }
+        .code-attr {
+            color:#3939ff;
+        }
+        .code-cdata {
+            color:#008080;
+        }
 
 	</style>
 
@@ -352,8 +372,8 @@
 
 		</div>
 		<div id="ExplainPlanWindow" style="min-height:100%; _height:100%; border: 2px; overflow: no; background-color: ButtonFace;">
-			<div class="tab-pane" id="tabPanel" style=" min-height:100%; _height:100%; ">
-				<div class="tab-page" id="tabpage_1" style=" min-height:100%; _height:100%;">
+			<div class="tab-pane" id="explainTabPanel" style="height:100px; ">
+				<div class="tab-page" id="tabpage_1" style="height:100px; overflow: auto; padding: 0px">
 					<h2 class="tab" id="tabTitle_1">
 						<img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span>
 						<span id='objTitle_1'>Tree</span>
@@ -363,15 +383,9 @@
 						 onclick="hiddenBaisworkMenu(event)"
 						 onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
 					</div>
-					<div
-							style="width: 100%; height: 100%; background-color: white; display: none;"
-							name="changeOutResultDiv" id="changeOutResultDiv"
-							onclick="hiddenBaisworkMenu(event)"
-							onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
-					</div>
 					<div id="outResultMenu" name="outResultMenu" class="BaisworkM"></div>
 				</div>
-				<div class="tab-page" id="tabpage_2" style=" min-height:100%; _height:100%;">
+				<div class="tab-page" id="tabpage_2" style="height:100px; overflow: auto;">
 					<h2 class="tab" id="tabTitle_2">
 						<img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span>
 						<span id='objTitle_2'>HTML</span>
@@ -379,26 +393,44 @@
                     <div id="explainHtmlId" style="font-family: Arial, Courier, mono; font-size: 12px;">
                     </div>
 				</div>
-				<div class="tab-page" id="tabpage_3" style=" min-height:100%; _height:100%;">
+				<div class="tab-page" id="tabpage_3" style="height:100px; overflow: auto;">
 					<h2 class="tab" id="tabTitle_3">
 						<img style="border:none" id='objIcoId_3' src='' align='absmiddle' /><span id="tmpImg_3" style="display:none"></span>
 						<span id='objTitle_3'>Text</span>
 					</h2>
 
-					<div id="explainTextId" style="font-family: Arial, Courier, mono; font-size: 12px; color: #000080">
+					<div id="explainTextId" style="font-family: Arial, Courier, mono; font-size: 12px; color: #000080;">
 					</div>
 
 				</div>
-				<div class="tab-page" id="tabpage_4" style=" min-height:100%; _height:100%;">
+				<div class="tab-page" id="tabpage_4" style="height:100px; overflow: auto;">
 					<h2 class="tab" id="tabTitle_4">
 						<img style="border:none" id='objIcoId_4' src='' align='absmiddle' /><span id="tmpImg_4" style="display:none"></span>
 						<span id='objTitle_4'>XML</span>
 					</h2>
-
+                    <div id="explainXMLId" style="font:normal normal 8pt Verdana,Arial; font-size: 12px; color:#000080;"></div>
 				</div>
-
 			</div>
 		</div>
+        <script type="text/javascript">
+            var ctHeightObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('ExplainPlanWindow');
+            var ctpageObj1 = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_1');
+            var ctpageObj2 = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_2');
+            var ctpageObj3 = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_3');
+            var ctpageObj4 = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_4');
+
+
+            var deHeight = 53; // footer 26px + tabtitle 25 px + border 2px
+            var ctpageHeight = ctHeightObj.clientHeight - deHeight;
+            ctpageObj1.style.height = ctpageHeight + "px";
+            ctpageObj2.style.height = ctpageHeight + "px";
+            ctpageObj3.style.height = ctpageHeight + "px";
+            ctpageObj4.style.height = ctpageHeight + "px";
+
+
+            var commandTabPane = new WebFXTabPane( document.getElementById( "explainTabPanel" ), true );
+
+        </script>
 
 
 
@@ -615,21 +647,33 @@
         function explainTreeCallback(data) {
             // console.log(data);
             var mdata = [];
+            var xmlf = "";
 
             for (var i = 0; i < data.length; i++) {
                 mdata[i] = [];
                 for (var j = 2; j < data[0].length-2; j++) {
                     mdata[i][j-2] = data[i][j];
                 }
+                for (var k = data[0].length-1; k < data[0].length; k++) {
+                   (i > 0) ? xmlf += data[i][k] : '';
+                }
             }
             // 第一个 TAB 页 -- Tree
             parent.parent.editorFrame.GGETFRAME.showDataHtmlExplain('outResultDiv', mdata);
+
+
+            // 第四个 TAB 页 -- XML
+            // xmlf = "<xmp>" + xmlf + "</xmp>";
+            xmlf = parseXML(xmlf);
+            $('explainXMLId').set('html', xmlf);
+
         }
 
 
         function explainInfoCallback(data) {
-            console.log(data);
             var s = '';
+            var sFlag = 0;
+            var sf = 0;
             // 第二个TAB页面 -- HTML
             var tabstyle = "font:normal normal 8pt Verdana,Arial;text-decoration:none;color:#000000; border:0px;";
             var tabhtmlf = '<table style="' + tabstyle + '">';
@@ -652,7 +696,7 @@
                         }
                         tabhtmlf += '</tr>';
                     }
-                } else if ( i > 4 ) {
+                } else if ( i > 4 && sFlag <= 3) {
                     var std = data[i];
                     if (std.replace(/^-.*$/g, '') != "") {
                         std = data[i].split("|");
@@ -664,8 +708,29 @@
                         tabhtmlf += '</tr>';
                     }
                 }
+
+                (data[i].replace(/^-.*$/g, '') == "") ? sFlag++ : '';
+
+                (sFlag == 3) ? (sf = i, sFlag++, tabhtmlf += '</table><br/>') : '';
+
+               if ( i > sf && i > 4 && sFlag > 3) {
+                   (i == sf + 2) ? tabhtmlf += data[i] : '';
+                   (i == sf + 3) ? tabhtmlf += '<hr size="1" width="260" align="left"/>' : '';
+                   (i == sf + 4) ? tabhtmlf += '<ul style="font:normal normal 8pt Verdana,Arial; margin:15px; padding: 10px; list-style: inside;">' : '';
+                   if (i >= sf + 5 ) {
+                       if (data[i] != null) {
+                           // 连续多行拼接
+                           (data[i].trim().match(/^[0-9].* - /) != null) ? tabhtmlf += '<li>' + data[i] : tabhtmlf += data[i];
+                           if (i < data.length -1) (data[i+1].trim().match(/^[0-9].* - /) != null && i < data.length -2) ? tabhtmlf += '</li>' : '';
+                           else tabhtmlf += '</li>';
+                       }
+                   }
+                   (i == data.length -1) ? tabhtmlf += '</ul>' : '';
+               }
+
             }
-            tabhtmlf += '</table>';
+            // tabhtmlf += '</table>';
+
             $('explainHtmlId').set('html', tabhtmlf);
 
 
@@ -676,6 +741,62 @@
         }
 
     }
+
+    var parseXML = function(content) {
+        var xml_doc = null;
+        try {
+            xml_doc = (new DOMParser()).parseFromString(content.replace(/[\n\r]/g, ""), 'text/xml');
+        } catch (e) {
+            return false;
+        }
+        var flag=0;
+        var list = [];
+        buildXML(0, list, xml_doc.documentElement);
+
+
+        function buildXML(index, list, element) {
+            var t = []
+            for (var i = 0; i < flag; i++) {
+                t.push('&nbsp;&nbsp;&nbsp;&nbsp;');
+            }
+            t = t.join("");
+            list.push(t + '&lt;<span class="code-key">'+ element.nodeName +'</span>&gt;<br/>');
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var nodeName = element.childNodes[i].nodeName;
+                var nodeAttr = "";
+                if (element.childNodes[i].getAttributeNames().length > 0) {
+                    nodeAttr = '&nbsp;' + element.childNodes[i].getAttributeNames()[0] + '=<span class="code-attr">"' + element.childNodes[i].getAttribute(element.childNodes[i].getAttributeNames()[0]) + '"</span>';
+                }
+                if (element.childNodes[i].childNodes.length===0) {
+                    var value_txt =""
+                    var item = t + '&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-key">' + nodeName +
+                        '</span>' + nodeAttr +'&gt;' + value_txt + '&lt;/<span class="code-key">' + nodeName + '</span>&gt;<br/>';
+                    list.push(item);
+                } else if ( (element.childNodes[i].childNodes.length === 1 && element.childNodes[i].childNodes[0].nodeValue!=null)) {
+                    var value = element.childNodes[i].innerHTML;
+                    value = value.replace(/\&/g, '&amp;').replace(/\</g,'&lt;').replace(/\>/g,'&gt;').replace(/\"/g, '&quot;');
+                    value = value.replace('![CDATA[','<span class="code-cdata">![CDATA[</span>');
+                    var value_color = !isNaN(Number(value)) ? 'code-number' : 'code-string';
+                    var value_txt = '<span class="'+ value_color +'">' + value + '</span>';
+                    var item = t + '&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="code-key">' + nodeName +
+                        '</span>' + nodeAttr +'&gt;' + value_txt + '&lt;/<span class="code-key">' + nodeName + '</span>&gt;<br/>';
+                    list.push(item);
+
+                } else {
+                    flag++;
+                    buildXML(++index, list, element.childNodes[i]);
+                    flag--;
+                }
+            }
+            list.push(t + '&lt;/<span class="code-key">'+ element.nodeName +'</span>&gt;<BR/>');
+        }
+
+        return list.join("");
+    };
+
+	function arLeftAbs() {};
+
+
 
 </script>
 </body>
