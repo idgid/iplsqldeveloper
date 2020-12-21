@@ -2339,7 +2339,7 @@ function hiddenBaisworkMenu(evt) {
 
 //创建编辑区的右键菜单
 function createBaisWorkMenu(divname) {
-	var stemp ='<a onclick="execExplainPlan(event);" ><font color="#808080">Explain Plan</font></a>' +
+	var stemp ='<a onclick="execExplainPlan(event);" >Explain Plan</a>' +
 	'<a onclick="execTest(event)" ><font color="#808080">Test</font></a>' +
 	'<ul></ul>' +
 	'<a onclick="execPaste(\'myTextarea\',\'paste\',event);" href="#">Paste&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ctrl+V</a>' +
@@ -2363,7 +2363,7 @@ function createBaisWorkMenu(divname) {
 //工作编辑区右键Explain Plan命令执行函数
 function execExplainPlan(e) {
 	hiddenBaisworkMenu(e);
-	//alert(baisworkSQL);
+    parent.parent.editorFrame.explain('myTextarea');
 }
 
 //工作编辑区右键Test命令执行函数
@@ -4764,6 +4764,12 @@ function doOnExplainRowSelected(rowID,celInd){
     if ( tmpStr == "NESTED LOOPS") footStr = 'Join two tables where at least one index is used';
     if ( tmpStr == "SORT GROUP BY") footStr = 'Sort a result set for a GROUP BY clause';
     if ( tmpStr == "SORT AGGREGATE") footStr = 'Sort a result set for an aggregation function (MIN, MAX, ...)';
+    if ( tmpStr == "SORT JOIN") footStr = 'Sort a set of records for a MERGE JOIN operation';
+    if ( tmpStr == "MERGE JOIN OUTER" || tmpStr == "MERGE JOIN") footStr = 'Join tables by merging sorted lists of records from each table';
+    if ( tmpStr == "HASH JOIN") footStr = 'Join one in-memory table to another table using a hash key';
+    if ( tmpStr == "INDEX UNIQUE SCAN") footStr = 'Select a unique value from a unique index';
+    if ( tmpStr == "TABLE ACESS BY INDEX ROWID") footStr = 'Return a single row based on its ROWID';
+
     setFootView('9999', footStr);
 
     if ( (parseInt(explainDatalink[0]) + 1) == rowID ) {
