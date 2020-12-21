@@ -829,47 +829,51 @@ function setDivValueText (divName,textvalue) {
 	}
 }
 
-//监听F8/F9/F10/F12按键事件，正常
+// 监听F8/F9/F10/F12按键事件，正常
+// 加入 F6 监听
 function mykeydown_old(myevent,textareaname){
-		//alert(myevent.key);
-		//$('myTextarea').focus();
-		if(myevent.key == 'f8') {
-			//'F8' 按下，和点击图标调用同一个事件处理函数
-            parent.editorFrame.executeRun(textareaname);
-		}
-		if(myevent.key == 'f9') {
-			//'F9' 按下，和点击图标调用同一个事件处理函数
-			//parent.editorFrame.rollback();
-			parent.parent.editorFrame.dhtmlx.alert({
-				type:"alert-warning",
-				top: dAlertTop,
-				text:"coding..."
-			});
-		}
-		if(myevent.key == 'f10') {
-			//'F10' 按下，和点击图标调用同一个事件处理函数
-			parent.editorFrame.commit();
-		}
-		if(myevent.key == 'f12') {
-			//'F12' 按下，和点击图标调用同一个事件处理函数
-			parent.editorFrame.rollback();
-		}
+    if(myevent.key == 'f2') {
+        //'F6' 按下，和点击图标调用同一个事件处理函数
+        parent.editorFrame.explain(textareaname);
+    }
+    if(myevent.key == 'f8') {
+		//'F8' 按下，和点击图标调用同一个事件处理函数
+           parent.editorFrame.executeRun(textareaname);
+	}
+	if(myevent.key == 'f9') {
+		//'F9' 按下，和点击图标调用同一个事件处理函数
+		//parent.editorFrame.rollback();
+		parent.parent.editorFrame.dhtmlx.alert({
+			type:"alert-warning",
+			top: dAlertTop,
+			text:"coding..."
+		});
+	}
+	if(myevent.key == 'f10') {
+		//'F10' 按下，和点击图标调用同一个事件处理函数
+		parent.editorFrame.commit();
+	}
+	if(myevent.key == 'f12') {
+		//'F12' 按下，和点击图标调用同一个事件处理函数
+		parent.editorFrame.rollback();
+	}
 
 
 }
 
 //监听F8/F9/F10/F12按键事件，正常
 function mykeydown(myevent_key,textareaname){
-	//alert(myevent.key);
-	//$('myTextarea').focus();
+    if(myevent_key == 'f2') {
+        //'F6' 按下，和点击图标调用同一个事件处理函数
+        if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
+            parent.parent.parent.editorFrame.GGETFRAME.explain(textareaname);
+        } else {
+            parent.parent.editorFrame.GGETFRAME.explain(textareaname);
+        }
+    }
 	if(myevent_key == 'f8') {
 		//'F8' 按下，和点击图标调用同一个事件处理函数
-        //debugger
-        if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
-            parent.parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
-        } else {
-            parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
-        }
+        parent.parent.editorFrame.GGETFRAME.initExecuteForF8(textareaname);
 	}
 	if(myevent_key == 'f9') {
 		//'F9' 按下，和点击图标调用同一个事件处理函数
@@ -4707,24 +4711,45 @@ function sortNumberDesc(a,b)
 function explain(a) {
     var tempSql = getTextareaContents(a);
 
-    parent.parent.leftFrameList.createNewSql('EPL','View.jsp');
-
-    // 等待 editarea 初始化完成后执行
-    setTimeout(function() {
-        parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, tempSql);
-
-		parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
-
-		tempSql = tempSql.trim().replace(/[;]*$/, '');
-
+    // 原计划执行窗口
+    if (parent.parent.leftFrameList.getWindowType() == 'EPL') {
+        // 修改左侧窗口提示信息
+        parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
+        // 执行计划页面和数据初始化
         parent.parent.parent.editorFrame.GGETFRAME.explainInit(tempSql);
+    } else {
+        // 新创建计划执行窗口
+        parent.parent.leftFrameList.createNewSql('EPL','View.jsp');
+        // 等待 editarea 初始化完成后执行
+        setTimeout(function() {
+            // 设定新开窗口 editarea 编辑区中的 text 内容
+            parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, tempSql);
+            // 修改左侧窗口提示信息
+            parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
+            // 过滤最后的 ';' 符号
+            tempSql = tempSql.trim().replace(/[;]*$/, '');
+            // 执行计划页面和数据初始化
+            parent.parent.parent.editorFrame.GGETFRAME.explainInit(tempSql);
+            // 延时 500 ms
+        }, 500);
+    }
+}
 
-
-    }, 500);
-
-
-
-
+// F8按键与点击事件一致调用函数
+function initExecuteForF8(textareaname) {
+    if (parent.parent.leftFrameList.getWindowType() == 'EPL') {
+        if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
+            parent.parent.parent.editorFrame.GGETFRAME.explain(textareaname);
+        } else {
+            parent.parent.editorFrame.GGETFRAME.explain(textareaname);
+        }
+    } else {
+        if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
+            parent.parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+        } else {
+            parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+        }
+    }
 }
 
 //关于我们团队

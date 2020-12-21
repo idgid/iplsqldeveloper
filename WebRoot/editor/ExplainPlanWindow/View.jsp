@@ -273,7 +273,7 @@
 	<div id="BaisworkMenu" name="BaisworkMenu" class="BaisworkM"></div>
     <div class="top">
 	<div id="myText"
-		 style="border: 2px; overflow: no; background-color: ButtonFace; width: 100%; height: 35%">
+		 style="border: 2px; overflow: no; background-color: ButtonFace; width: 100%; height: 30%">
 		<div id="editortop" class="webfxGrid" style="width: 100%" >
 			<%--<div id="myTextarea" class="editor" contentEditable--%>
 			<%--onkeydown="detectCtrlKey(event)" onkeyup=""--%>
@@ -285,42 +285,13 @@
 			<textarea id="myTextarea" class="editor" name="myTextarea_editor"></textarea>
 				<div id="autoCompletion" name="autoCompletion"></div>
 
-			<div
-					style="border: 0px; width: 3%; height: 100%; background: ButtonFace; float: right; vertical-align: middle; display: none;">
-				<table border="0" id="rightToolBar"
-					   style="background: ButtonFace;" cellspacing="1" height="100%">
-					<tr>
-						<td class="coolButton" height="48">
-							&nbsp;
-						</td>
-					</tr>
-					<tr>
-						<td class="coolButton" id="previouSql" onclick="execNextSql()">
-							<img id='previouSqlButton' src="../../images/previous_sql.gif"
-								 title="Previous SQL" alt="Previous SQL" align="absmiddle">
-						</td>
-					</tr>
-					<tr>
-						<td class="coolButton" id="nextSql"
-							onclick="changePreviousSql('previouSql')">
-							<img id='nextSqlButton' src="../../images/next_sql.gif"
-								 title="Next SQL" alt="Next SQL" align="absmiddle">
-						</td>
-					</tr>
-					<tr style="height: 85%;">
-						<td class="coolButton" height="85%">
-							&nbsp;
-						</td>
-					</tr>
-				</table>
 
-			</div>
 		</div>
 	</div>
 	<div id="t_controlDiv"
-		 style="border: 1px; overflow: no; background-color: ButtonFace; padding-bottom:26px; height: 65%; width: 100%;">
+		 style="border: 1px; overflow: no; background-color: ButtonFace; padding-bottom:26px; height: 70%; width: 100%;">
 
-		<div id="foot_outputDiv1"
+		<div id="explain_outputDiv"
 			 style="overflow: no; background-color : ButtonFace; width: 100%">
 
 			<table border="0" id="toolBar" style="background: ButtonFace;"
@@ -333,12 +304,12 @@
 						<select style="width:85px;font-size:12px;" name="planChoose" id="planChoose" onchange="forsubmit()">
 							<option value="0" >Choose</option>
 							<option value="1" >Rule</option>
-							<option value="1" >First rows</option>
-							<option value="1" selected>All rows</option>
+							<option value="2" >First rows</option>
+							<option value="3" selected>All rows</option>
 						</select>
 					</td>
 					<td class="coolButtonDisabled" id='arLeftAbsTd'
-						onclick="arLeftAbs()">
+						onclick="arLeft()">
 						<img id='arLeftAbsButton' src="../../images/ar_left_abs.png"
 							 title="First operation" alt="First operation" align="absmiddle">
 					</td>
@@ -348,17 +319,17 @@
 							 title="Previous operation" alt="Previous operation" align="absmiddle">
 					</td>
 					<td class="coolButtonDisabled" id='arRightTd'
-						onclick="arLeftAbs()">
+						onclick="arRight()">
 						<img id='arRightButton' src="../../images/ar_right.png"
 							 title="Next operation" alt="Next operation" align="absmiddle">
 					</td>
 					<td class="coolButtonDisabled" id='arRightAbsTd'
-						onclick="arLeftAbs()">
+						onclick="arRightAbs()">
 						<img id='arRightAbsButton' src="../../images/ar_right_abs.png"
 							 title="Last operation" alt="Last operation" align="absmiddle">
 					</td>
 					<td class="coolButtonDisabled" id="preferencesTd"
-						onclick="arLeftAbs()">
+						onclick="">
 						<img id='preferencesButton' src="../../images/compiler_preferences.png"
 							 title="Preferences..." alt="Preferences..." align="absmiddle">
 					</td>
@@ -381,7 +352,7 @@
 					<div style="width: 100%; height: 95%; background-color: white"
 						 name="outResultDiv" id="outResultDiv"
 						 onclick="hiddenBaisworkMenu(event)"
-						 onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
+						 onmouseup="hiddenBaisworkMenu(event)">
 					</div>
 					<div id="outResultMenu" name="outResultMenu" class="BaisworkM"></div>
 				</div>
@@ -466,32 +437,7 @@
 </div>
 
 
-<script>
-	// 右键菜单
-	function rightToolBarButton() {
-			var rightcells = document.getElementById('rightToolBar').rows[1].cells;
-		//alert(rightcells[0]);
-		for (var i = 0; i < rightcells.length; i++)
-		{
-			createButton(rightcells[i]);
-			//rightcells[i].setToggle(true);
-			//alert(rightcells[i]);
-			//cells1[i].setAlwaysUp(true)
-		}
-		rightcells[0].setEnabled(false);
-		rightcells = document.getElementById('rightToolBar').rows[2].cells;
-		//alert(rightcells[0]);
-		for (var i = 0; i < rightcells.length; i++)
-		{
-			createButton(rightcells[i]);
-			//rightcells[i].setToggle(true);
-			//alert(rightcells[i]);
-			//cells1[i].setAlwaysUp(true)
-		}
-		rightcells[0].setEnabled(false);
-	}
-	rightToolBarButton();
-</script>
+
 <script>
 	function addMyTextAreaKeyDown(keycode) {
 
@@ -506,7 +452,10 @@
 
 <script>
 
-	// initialisation
+    var explainPlanDataArray = [];
+    var explainDatalink = [];
+
+    // initialisation
 	editAreaLoader.init({
 		id: "myTextarea"	// id of the textarea to transform
 		,start_highlight: true	// if start with highlight
@@ -521,7 +470,6 @@
         ,save_callback: "winsave"
 	});
 
-	createOutResultMenu('outResultMenu');
 
 	function initToolBarButton() {
 		var cells = document.getElementById('toolBar').rows[0].cells;
@@ -533,9 +481,9 @@
 			//cells1[i].setAlwaysUp(true)
 		}
 
-		cells[2].setEnabled(true);
-		cells[3].setEnabled(true);
-		cells[6].setEnabled(true);
+		cells[4].setEnabled(true);
+		cells[5].setEnabled(true);
+		// cells[6].setEnabled(true);
 
 		// cells[9].setToggle(true);
 
@@ -577,7 +525,7 @@
 
     // 文本内容保存到本地
     function winsave() {
-        f = "tmp.sql";
+        f = "explain.sql";
         c = document.getElementById('frame_myTextarea').contentWindow.editArea.last_selection.full_text;
         try {
             save_record(f, c);
@@ -648,15 +596,18 @@
             // console.log(data);
             var mdata = [];
             var xmlf = "";
+            explainPlanDataArray = [];
 
             for (var i = 0; i < data.length; i++) {
-                mdata[i] = [];
+                mdata[i] = [], explainPlanDataArray[i] = [];
                 for (var j = 2; j < data[0].length-2; j++) {
                     mdata[i][j-2] = data[i][j];
                 }
                 for (var k = data[0].length-1; k < data[0].length; k++) {
                    (i > 0) ? xmlf += data[i][k] : '';
                 }
+                explainPlanDataArray[i][0] = data[i][0];
+                explainPlanDataArray[i][1] = data[i][1];
             }
             // 第一个 TAB 页 -- Tree
             parent.parent.editorFrame.GGETFRAME.showDataHtmlExplain('outResultDiv', mdata);
@@ -666,6 +617,12 @@
             // xmlf = "<xmp>" + xmlf + "</xmp>";
             xmlf = parseXML(xmlf);
             $('explainXMLId').set('html', xmlf);
+
+            // 创建计划执行链路数组
+            explainDatalink = getEPLDataLink(explainPlanDataArray);
+
+            // 定位到计划表中最开始的位置
+
 
         }
 
@@ -702,8 +659,11 @@
                         std = data[i].split("|");
                         tabhtmlf += '<tr bgcolor="#F7F777" valign="bottom">';
                         for ( var j = 1; j < std.length - 1; j ++ ) {
-                            std[j] = std[j].trim();
-                            tabhtmlf += '<td class="s26" align="right">' + std[j] + '</td>';
+                            var alignStr = "right";
+                            std[2] = std[2].replace(/ /g, '&nbsp;');
+                            ( j == 2 || j == 3 ) ? alignStr = "left" : '';
+
+                            tabhtmlf += '<td class="s26" align="' + alignStr + '">' + std[j] + '</td>';
                         }
                         tabhtmlf += '</tr>';
                     }
@@ -742,6 +702,7 @@
 
     }
 
+    // 对 XML 显示格式化
     var parseXML = function(content) {
         var xml_doc = null;
         try {
@@ -794,7 +755,103 @@
         return list.join("");
     };
 
-	function arLeftAbs() {};
+	// 得到某个节点的最末子节点
+    // 入参：关系数组，节点ID
+	function getEPLFirstChildrenNode(a, id) {
+	    var arr = a;
+	    var rid = id;
+        for ( var i = 0; i < arr.length; i++ ) {
+            if ( arr[i][1] == id) id = arr[i][0];
+        }
+        rid == id ? rid = '' : rid = id;
+        return rid;
+    }
+
+    // 得到某节点的父节点
+    // 入参：关系数组，节点ID
+    function getEPLParenetNode(a, id) {
+        var arr = a;
+        var rid = id;
+        for ( var i = 0; i < arr.length; i++ ) {
+            if ( arr[i][0] == id) rid = arr[i][1];
+        }
+        rid == id ? rid = '' : '';
+        return rid;
+    }
+
+    // 得到某个节点的下一个平级节点
+    // 入参：关系数组，节点ID
+    function getEPLNextNode(a, id) {
+        var arr = a;
+        var pid = '';
+        var rid = '';
+        for ( var i = 0; i < arr.length; i++ ) {
+            if ( arr[i][0] == id) {
+                pid = arr[i][1];
+            }
+            // 已经找到 Pid
+            if ( pid != '') {
+                if (arr[i][1] == pid && arr[i][0] > id) {
+                    rid = arr[i][0];
+                    break;
+                }
+            }
+        }
+        return rid;
+    }
+
+    // 得到某节点的下一个步骤节点
+    // 执行的先后顺序是从父节点开始找，有子节点先执行子节点，
+    // 有多个子节点先执行从上向下的第一个，子节点全部执行完毕再执行父节点
+    function getEPLNextStepNode(a, id) {
+	    var arr = a;
+        var rid = '';
+        var rrid = '';
+        // 除首节点外的规则
+        // 首先找下一个同级
+        // 为空，即不存在
+        if ( getEPLNextNode(a, id) == '') {
+            // 则找上一级
+            rrid = getEPLParenetNode(a, id);
+        } else {
+            // 下一个同级存在
+            // 则取该同级的最末节点
+            rid = getEPLNextNode(a, id);
+            rrid = getEPLFirstChildrenNode(a, rid);
+
+        }
+        return rrid;
+    }
+
+    function getEPLDataLink(a) {
+	    var dl = [];
+	    // 首先得到起始节点 id
+        dl[0] =  getEPLFirstChildrenNode(a, 0);
+        // 再次从起始节点开始，逐步得到下一个节点
+        for ( var i = 0; i < a.length-1; i++ ) {
+            (getEPLNextStepNode(a, dl[i]) == "") ? '' : dl[i+1] = getEPLNextStepNode(a, dl[i]);
+        }
+        return dl;
+    }
+
+    function arLeft() {
+
+    }
+
+
+	function arLeftAbs() {
+	    var explainDatalink = [];
+        explainDatalink = getEPLDataLink(explainPlanDataArray);
+        console.log(explainDatalink);
+    };
+
+	function arRigth() {
+
+    }
+
+    function arRightAbs() {
+
+    }
 
 
 
