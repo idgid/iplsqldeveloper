@@ -301,20 +301,20 @@
 						<span style="font-family: Arial, Courier, mono; font-size: 12px;">Optimizer goal</span>
 					</td>
 					<td id="planChooseTd">
-						<select style="width:85px;font-size:12px;" name="planChoose" id="planChoose" onchange="forsubmit()">
-							<option value="0" >Choose</option>
-							<option value="1" >Rule</option>
-							<option value="2" >First rows</option>
-							<option value="3" selected>All rows</option>
+						<select style="width:85px;font-size:12px;" name="planChoose" id="planChoose" onchange="parent.parent.editorFrame.explain('myTextarea')">
+							<option value="choose" >Choose</option>
+							<option value="rule" >Rule</option>
+							<option value="first_rows" >First rows</option>
+							<option value="all_rows" selected>All rows</option>
 						</select>
 					</td>
 					<td class="coolButtonDisabled" id='arLeftAbsTd'
-						onclick="arLeft()">
+						onclick="arLeftAbs()">
 						<img id='arLeftAbsButton' src="../../images/ar_left_abs.png"
 							 title="First operation" alt="First operation" align="absmiddle">
 					</td>
 					<td class="coolButtonDisabled" id='arLeftTd'
-						onclick="arLeftAbs()">
+						onclick="arLeft()">
 						<img id='arLeftButton' src="../../images/ar_left.png"
 							 title="Previous operation" alt="Previous operation" align="absmiddle">
 					</td>
@@ -413,10 +413,10 @@
                cellspacing="1" width="100%">
             <tr align='left'>
                 <td class="coolButtonDisabled_my">
-                    <img id='execIsRunButton' src="../../images/exec_norun.gif"
+                    <img id='execIsRunButton' src="../../images/view_explain.png"
                          align="absmiddle">
                 </td>
-                <td class="coolButton" onclick="changeAutorefresh('autorefreshButton')">
+                <td class="coolButton" onclick="">
                     <img id='autorefreshButton' src="../../images/autorefresh.gif"
                          title="Auto refresh timer (5 sec)"
                          alt="Auto refresh timer (5 sec)" align="absmiddle">
@@ -454,6 +454,7 @@
 
     var explainPlanDataArray = [];
     var explainDatalink = [];
+    var explainDatalinkPoint = 0;  // 初始指向 0 的位置
 
     // initialisation
 	editAreaLoader.init({
@@ -560,6 +561,7 @@
 
     function explainInit(s) {
 	    var sql = [];
+	    var m = parent.parent.editorFrame.GGETFRAME.document.getElementById('planChoose');
         sql[0] = "explain plan for "  + s ;
         sql[1] = "select * from table(dbms_xplan.display())";
         sql[2] = "select id,\n" +
@@ -579,13 +581,15 @@
             "  from plan_table t\n" +
             " start with parent_id is null\n" +
             "connect by prior id = parent_id";
+        m = m.options[m.selectedIndex].value;
+        sql[4] = "alter session set optimizer_mode=" + m;
 
-
-        BaisWorkBean.intOfInsertDelete(sql[0], '');
+		BaisWorkBean.intOfInsertDelete(sql[4], '');
+		BaisWorkBean.intOfInsertDelete(sql[0], '');
         DbObjectBean.getOther2(sql[1], ['Explain Info'], explainInfoCallback);
         DbObjectBean.getOther2(sql[2], ['Id','Pid','Description','Object owner','Object name', 'Cost', 'Cardinality', 'Bytes', 'Time', 'XML'], explainTreeCallback);
 
-        //最后回滚
+        // 最后回滚
         setTimeout(function(){
             BaisWorkBean.setDbRollback();
         },600);
@@ -621,7 +625,15 @@
             // 创建计划执行链路数组
             explainDatalink = getEPLDataLink(explainPlanDataArray);
 
-            // 定位到计划表中最开始的位置
+			// 重置
+			explainDatalinkPoint = 0;
+			setExplainButton(2, false);
+			setExplainButton(3, false);
+			setExplainButton(4, true);
+			setExplainButton(5, true);
+			// 定位到计划表中最开始的位置
+			parent.parent.editorFrame.GGETFRAME.explainMygrid.setSelectedRow(parseInt(explainDatalink[explainDatalinkPoint]) + 1);  // grid 中第一行为 title ， 加上跳过
+
 
 
         }
@@ -829,30 +841,84 @@
         dl[0] =  getEPLFirstChildrenNode(a, 0);
         // 再次从起始节点开始，逐步得到下一个节点
         for ( var i = 0; i < a.length-1; i++ ) {
-            (getEPLNextStepNode(a, dl[i]) == "") ? '' : dl[i+1] = getEPLNextStepNode(a, dl[i]);
+            (getEPLNextStepNode(a, parseInt(dl[i])) == "") ? '' : dl[i+1] = getEPLNextStepNode(a, parseInt(dl[i]));
         }
         return dl;
     }
 
+    // 前一步计划步骤 i = 3
     function arLeft() {
+		var cells = document.getElementById('toolBar').rows[0].cells;
+		var tmygrid = parent.parent.editorFrame.GGETFRAME.explainMygrid;
+		if ( cells[3].getEnabled() ) {
+			explainDatalinkPoint--;
+			setExplainButton(4, true);
+			setExplainButton(5, true);
+			(explainDatalinkPoint <= 0) ? ( explainDatalinkPoint = 0,
+					setExplainButton(2, false),
+					setExplainButton(3, false),
+					setExplainButton(4, true),
+					setExplainButton(5, true) ) : '';
+			tmygrid.setSelectedRow(parseInt(explainDatalink[explainDatalinkPoint]) + 1);
+			doOnExplainRowSelected(tmygrid.getSelectedId(), 0);
+		}
 
-    }
+	}
 
-
+	// 计划步骤开始位置 i = 2
 	function arLeftAbs() {
-	    var explainDatalink = [];
-        explainDatalink = getEPLDataLink(explainPlanDataArray);
-        console.log(explainDatalink);
-    };
+		var cells = document.getElementById('toolBar').rows[0].cells;
+		var tmygrid = parent.parent.editorFrame.GGETFRAME.explainMygrid;
+		if ( cells[2].getEnabled() ) {
+			explainDatalinkPoint = 0;
+			setExplainButton(2, false);
+			setExplainButton(3, false);
+			setExplainButton(4, true);
+			setExplainButton(5, true);
+			tmygrid.setSelectedRow(parseInt(explainDatalink[explainDatalinkPoint]) + 1);
+			doOnExplainRowSelected(tmygrid.getSelectedId(), 0);
+		}
+	};
 
-	function arRigth() {
+	// 后一步计划步骤 i = 4
+	function arRight() {
+		var cells = document.getElementById('toolBar').rows[0].cells;
+		var tmygrid = parent.parent.editorFrame.GGETFRAME.explainMygrid;
+		if ( cells[4].getEnabled() ) {
+			explainDatalinkPoint++;
+			setExplainButton(2, true);
+			setExplainButton(3, true);
+			(explainDatalinkPoint >= (explainDatalink.length - 1)) ? ( explainDatalinkPoint = explainDatalink.length - 1,
+					setExplainButton(2, true),
+					setExplainButton(3, true),
+					setExplainButton(4, false),
+					setExplainButton(5, false) ) : '';
+			tmygrid.setSelectedRow(parseInt(explainDatalink[explainDatalinkPoint]) + 1);
+			doOnExplainRowSelected(tmygrid.getSelectedId(), 0);
+		}
+	}
 
-    }
-
+	// 计划步骤结束位置 i = 5
     function arRightAbs() {
+		var cells = document.getElementById('toolBar').rows[0].cells;
+		var tmygrid = parent.parent.editorFrame.GGETFRAME.explainMygrid;
+		if ( cells[4].getEnabled() ) {
+			explainDatalinkPoint = explainDatalink.length - 1;
+			setExplainButton(2, true);
+			setExplainButton(3, true);
+			setExplainButton(4, false);
+			setExplainButton(5, false);
+			tmygrid.setSelectedRow(parseInt(explainDatalink[explainDatalinkPoint]) + 1);
+			doOnExplainRowSelected(tmygrid.getSelectedId(), 0);
+		}
 
-    }
+	}
 
+	// 计划按钮关系设置 [位置, FALSE OR TRUE]
+	function setExplainButton(i, f) {
+		var cells = document.getElementById('toolBar').rows[0].cells;
+		cells[i].setEnabled(f);
+	}
 
 
 </script>

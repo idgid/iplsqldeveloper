@@ -69,6 +69,8 @@ if (UserObject == null ) var UserObject;
 
 if (mygrid == null)  var mygrid;
 
+if (explainMygrid == null)  var explainMygrid;
+
 //全局编辑区间textarea名称
 if (gMyTextArea == null)  var gMyTextArea='myTextarea';
 
@@ -2751,9 +2753,9 @@ function showDataHtmlD(data) {
 // 展示执行计划的 grid
 function showDataHtmlExplain(s,data) {
 
-    var mygrid = new dhtmlXGridObject(s);
+    explainMygrid = new dhtmlXGridObject(s);
 
-    mygrid.setImagePath("../../imgs/");
+    explainMygrid.setImagePath("../../imgs/");
 
     tlow_flag_num = data.length; //表格展示的行数
     tlow = data.length ;  //无标志行可去
@@ -2773,13 +2775,14 @@ function showDataHtmlExplain(s,data) {
     }
 
 
-    mygrid.setHeader(strHeader);
-    mygrid.setStyle("background-color: #FFF;text-align:left;",null,null,null);
+    explainMygrid.setHeader(strHeader);
+    explainMygrid.setStyle("background-color: #FFF;text-align:left;",null,null,null);
 
-    mygrid.setColAlign("left");
-    //mygrid.setColTypes("ro,ed");
+    explainMygrid.setColAlign("left");
 
-    mygrid.setColSorting(strSort);
+    explainMygrid.setColSorting(strSort);
+    explainMygrid.attachEvent("onRowSelect",doOnExplainRowSelected);
+
 
 
     var strHeaderWidth = "";
@@ -2803,7 +2806,7 @@ function showDataHtmlExplain(s,data) {
     strHeaderWidth =  strHeaderWidth;
 
 
-    mygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
+    explainMygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
 
     if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
         errOracleMsg = data[0][1];
@@ -2815,10 +2818,9 @@ function showDataHtmlExplain(s,data) {
         });
     } else {
 
-        //mygrid.enableAutoHeigth(true,380);
 
-        mygrid.init();  //进行初始化
-        mygrid.setEditable(false);
+        explainMygrid.init();  //进行初始化
+        explainMygrid.setEditable(false);
 
         for(var i = 1; i < tlow; i++) {
             var strRow = "";
@@ -2831,9 +2833,9 @@ function showDataHtmlExplain(s,data) {
 
             }
             // trstyle="#E3E3E3"+ "," + trstyle;
-            mygrid.setColumnColor(trstyle);
+            explainMygrid.setColumnColor(trstyle);
             // strRow = i + "," + strRow;
-            mygrid.addRow(i,strRow);
+            explainMygrid.addRow(i,strRow);
         }
     }
 }
@@ -4749,6 +4751,36 @@ function initExecuteForF8(textareaname) {
         } else {
             parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
         }
+    }
+}
+
+
+function doOnExplainRowSelected(rowID,celInd){
+    var tmpStr = parent.parent.editorFrame.GGETFRAME.explainMygrid.cells(rowID, 0).getValue();
+    var footStr = '';
+    tmpStr = tmpStr.trim();
+    if ( tmpStr == "TABLE ACCESS FULL") footStr = 'Return all rows from a table';
+    if ( tmpStr == "VIEW") footStr = 'Resolve view and return the results';
+    if ( tmpStr == "NESTED LOOPS") footStr = 'Join two tables where at least one index is used';
+    if ( tmpStr == "SORT GROUP BY") footStr = 'Sort a result set for a GROUP BY clause';
+    if ( tmpStr == "SORT AGGREGATE") footStr = 'Sort a result set for an aggregation function (MIN, MAX, ...)';
+    setFootView('9999', footStr);
+
+    if ( (parseInt(explainDatalink[0]) + 1) == rowID ) {
+        setExplainButton(2, false);
+        setExplainButton(3, false);
+        setExplainButton(4, true);
+        setExplainButton(5, true);
+    } else if ( (parseInt(explainDatalink[explainDatalink.length -1]) + 1) == rowID ) {
+        setExplainButton(2, true);
+        setExplainButton(3, true);
+        setExplainButton(4, false);
+        setExplainButton(5, false);
+    } else {
+        setExplainButton(2, true);
+        setExplainButton(3, true);
+        setExplainButton(4, true);
+        setExplainButton(5, true);
     }
 }
 
