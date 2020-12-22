@@ -43,7 +43,7 @@ UserBean ub = (UserBean) session.getAttribute("user");
 						</font>
 					</div>
 				</td>
-				<td align="right">
+				<td align="right" style="padding: 2px;">
 					<br />
 					<span class="style1"> <%=ub.getUsername()%><%="@//" + ub.getDatabaseip() + ":" + ub.getListenport()
 					+ "/" + ub.getServername()%>

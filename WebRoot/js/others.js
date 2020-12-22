@@ -4768,7 +4768,7 @@ function doOnExplainRowSelected(rowID,celInd){
     if ( tmpStr == "MERGE JOIN OUTER" || tmpStr == "MERGE JOIN") footStr = 'Join tables by merging sorted lists of records from each table';
     if ( tmpStr == "HASH JOIN") footStr = 'Join one in-memory table to another table using a hash key';
     if ( tmpStr == "INDEX UNIQUE SCAN") footStr = 'Select a unique value from a unique index';
-    if ( tmpStr == "TABLE ACESS BY INDEX ROWID") footStr = 'Return a single row based on its ROWID';
+    if ( tmpStr == "TABLE ACCESS BY INDEX ROWID") footStr = 'Return a single row based on its ROWID';
 
     setFootView('9999', footStr);
 
