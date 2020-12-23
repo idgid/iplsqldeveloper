@@ -199,6 +199,10 @@ table {
                         <img id='columnButton' src="../images/explain.png" title="Explain Plan (F2)" alt="Explain Plan (F2)"
                              align="absmiddle">
                     </td>
+					<td class="coolButton" id="compileInvalidTd" onclick="parent.editorFrame.GGETFRAME.compileInvalid('myTextarea');">
+						<img id='columnButton' src="../images/compileinvalidobj.gif" title="Compile Invalid Objects" alt="Compile Invalid Objects"
+							 align="absmiddle">
+					</td>
 					<td class="coolButton" onclick="aboutUS();">
 						<img id='columnButton' src="../images/aboutus.gif" title="About US" alt="About US"
 							align="absmiddle">
@@ -215,7 +219,7 @@ table {
 
 							var toprightcells = document.getElementById('topToolBar').rows[1].cells;
 
-							for (var i = 0; i < 8; i++)
+							for (var i = 0; i < 9; i++)
 							{
 								createButton(toprightcells[i]);
 								//rightcells[i].setToggle(true);

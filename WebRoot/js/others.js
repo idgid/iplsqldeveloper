@@ -931,6 +931,8 @@ function executeRun(textareaname) {
                 || currWindoType == "TRI" || currWindoType == "JAV" || currWindoType == "VIE"
                 || currWindoType == "VIM") {
                 parent.parent.editorFrame.executeFUN(alltmpSql, currWindoType);
+            } else if (currWindoType == "CIO") {
+                // by 2020-12-22
             }
         }
     } else { // command window 多条命令执行入口
@@ -3063,7 +3065,7 @@ function showViewObject(type,name,field,operate) {
 		tmptype = "TAB";
 	}
 
-	parent.leftFrameList.createNewSql(tmptype, url);
+	parent.parent.leftFrameList.createNewSql(tmptype, url);
 
 	//parent.editorFrame.location.replace(url);
 }
@@ -3173,6 +3175,7 @@ function createWindowList(windowType, str, eFlag) {
 	var oname = "";
     var sqlImage = "";
     var eplimg = "../images/view_table.png";
+    var cioimg = "../images/compile_invalid_object.png"
 
 
 	eFlag == true ? eFlagStr = 'Edit' : eFlagStr = 'View';
@@ -3246,6 +3249,10 @@ function createWindowList(windowType, str, eFlag) {
         initStr = "Explain Plan Window - ";
         newStr = "";
         img = eplimg;
+    } else if (windowType == "CIO") {
+        initStr = "Compile Invalid Objects";
+        newStr = "";
+        img = cioimg;
     }
 
 	endStr = initStr + newStr;
@@ -3395,6 +3402,11 @@ function createWindowList(windowType, str, eFlag) {
             var SQLWindowString = "SQLWindow" + i;
             //saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
             initWindwoListButton(introws);
+        } else if (windowType == "CIO")  {
+            var i = getWindowTr();
+            var SQLWindowString = "SQLWindow" + i;
+            //saveDivValue("SQLWindow",SQLWindowString, getWindowType(), i);
+            initWindwoListButton(introws);
         }
 
 	}
@@ -3512,6 +3524,13 @@ function createNewSql(windowType, textareaname) {
 	    parent.parent.leftFrameList.createWindowList(windowType, this.url, f);
         //更改右边工作区的内容
 	    clearSQLWindow(windowType);
+
+    } else if (windowType == "CIO") {
+        this.url = textareaname;
+        //创建windowlist工具条
+        parent.parent.leftFrameList.createWindowList(windowType, this.url, f);
+        //更改右边工作区的内容
+        // clearSQLWindow(windowType);
 
     }
 }
@@ -3717,6 +3736,14 @@ function clearSQLWindow(windowType) {
         GGETFRAME = parent.editorFrame.GGETFRAME;
         // resetBaseWorkToolBar(false);
 
+    } else if (windowType == "CIO") {
+        var url = "../editor/CompileInvalidWindow/View.jsp";
+        parent.editorFrame.createSqlForColorText(parent.leftFrameList.GTDID, url);
+        parent.editorFrame.GGETFRAME = parent.editorFrame.document.getElementById("if_SQLWindow_" + parent.leftFrameList.GTDID).contentWindow;
+
+        GGETFRAME = parent.editorFrame.GGETFRAME;
+        // resetBaseWorkToolBar(false);
+
     }
 
 	//状态栏初始为空
@@ -3810,7 +3837,7 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
 					|| windowType == "VIM" || windowType == "TAB" || windowType == "CSQ"
-                    || windowType == "EPL" ) {
+                    || windowType == "EPL" || windowType == "CIO" ) {
 		var destMyTextarea = "myTextarea" + trRow;
 		var destobjTitle = "objTitle" + trRow;
 		var desttmpImg = "tmpImg" + trRow;
@@ -3859,6 +3886,11 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
         tmpStrA = initStr + titleStr;
     } else if (windowType == "EPL") {
         initStr = "Explain Plan Window - ";
+        tmpStr = initStr + titleStr;
+        tmpStrA = initStr + titleStr;
+        imgIcon = eplimg;
+    } else if (windowType == "CIO") {
+        initStr = "Compile Invalid Objects";
         tmpStr = initStr + titleStr;
         tmpStrA = initStr + titleStr;
         imgIcon = eplimg;
@@ -4712,7 +4744,8 @@ function sortNumberDesc(a,b)
 // 增加 Explain Plan 功能 2020-12-13
 function explain(a) {
     var tempSql = getTextareaContents(a);
-
+    // 过滤最后的 ';' 符号
+    tempSql = tempSql.trim().replace(/[;]*$/, '');
     // 原计划执行窗口
     if (parent.parent.leftFrameList.getWindowType() == 'EPL') {
         // 修改左侧窗口提示信息
@@ -4728,8 +4761,6 @@ function explain(a) {
             parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, tempSql);
             // 修改左侧窗口提示信息
             parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
-            // 过滤最后的 ';' 符号
-            tempSql = tempSql.trim().replace(/[;]*$/, '');
             // 执行计划页面和数据初始化
             parent.parent.parent.editorFrame.GGETFRAME.explainInit(tempSql);
             // 延时 500 ms
@@ -4789,6 +4820,14 @@ function doOnExplainRowSelected(rowID,celInd){
         setExplainButton(5, true);
     }
 }
+
+
+function compileInvalid(t) {
+	// 新创建计划执行窗口
+	parent.parent.leftFrameList.createNewSql('CIO','View.jsp');
+}
+
+
 
 //关于我们团队
 function aboutUS() {
