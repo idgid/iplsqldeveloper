@@ -786,7 +786,7 @@
         for ( var i = 0; i < arr.length; i++ ) {
             if ( arr[i][1] == id) id = arr[i][0];
         }
-        rid == id ? rid = '' : rid = id;
+        rid = id;
         return rid;
     }
 
@@ -840,7 +840,7 @@
             // 下一个同级存在
             // 则取该同级的最末节点
             rid = getEPLNextNode(a, id);
-            rrid = getEPLFirstChildrenNode(a, rid);
+            rrid = getEPLFirstChildrenNode(a, parseInt(rid));
 
         }
         return rrid;

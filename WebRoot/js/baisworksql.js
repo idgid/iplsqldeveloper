@@ -459,7 +459,7 @@ function execObject(localsql, oname) {
 			var bk = "";
 			for ( var i = 1; i < intdata.length; i++ ) {
 				parent.parent.parent.editorFrame.GGETFRAME.GERRORPROCINFO[i-1] = intdata[i][0];
-				i == 1 ? bk = "width: 100%; background-color: #0078d7; color: #eee;" : bk = "width: 100%; color: #ad0039;";
+				i == 1 ? bk = "width: 100%; background-color: #0078d7; color: #eee;" : bk = "width: 100%; color: #800000;";
 				o.innerHTML += "<div style='" + bk + "' onclick='parent.parent.parent.editorFrame.GGETFRAME.chcolor(event)'><span style='width: 5%; display: inline-block;'>" + intdata[i][0] + "</span><span style='width: 95%'>" + intdata[i][1] + "</span> </div>";
 			}
 			// 直接定位到第一个问题代码处

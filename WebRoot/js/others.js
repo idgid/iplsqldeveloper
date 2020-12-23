@@ -116,6 +116,11 @@ if (GQueryByExampleFlag == null) var GQueryByExampleFlag = 0;
 // QueryByExample 条件
 if (GQueryByExampleArrayStr == null) var GQueryByExampleArrayStr = "";
 
+// 无效编译对象全局 grid
+if (compileInvalidMygrid == null)  var compileInvalidMygrid;
+
+
+
 
 
 
@@ -831,39 +836,8 @@ function setDivValueText (divName,textvalue) {
 	}
 }
 
-// 监听F8/F9/F10/F12按键事件，正常
-// 加入 F6 监听
-function mykeydown_old(myevent,textareaname){
-    if(myevent.key == 'f2') {
-        //'F6' 按下，和点击图标调用同一个事件处理函数
-        parent.editorFrame.explain(textareaname);
-    }
-    if(myevent.key == 'f8') {
-		//'F8' 按下，和点击图标调用同一个事件处理函数
-           parent.editorFrame.executeRun(textareaname);
-	}
-	if(myevent.key == 'f9') {
-		//'F9' 按下，和点击图标调用同一个事件处理函数
-		//parent.editorFrame.rollback();
-		parent.parent.editorFrame.dhtmlx.alert({
-			type:"alert-warning",
-			top: dAlertTop,
-			text:"coding..."
-		});
-	}
-	if(myevent.key == 'f10') {
-		//'F10' 按下，和点击图标调用同一个事件处理函数
-		parent.editorFrame.commit();
-	}
-	if(myevent.key == 'f12') {
-		//'F12' 按下，和点击图标调用同一个事件处理函数
-		parent.editorFrame.rollback();
-	}
 
-
-}
-
-//监听F8/F9/F10/F12按键事件，正常
+// 监听F2/F8/F9/F10/F12按键事件，正常
 function mykeydown(myevent_key,textareaname){
     if(myevent_key == 'f2') {
         //'F6' 按下，和点击图标调用同一个事件处理函数
@@ -2842,6 +2816,107 @@ function showDataHtmlExplain(s,data) {
     }
 }
 
+
+// phanrider add by 2020-12-23
+// 展示无效对象编译的 grid
+function showDataHtmlCompileInvalid(s,data) {
+
+	compileInvalidMygrid = new dhtmlXGridObject(s);
+
+	compileInvalidMygrid.setImagePath("../../imgs/");
+
+	tlow_flag_num = data.length; //表格展示的行数
+	tlow = data.length ;  //无标志行可去
+
+	//alert(data.length);
+	tcell = data[0].length; //表格展示的列数
+	var strHeader = "";
+	var strSort = "";
+	var gridRowType = "";
+	for(var i = 0; i < tcell; i++) {
+		if(i == (tcell - 1)) {
+			strHeader = strHeader + data[0][i];
+			strSort = strSort + "str";
+			gridRowType += "ro";
+		} else  {
+			strHeader = strHeader + data[0][i] + "," ;
+			strSort = strSort + "str" + ",";
+			gridRowType += "ro,";
+
+		}
+	}
+
+	strHeader = " ," + strHeader;
+	strSort = "str," + strSort;
+	gridRowType = "img," + gridRowType;
+
+
+
+	compileInvalidMygrid.setHeader(strHeader);
+	compileInvalidMygrid.setStyle("text-align:left;",null,null,null);
+
+	compileInvalidMygrid.setColAlign("left");
+
+	compileInvalidMygrid.setColSorting(strSort);
+	compileInvalidMygrid.attachEvent("onRowSelect",doOnCompileInvalidRowSelected);
+	compileInvalidMygrid.setColTypes(gridRowType);
+
+
+
+	var strHeaderWidth = "";
+
+
+	strHeaderWidth =  "20,240,120,*";
+
+
+	compileInvalidMygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
+	compileInvalidMygrid.enableAutoWidth(true);
+
+
+	if(tcell == 2 && data[0][0] == "ReddragonflyErrorFlag*") {
+		errOracleMsg = data[0][1];
+		parent.parent.editorFrame.dhtmlx.alert({
+			title : "ERROR",
+			top: dAlertTop,
+			type : "alert-error",
+			text : data[0][1]
+		});
+	} else {
+
+
+		compileInvalidMygrid.init();  //进行初始化
+		compileInvalidMygrid.setEditable(false);
+
+		for(var i = 1; i < tlow; i++) {
+			var strRow = "";
+			var trstyle = "";
+			var strImg = "../../tree/dbimages/";
+			for (var j = 0; j < tcell; j++) {
+
+				var tmpS = changeHtml(data[i][j]);
+				if(j == (tcell - 1)) strRow = strRow + tmpS;
+				else strRow = strRow + tmpS + "," ;
+
+			}
+			// trstyle="#E3E3E3"+ "," + trstyle;
+			compileInvalidMygrid.setColumnColor(trstyle);
+			if (data[i][1] == "FUNCTION") strImg += "invalid_funs.png";
+			else if (data[i][1] == "PROCEDURE") strImg += "invalid_prcs.png";
+			else if (data[i][1] == "PACKAGE") strImg += "invalid_pkgs.png";
+			else if (data[i][1] == "PACKAGE BODY") strImg += "invalid_pkgs_b.png";
+			else if (data[i][1] == "TYPE") strImg += "invalid_types.png";
+			else if (data[i][1] == "TYPE BODY") strImg += "invalid_types_b.png";
+			else if (data[i][1] == "VIEW" || data[i][1] == "MATERIALIZED VIEW" ) strImg += "invalid_views.png";
+			else if (data[i][1] == "JAVA CLASS" || data[i][1] == "JAVA DATA" || data[i][1] == "JAVA RESOURCE" || data[i][1] == "JAVA SOURCE" ) strImg += "invalid_views.png";
+			else if (data[i][1] == "TRIGGER") strImg += "err_triggers.png";
+			else strImg += "notype.png";
+
+			strRow = strImg + "^" + i + "," + strRow;
+			compileInvalidMygrid.addRow(i,strRow);
+		}
+	}
+}
+
 // phanrider add by 2011-04-12
 // View Table 调用每个DIV调用的回调函数，会带上本地DIV名称调用真正显示函数 showDataHtmlReal
 function showDataHtmlKeys(data) {
@@ -3529,8 +3604,8 @@ function createNewSql(windowType, textareaname) {
         this.url = textareaname;
         //创建windowlist工具条
         parent.parent.leftFrameList.createWindowList(windowType, this.url, f);
-        //更改右边工作区的内容
-        // clearSQLWindow(windowType);
+        //更改右边工作区的内容，并加载定义的页面 jsp 文件
+        clearSQLWindow(windowType);
 
     }
 }
@@ -4776,13 +4851,19 @@ function initExecuteForF8(textareaname) {
         } else {
             parent.parent.editorFrame.GGETFRAME.explain(textareaname);
         }
-    } else {
+    } else if (parent.parent.leftFrameList.getWindowType() == 'CIO') {
         if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
-            parent.parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+            console.log("compileInvalidObjects");
         } else {
-            parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+			console.log("compileInvalidObjects");
         }
-    }
+    } else {
+		if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
+			parent.parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+		} else {
+			parent.parent.editorFrame.GGETFRAME.executeRun(textareaname);
+		}
+	}
 }
 
 
@@ -4792,16 +4873,22 @@ function doOnExplainRowSelected(rowID,celInd){
     tmpStr = tmpStr.trim();
     if ( tmpStr == "TABLE ACCESS FULL") footStr = 'Return all rows from a table';
     if ( tmpStr == "VIEW") footStr = 'Resolve view and return the results';
-    if ( tmpStr == "NESTED LOOPS") footStr = 'Join two tables where at least one index is used';
-    if ( tmpStr == "SORT GROUP BY") footStr = 'Sort a result set for a GROUP BY clause';
-    if ( tmpStr == "SORT AGGREGATE") footStr = 'Sort a result set for an aggregation function (MIN, MAX, ...)';
+	if ( tmpStr == "FILTER") footStr = 'Test WHERE clause condition without using an index';
+	if ( tmpStr == "NESTED LOOPS") footStr = 'Join two tables where at least one index is used';
+	if ( tmpStr == "UNION-ALL") footStr = 'Concatenate result sets without eliminating duplicates';
+	if ( tmpStr == "SORT GROUP BY") footStr = 'Sort a result set for a GROUP BY clause';
+	if ( tmpStr == "SORT ORDER BY") footStr = 'Sort a result set for an ORDER BY clause';
+	if ( tmpStr == "SORT AGGREGATE") footStr = 'Sort a result set for an aggregation function (MIN, MAX, ...)';
     if ( tmpStr == "SORT JOIN") footStr = 'Sort a set of records for a MERGE JOIN operation';
     if ( tmpStr == "MERGE JOIN OUTER" || tmpStr == "MERGE JOIN") footStr = 'Join tables by merging sorted lists of records from each table';
     if ( tmpStr == "HASH JOIN") footStr = 'Join one in-memory table to another table using a hash key';
     if ( tmpStr == "INDEX UNIQUE SCAN") footStr = 'Select a unique value from a unique index';
-    if ( tmpStr == "TABLE ACCESS BY INDEX ROWID") footStr = 'Return a single row based on its ROWID';
+	if ( tmpStr == "INDEX FULL SCAN") footStr = 'Select all values from an index';
+	if ( tmpStr == "INDEX RANGE SCAN") footStr = 'Select a range of values from an index in ascending order';
+	if ( tmpStr == "TABLE ACCESS BY INDEX ROWID") footStr = 'Return a single row based on its ROWID';
 
-    setFootView('9999', footStr);
+
+	setFootView('9999', footStr);
 
     if ( (parseInt(explainDatalink[0]) + 1) == rowID ) {
         setExplainButton(2, false);
@@ -4826,6 +4913,8 @@ function compileInvalid(t) {
 	// 新创建计划执行窗口
 	parent.parent.leftFrameList.createNewSql('CIO','View.jsp');
 }
+
+
 
 
 
