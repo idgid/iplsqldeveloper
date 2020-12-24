@@ -730,6 +730,7 @@
 				cells1[1].setToggle(false);
 
 				cells1[1].setValue(false, false);
+				setEditortoolbarReset();
 			}
 			initViewFootButton();
 			// 文本内容保存到本地

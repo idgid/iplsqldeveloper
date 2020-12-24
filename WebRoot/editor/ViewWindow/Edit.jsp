@@ -318,6 +318,7 @@
 				cells1[1].setToggle(false);
 
 				cells1[1].setValue(false, false);
+				setEditortoolbarReset();
 			}
 			initViewFootButton();
 

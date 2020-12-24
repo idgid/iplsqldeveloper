@@ -119,7 +119,8 @@ if (GQueryByExampleArrayStr == null) var GQueryByExampleArrayStr = "";
 // 无效编译对象全局 grid
 if (compileInvalidMygrid == null)  var compileInvalidMygrid;
 
-
+//设置 DDL SQL 标志
+if (DDLFlag == null) var DDLFlag = 0;
 
 
 
@@ -298,7 +299,10 @@ function changeExecNoRun(runFlag,imagesName) {
 			if (parent.parent.leftFrameList.getWindowType() == "FUN") {
 				execNoRunIcon = '../../images/exec_fun_norun.gif';
 				execRunningIcon = '../../images/exec_running.gif';
-			}
+			} else if (parent.parent.leftFrameList.getWindowType() == "CIO") {
+                execNoRunIcon = '../../images/compile_invalid_object_f.png';
+                execRunningIcon = '../../images/compile_invalid_object_f_r.png';
+            }
 	}
 
 
@@ -346,6 +350,7 @@ function changeLock(imagesName) {
 	var lockIcon = '../../images/lock.gif';
 	var unlockIcon = '../../images/unlock.gif';
 	forUpdateFlag = parent.parent.editorFrame.GGETFRAME.forUpdateFlag;
+	lockFlag = parent.parent.editorFrame.GGETFRAME.lockFlag;
     mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
 
     if (lockFlag) {
@@ -357,6 +362,7 @@ function changeLock(imagesName) {
 		var deleteRecordObject = parent.parent.editorFrame.GGETFRAME.$('deleteRecordTd');
 			deleteRecordObject.setEnabled(true);
         mygrid.setEditable(true);
+        parent.parent.editorFrame.GGETFRAME.DDLFlag = 1;
         setCommit(true);
         setRollback(true);
 		setPostChangeFlag(1);	//再次锁定，置数据改变标志为1
@@ -663,33 +669,35 @@ function changeRecordViewRestore() {
 
 //改变执行标志
 function setExecuteFlag(exFlag) {
+    parent.parent.editorFrame.GGETFRAME.executeFlag = exFlag;
 	executeFlag = exFlag;
 }
 
 //得到执行标志
 function getExecuteFlag() {
-	return executeFlag;
+	return parent.parent.editorFrame.GGETFRAME.executeFlag;
 }
 
 //改变锁定标志
 function setLockFlag(loFlag) {
-	lockFlag = loFlag;
+	lockFlag = parent.parent.editorFrame.GGETFRAME.lockFlag;
 }
 
 //得到锁定标志
 function getLockFlag() {
-	return lockFlag;
+	return parent.parent.editorFrame.GGETFRAME.lockFlag;
 }
 
 
 //改变数据是否改变标志
 function setPostChangeFlag(poFlag) {
+    parent.parent.editorFrame.GGETFRAME.postChangeFlag = poFlag;
 	postChangeFlag = poFlag;
 }
 
 //得到数据是否改变标志
 function getPostChangeFlag() {
-	return postChangeFlag;
+	return parent.parent.editorFrame.GGETFRAME.postChangeFlag;
 }
 
 function setsingleRecordViewFlag(siFlag) {
@@ -950,6 +958,7 @@ function executeSQL(textareaname) {
     if (getIfForupdate(textareaname, 0) && getIfSelect(textareaname, 0)) {
 		//如果为for update，并且开始为select
 		//设置commit、rollback按钮可用
+        parent.parent.editorFrame.GGETFRAME.DDLFlag = 1;
 		setCommit(true);
 		setRollback(true);
 
@@ -972,6 +981,8 @@ function executeSQL(textareaname) {
 
 		//提交给接口
 		var deleteFlag = 0;
+        parent.parent.editorFrame.GGETFRAME.DDLFlag = 1;
+
 		if (getIfInsertInto(textareaname, 0) || getIfUpdate(textareaname, 0) )  {
 			setCommit(true);
 			setRollback(true);
@@ -2150,7 +2161,9 @@ function commit() {
 	var commitObject = parent.parent.editorToolFrame.document.getElementById(commitID);
 
 	if(commitObject.getEnabled()) {
-		BaisWorkBean.setDbCommit();
+        parent.parent.editorFrame.GGETFRAME.forUpdateFlag = 0;
+        parent.parent.editorFrame.GGETFRAME.DDLFlag = 0;
+        BaisWorkBean.setDbCommit();
 		setCommit(false);
 		setRollback(false);
 		setFootView(10, '');
@@ -2165,7 +2178,9 @@ function rollback() {
 	var rollbackObject = parent.parent.editorToolFrame.document.getElementById(rollbackID);
 
 	if(rollbackObject.getEnabled()) {
-		BaisWorkBean.setDbRollback();
+        parent.parent.editorFrame.GGETFRAME.forUpdateFlag = 0;
+        parent.parent.editorFrame.GGETFRAME.DDLFlag = 0;
+        BaisWorkBean.setDbRollback();
 		setCommit(false);
 		setRollback(false);
 		setFootView(9, '');
@@ -2825,11 +2840,11 @@ function showDataHtmlCompileInvalid(s,data) {
 
 	compileInvalidMygrid.setImagePath("../../imgs/");
 
-	tlow_flag_num = data.length; //表格展示的行数
-	tlow = data.length ;  //无标志行可去
+	var tlow_flag_num = data.length; //表格展示的行数
+	var tlow = data.length ;  //无标志行可去
 
 	//alert(data.length);
-	tcell = data[0].length; //表格展示的列数
+	var tcell = data[0].length; //表格展示的列数
 	var strHeader = "";
 	var strSort = "";
 	var gridRowType = "";
@@ -2866,7 +2881,7 @@ function showDataHtmlCompileInvalid(s,data) {
 	var strHeaderWidth = "";
 
 
-	strHeaderWidth =  "20,240,120,*";
+	strHeaderWidth =  "25,240,120,*";
 
 
 	compileInvalidMygrid.setInitWidths(strHeaderWidth); //定义各列的宽度
@@ -2882,7 +2897,6 @@ function showDataHtmlCompileInvalid(s,data) {
 			text : data[0][1]
 		});
 	} else {
-
 
 		compileInvalidMygrid.init();  //进行初始化
 		compileInvalidMygrid.setEditable(false);
@@ -2914,6 +2928,17 @@ function showDataHtmlCompileInvalid(s,data) {
 			strRow = strImg + "^" + i + "," + strRow;
 			compileInvalidMygrid.addRow(i,strRow);
 		}
+
+		// error_info 框内容
+        var o = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('errorInfo');
+        o.innerHTML = '';
+        var bk = "width: 100%; color: #800000;";
+        var intdata = [];
+        parseInt(tlow) > 0 ? intdata[0] = (parseInt(tlow) - 1) + " invalid object(s) found" : intdata[0] = "0 invalid object(s) found";
+        intdata[1] = "Press the Execute button to compile thess objects";
+         for (var i = 0; i < 2; i++) {
+            o.innerHTML += "<div style='" + bk + "' onclick='parent.parent.parent.editorFrame.GGETFRAME.chcolor(event)'><span style='width: 100%; display: inline-block;'>" + intdata[i] + "</span></div>";
+        }
 	}
 }
 
@@ -3906,13 +3931,14 @@ function restoreDivValue(windowType, trRow, sameWindow) {
         }
         parent.parent.editorFrame.$('#SQLWindow_'+ parent.parent.leftFrameList.GWINDOWLIST[trRow][1] ).css("display","inline");
 
-
+        // 恢复 editortoolbar
+        setEditortoolbarReset();
 
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
 					|| windowType == "VIM" || windowType == "TAB" || windowType == "CSQ"
-                    || windowType == "EPL" || windowType == "CIO" ) {
+                    || windowType == "EPL"  ) {
 		var destMyTextarea = "myTextarea" + trRow;
 		var destobjTitle = "objTitle" + trRow;
 		var desttmpImg = "tmpImg" + trRow;
@@ -3923,18 +3949,28 @@ function restoreDivValue(windowType, trRow, sameWindow) {
 		//alert(parent.leftFrameList.$(destobjIcoId).get('src').substr(parent.leftFrameList.$(destobjIcoId).get('src').lastIndexOf("/")));
 
 
+
             for (i = 0; i < GMIXWINDOWS; i++) {
                 parent.parent.editorFrame.$('#SQLWindow_' + 'n' + i).css("display", "none");
             }
             parent.parent.editorFrame.$('#SQLWindow_' + parent.parent.leftFrameList.GWINDOWLIST[trRow][1]).css("display", "inline");
-
-
+        // 恢复 editortoolbar
+        setEditortoolbarReset();
 
 	} else if (windowType == "JAVA") {
 		var destMyTextarea = "myTextarea" + trRow;
 		//alert(destMyTextarea);
 		parent.editorFrame.$('myTextarea').set('html',$(destMyTextarea).get('html'));
-	}
+	} else if (windowType == "CIO") {
+
+        for (i = 0; i < GMIXWINDOWS; i++) {
+            parent.parent.editorFrame.$('#SQLWindow_' + 'n' + i).css("display", "none");
+        }
+        parent.parent.editorFrame.$('#SQLWindow_' + parent.parent.leftFrameList.GWINDOWLIST[trRow][1]).css("display", "inline");
+
+        // 重置 editortoolbar 按钮状态 -- for compile invalid objects
+        setEditortoolbarForCIO();
+    }
 
 }
 
@@ -3948,7 +3984,8 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 	var imgIcon = "../images/windowlist_running.gif";
 	var maxLength = 36; //设置左边工具条最大显示的字符数
 	var maxAltLength = 200; //设置鼠标放在上面提示的最大字符数
-	var eplimg = "../images/view_table.png";
+	var eplimg = "../images/compile_invalid_object_r.png";
+	var cioimg = "../images/compile_invalid_object_r.png";
 
 
 	if(windowType == "SQL") {
@@ -3968,7 +4005,7 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
         initStr = "Compile Invalid Objects";
         tmpStr = initStr + titleStr;
         tmpStrA = initStr + titleStr;
-        imgIcon = eplimg;
+        imgIcon = cioimg;
     } else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
 					|| windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
 					|| windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
@@ -4056,7 +4093,11 @@ function restoreWindowListImg(trRow) {
 	|| tmpCurrWindowType == "PAB" || tmpCurrWindowType == "TYP" || tmpCurrWindowType == "TYB"
 	|| tmpCurrWindowType == "TRI" || tmpCurrWindowType == "JAV" ) {
 		imgIcon = "../images/no_fun_saved.gif";
-	}
+	} else if (tmpCurrWindowType == "EPL") {
+        imgIcon = "../images/view_table.png";
+    } else if (tmpCurrWindowType == "CIO") {
+        imgIcon = "../images/compile_invalid_object.png";
+    }
 
 	$(imgListVauleId).set('src', imgIcon);
 
@@ -4163,7 +4204,7 @@ function deleteWindowList() {
 
         GGETFRAME = parent.editorFrame.GGETFRAME;
 
-
+        (parent.parent.leftFrameList.getWindowType() == 'CIO') ? setEditortoolbarForCIO() : setEditortoolbarReset();
 
 
 	}
@@ -4853,9 +4894,9 @@ function initExecuteForF8(textareaname) {
         }
     } else if (parent.parent.leftFrameList.getWindowType() == 'CIO') {
         if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
-            console.log("compileInvalidObjects");
+            parent.parent.editorFrame.GGETFRAME.execCompileInObj();
         } else {
-			console.log("compileInvalidObjects");
+            parent.parent.editorFrame.GGETFRAME.execCompileInObj();
         }
     } else {
 		if (typeof(parent.parent.editorFrame.GGETFRAME) == 'undefined') {
@@ -4910,13 +4951,108 @@ function doOnExplainRowSelected(rowID,celInd){
 
 
 function compileInvalid(t) {
-	// 新创建计划执行窗口
-	parent.parent.leftFrameList.createNewSql('CIO','View.jsp');
+    if (parent.parent.leftFrameList.getWindowType() == 'CIO') {
+        return 0;
+    } else {
+        // 新创建计划执行窗口
+        parent.parent.leftFrameList.createNewSql('CIO','View.jsp');
+    }
+
+}
+
+// 重置 editortoolbar 按钮状态 -- for compile invalid objects
+function setEditortoolbarForCIO() {
+    // 第一行
+    var toprightcells0 = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[0].cells;
+    // 第二行
+    var toprightcells = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[1].cells;
+
+    for (var i = 2; i < toprightcells0.length - 1; i++)
+    {
+        toprightcells0[i].setEnabled(false);
+    }
+
+    for (var i = 2; i < toprightcells.length - 3; i++)
+    {
+        toprightcells[i].setEnabled(false);
+    }
 }
 
 
+// editortoolbar 按钮状态 初始设置
+function setEditortoolbarReset() {
+    // 第一行
+    var toprightcells0 = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[0].cells;
+    // 第二行
+    var toprightcells = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[1].cells;
+
+    for (var i = 2; i < toprightcells0.length - 1; i++)
+    {
+        toprightcells0[i].setEnabled(true);
+    }
+
+    for (var i = toprightcells.length - 5; i < toprightcells.length - 3; i++)
+    {
+        toprightcells[i].setEnabled(true);
+    }
+
+    // 提交和回滚按钮状态
+    (parent.parent.editorFrame.GGETFRAME.DDLFlag == 1) ? (toprightcells[3].setEnabled(true),toprightcells[4].setEnabled(true))
+        : (toprightcells[3].setEnabled(false),toprightcells[4].setEnabled(false));
+
+}
 
 
+function execCompileInObj() {
+    compileInvalidMygrid = parent.parent.editorFrame.GGETFRAME.compileInvalidMygrid;
+    var rowsnum = compileInvalidMygrid.getRowsNum();
+    var footerprogressObj =  parent.parent.editorFrame.GGETFRAME.document.getElementById('footerprogress');
+    var inValidObjName = '';
+    var inValidObjType = '';
+    var debugFlag = 0;
+    rowsnum = parseInt(rowsnum);
+
+
+
+    // 初始化
+    footerprogressObj.style.color = "#333333";
+    footerprogressObj.innerText = 'Initializing...';
+    // 设置左边 windowList 运行状态
+    parent.parent.leftFrameList.changeWindowListTitle('CIO',parent.parent.leftFrameList.getWindowTr(), '');
+
+    // 设置下边 footer 运行状态
+    parent.parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton");
+
+    // 从 grid 中取得 object 名称和类型
+    for ( var i = 0; i < rowsnum; i++ ) {
+        // 得到 object 的名称
+        inValidObjName = compileInvalidMygrid.cells(compileInvalidMygrid.getRowId(i), 1).getValue();
+        inValidObjType = compileInvalidMygrid.cells(compileInvalidMygrid.getRowId(i), 2).getValue();
+
+        if ( inValidObjType == 'FUNCTION' || inValidObjType == 'PROCEDURE' || inValidObjType == 'PACKAGE'
+            || inValidObjType == 'PACKAGE BODY' || inValidObjType == 'TYPE' || inValidObjType == 'TYPE BODY') {
+            parent.parent.editorToolFrame.BaisWorkBean.execObjectCompile(inValidObjType, inValidObjName, debugFlag, callexecInvalidObjectback);
+        }
+
+        function callexecInvalidObjectback(intdata){
+            // 执行刷新操作
+            compileInvalidObjectsInit();
+            // 设置 footer 进度条
+            setTimeout(function() {
+                footerprogressObj.innerText = '.';
+                footerprogressObj.style.color = "#06b025";
+                footerprogressObj.style.width = (parseInt((i + 1)/rowsnum) * 100) + '%';
+            }, 100);
+        }
+
+    }
+
+    // 恢复下边 footer 非运行状态
+    parent.parent.editorToolFrame.changeExecNoRun(0, "execIsRunButton");
+    // 恢复左边 windowList 非运行状态
+    parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+
+}
 
 //关于我们团队
 function aboutUS() {

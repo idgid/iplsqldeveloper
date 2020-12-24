@@ -791,6 +791,7 @@
 		}
 		cells1[1].setToggle(true);
 
+        setEditortoolbarReset();
 	}
 	initViewFootButton();
 	//setupAllTabs();

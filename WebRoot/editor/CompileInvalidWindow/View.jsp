@@ -142,7 +142,7 @@
 			background-color: #FFFFFF;
 			color: #004a7e;
 		}
-		#errorInfo{
+		#errorInfo {
 			flex: 0 0 112px;
 			background-color: #fff;
 			width: 100%;
@@ -152,12 +152,18 @@
 			bottom: 26px;
 			z-index: -1;
 		}
-		#errorInfo.show{
+		#errorInfo.show {
 			border: 2px solid #a0a0a0;
 			z-index: 9;
 		}
-		#errorInfo.hide{
+		#errorInfo.hide {
 			border: none;
+		}
+		.footerprogress {
+			text-align: left;
+			width: 0%;
+			background-color: #06b025;
+			color: #06b025;
 		}
 
 	</style>
@@ -216,7 +222,7 @@
                cellspacing="1" width="100%">
             <tr align='left'>
                 <td class="coolButtonDisabled_my">
-                    <img id='execIsRunButton' src="../../images/view_explain.png"
+                    <img id='execIsRunButton' src="../../images/compile_invalid_object_f.png"
                          align="absmiddle">
                 </td>
                 <td class="coolButton" onclick="compileInvalidObjectsInit()">
@@ -227,7 +233,7 @@
 
                 <td class="coolButtonActiveHover" width="100%">
                     <div id="footview" style="font-family: Arial, Courier, mono; font-size: 12px;">
-                        &nbsp;
+						<div id="footerprogress" class="footerprogress">&nbsp;</div>
                     </div>
                 </td>
             </tr>
@@ -259,6 +265,9 @@
 		cells1[1].setToggle(false);
 
 		cells1[1].setValue(false, false);
+
+		// 对上面的 editortoolbar 设置
+		setEditortoolbarForCIO();
 	}
 	initViewFootButton();
 </script>
@@ -282,7 +291,6 @@
 
 
         }
-
     }
 
 	compileInvalidObjectsInit();
@@ -323,7 +331,7 @@
 				}
 			}
 		}
-		console.log(objName.cells(rowID, 1).getValue());
+		// console.log(objName.cells(rowID, 1).getValue());
 
 	}
 

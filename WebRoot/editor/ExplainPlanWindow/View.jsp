@@ -498,6 +498,8 @@
 
 		cells1[1].setToggle(true);
 		// cells1[0].setValue(true, true);
+
+		setEditortoolbarReset();
 	}
 	initToolBarButton();
 
