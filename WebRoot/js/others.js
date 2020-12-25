@@ -129,8 +129,10 @@ if (DDLFlag == null) var DDLFlag = 0;
 //设置提示 --已改
 function setFootView(errNo, ename) {
 	var strlen = 200;
-	ename = ename.replaceAll("\n", "");
-	ename.length > 200 ? ename = ename.substring(0, strlen) + "..." : ename = ename ;
+	if (ename != null) {
+        ename = ename.replaceAll("\n", "");
+        ename.length > 200 ? ename = ename.substring(0, strlen) + "..." : ename = ename ;
+    }
 	if (errNo == 0) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Initializing...';
 	else if (errNo == 1) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText ='Executing...';
 	else if (errNo == 2) parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('footview').innerText = 'Compiling...';
@@ -1161,6 +1163,8 @@ function breakRun(textareaname) {
 	//var oracleTitle = "OK";	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
 	//setFootView(9999, oracleTitle);
 	changeExecNoRun(0, "execIsRunButton"); //恢复左下角执行图标状态
+    parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+
 }
 
 
@@ -2005,7 +2009,7 @@ function getIfDesc(textareaname, cflag) {
     var tempStr;
     cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
     var Flag = false;
-    if (tempStr.trim().test("^desc ","i") ) {
+    if (tempStr.trim().test("^desc ","i") || tempStr.trim().test("^describe ","i") ) {
         Flag = true;
     } else {
         Flag = false;
@@ -2082,7 +2086,7 @@ function getIfExec(textareaname, cflag) {
     var tempStr;
     cflag == 0 ? tempStr =  getTextareaContents(textareaname) : tempStr = textareaname;
     var Flag = false;
-    if (tempStr.trim().test("^exec ","i") ) {
+    if (tempStr.trim().test("^exec ","i") || tempStr.trim().test("^execute ","i")) {
         Flag = true;
     } else {
         Flag = false;
@@ -4865,25 +4869,28 @@ function explain(a) {
     var tempSql = getTextareaContents(a);
     // 过滤最后的 ';' 符号
     tempSql = tempSql.trim().replace(/[;]*$/, '');
-    // 原计划执行窗口
+    // 是否是原计划执行窗口
     if (parent.parent.leftFrameList.getWindowType() == 'EPL') {
         // 修改左侧窗口提示信息
         parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
         // 执行计划页面和数据初始化
         parent.parent.parent.editorFrame.GGETFRAME.explainInit(tempSql);
     } else {
-        // 新创建计划执行窗口
-        parent.parent.leftFrameList.createNewSql('EPL','View.jsp');
-        // 等待 editarea 初始化完成后执行
-        setTimeout(function() {
-            // 设定新开窗口 editarea 编辑区中的 text 内容
-            parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, tempSql);
-            // 修改左侧窗口提示信息
-            parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
-            // 执行计划页面和数据初始化
-            parent.parent.parent.editorFrame.GGETFRAME.explainInit(tempSql);
-            // 延时 500 ms
-        }, 500);
+        // 否则，当前窗口是否为 SQL 窗口，即从 SQL 窗口才能打开
+        if (parent.parent.leftFrameList.getWindowType() == 'SQL') {
+            // 新创建计划执行窗口
+            parent.parent.leftFrameList.createNewSql('EPL','View.jsp');
+            // 等待 editarea 初始化完成后执行
+            setTimeout(function() {
+                // 设定新开窗口 editarea 编辑区中的 text 内容
+                parent.parent.parent.editorFrame.GGETFRAME.editAreaLoader.setValue(gMyTextArea, tempSql);
+                // 修改左侧窗口提示信息
+                parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), tempSql);
+                // 执行计划页面和数据初始化
+                parent.parent.parent.editorFrame.GGETFRAME.explainInit(tempSql);
+                // 延时 500 ms
+            }, 500);
+        }
     }
 }
 

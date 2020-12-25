@@ -343,16 +343,17 @@ function backInsert(dataResult) {
 			text : dataResult[0][1]
 		});
 	} else if(tcell == 2 && dataResult[0][0] == "ReddragonflySuccessFlag*") {
-		rows = dataResult[0][1];
+		var rows = dataResult[0][1];
 		//alert(intdata[0][1]);
-		rowsA = rows.split(',');
-		foottitleu = "";
-		foottitled = "";
-		foottitlei = "";
+		var rowsA = rows.split(',');
+		var foottitleu = "";
+		var foottitled = "";
+		var foottitlei = "";
+		var foottitle = "";
 
-		foottileu = rowsA[0] > 1 ?  rowsA[0] + " records updated, " : rowsA[0] + " record updated, " ;
-		foottiled = rowsA[1] > 1 ?  rowsA[1] + " records deleted, " : rowsA[1] + " record deleted, " ;
-		foottilei = rowsA[2] > 1 ?  rowsA[2] + " records inserted" : rowsA[2] + " record inserted" ;
+		foottitleu = rowsA[0] > 1 ?  rowsA[0] + " records updated, " : rowsA[0] + " record updated, " ;
+		foottitled = rowsA[1] > 1 ?  rowsA[1] + " records deleted, " : rowsA[1] + " record deleted, " ;
+		foottitlei = rowsA[2] > 1 ?  rowsA[2] + " records inserted" : rowsA[2] + " record inserted" ;
 
 		foottitle = foottileu + foottiled + foottilei;
 

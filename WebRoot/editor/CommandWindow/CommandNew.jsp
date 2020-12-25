@@ -418,7 +418,7 @@
                         c1 = c1[c1.length - 1];
                         sql = command;
 
-                        sql = sql.replace(/^exec /i,'call ');
+                        sql = sql.replace(/^exec.* /i,'call ');
                         //sql = "select name,decode(type, 1, 'boolean', 2, 'string', 3, 'integer', 4, 'parameter file', 5, 'reserved', 6, 'big integer', '' ) type, display_value value from v$parameter where name like " + c1 + " order by name asc";
 
                         DbObjectBean.getOtherForProcedure(sql, ['Execute Status_$$$_VARCHAR2_$$$_13'], callbackCommandadd);

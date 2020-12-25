@@ -553,56 +553,56 @@
             }
 
 
-            // var ws = window.open();
-            // ws.document.open("text/html", "utf-8");
-            // ws.document.write(c);
-            // ws.document.execCommand("saveas", true, f + ".sql");
-            // ws.close();
         }
     }
 
     function explainInit(s) {
 	    var sql = [];
 	    var m = parent.parent.editorFrame.GGETFRAME.document.getElementById('planChoose');
-        sql[0] = "explain plan for "  + s ;
-        sql[1] = "select * from table(dbms_xplan.display())";
-        sql[2] = "select id,\n" +
-            "       parent_id,\n" +
-            "       (case when parent_id is null then\n" +
-            "             lpad('　', 2 * (level - 1), '　') || operation || ' ' || options ||', '||'GOAL = '||optimizer \n" +
-            "       else \n" +
-            "             lpad('　', 2 * (level - 1), '　') || operation || ' ' || options \n" +
-            "       end) descr,\n" +
-            "       object_owner,\n" +
-            "       object_name,\n" +
-            "       cost,\n" +
-            "       cardinality,\n" +
-            "       bytes,\n" +
-            "       time,\n" +
-            "       other_xml\n" +
-            "  from plan_table t\n" +
-            " start with parent_id is null\n" +
-            "connect by prior id = parent_id";
-        m = m.options[m.selectedIndex].value;
-        sql[4] = "alter session set optimizer_mode=" + m;
+		if (getIfSelect(s, 1)) {
+			sql[0] = "explain plan for "  + s ;
+			sql[1] = "select * from table(dbms_xplan.display())";
+			sql[2] = "select id,\n" +
+				"       parent_id,\n" +
+				"       (case when parent_id is null then\n" +
+				"             lpad('　', 2 * (level - 1), '　') || operation || ' ' || options ||', '||'GOAL = '||optimizer \n" +
+				"       else \n" +
+				"             lpad('　', 2 * (level - 1), '　') || operation || ' ' || options \n" +
+				"       end) descr,\n" +
+				"       object_owner,\n" +
+				"       object_name,\n" +
+				"       cost,\n" +
+				"       cardinality,\n" +
+				"       bytes,\n" +
+				"       time,\n" +
+				"       other_xml\n" +
+				"  from plan_table t\n" +
+				" start with parent_id is null\n" +
+				"connect by prior id = parent_id";
+			m = m.options[m.selectedIndex].value;
+			sql[4] = "alter session set optimizer_mode=" + m;
 
-		// 设置下边 footer 运行状态
-		parent.parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton");
+			// 设置下边 footer 运行状态
+			parent.parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton");
 
 
-		BaisWorkBean.intOfInsertDelete(sql[4], '');
-		BaisWorkBean.intOfInsertDelete(sql[0], explainErrorCallback);
-        DbObjectBean.getOther2(sql[1], ['Explain Info'], explainInfoCallback);
-        DbObjectBean.getOther2(sql[2], ['Id','Pid','Description','Object owner','Object name', 'Cost', 'Cardinality', 'Bytes', 'Time', 'XML'], explainTreeCallback);
+			BaisWorkBean.intOfInsertDelete(sql[4], '');
+			BaisWorkBean.intOfInsertDelete(sql[0], explainErrorCallback);
+			DbObjectBean.getOther2(sql[1], ['Explain Info'], explainInfoCallback);
+			DbObjectBean.getOther2(sql[2], ['Id','Pid','Description','Object owner','Object name', 'Cost', 'Cardinality', 'Bytes', 'Time', 'XML'], explainTreeCallback);
 
-        // 最后回滚
-        setTimeout(function(){
-            BaisWorkBean.setDbRollback();
-			// 恢复下边和左边 footer 运行状态
+			// 最后回滚
+			setTimeout(function(){
+				BaisWorkBean.setDbRollback();
+				// 恢复下边和左边 footer 运行状态
+				parent.parent.editorToolFrame.changeExecNoRun(0, "execIsRunButton");
+				parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+			},600);
+
+		} else {
 			parent.parent.editorToolFrame.changeExecNoRun(0, "execIsRunButton");
 			parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
-        },600);
-
+		}
 
         function explainErrorCallback(data) {
             if (data != '' || data != null)
@@ -922,7 +922,7 @@
     function arRightAbs() {
 		var cells = document.getElementById('toolBar').rows[0].cells;
 		var tmygrid = parent.parent.editorFrame.GGETFRAME.explainMygrid;
-		if ( cells[4].getEnabled() ) {
+		if ( cells[5].getEnabled() ) {
 			explainDatalinkPoint = explainDatalink.length - 1;
 			setExplainButton(2, true);
 			setExplainButton(3, true);
