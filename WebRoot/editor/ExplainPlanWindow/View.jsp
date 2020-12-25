@@ -594,6 +594,7 @@
         // 最后回滚
         setTimeout(function(){
             BaisWorkBean.setDbRollback();
+			restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
         },600);
 
 

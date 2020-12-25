@@ -4099,7 +4099,7 @@ function restoreWindowListImg(trRow) {
         imgIcon = "../images/compile_invalid_object.png";
     }
 
-	$(imgListVauleId).set('src', imgIcon);
+    $(imgListVauleId) == null ?  parent.parent.leftFrameList.document.getElementById(imgListVauleId).src = imgIcon : $(imgListVauleId).set('src', imgIcon);
 
 }
 
@@ -5029,8 +5029,12 @@ function execCompileInObj() {
         inValidObjName = compileInvalidMygrid.cells(compileInvalidMygrid.getRowId(i), 1).getValue();
         inValidObjType = compileInvalidMygrid.cells(compileInvalidMygrid.getRowId(i), 2).getValue();
 
+
         if ( inValidObjType == 'FUNCTION' || inValidObjType == 'PROCEDURE' || inValidObjType == 'PACKAGE'
-            || inValidObjType == 'PACKAGE BODY' || inValidObjType == 'TYPE' || inValidObjType == 'TYPE BODY') {
+            || inValidObjType == 'PACKAGE BODY' || inValidObjType == 'TYPE' || inValidObjType == 'TYPE BODY'
+            || inValidObjType == 'TRIGGER' ) {
+            inValidObjType == 'TRIGGER' ?  debugFlag = 2 : debugFlag = 0;
+            inValidObjType = inValidObjType.toLowerCase();
             parent.parent.editorToolFrame.BaisWorkBean.execObjectCompile(inValidObjType, inValidObjName, debugFlag, callexecInvalidObjectback);
         }
 
