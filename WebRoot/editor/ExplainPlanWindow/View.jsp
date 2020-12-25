@@ -586,6 +586,10 @@
         m = m.options[m.selectedIndex].value;
         sql[4] = "alter session set optimizer_mode=" + m;
 
+		// 设置下边 footer 运行状态
+		parent.parent.editorToolFrame.changeExecNoRun(1, "execIsRunButton");
+
+
 		BaisWorkBean.intOfInsertDelete(sql[4], '');
 		BaisWorkBean.intOfInsertDelete(sql[0], explainErrorCallback);
         DbObjectBean.getOther2(sql[1], ['Explain Info'], explainInfoCallback);
@@ -594,7 +598,9 @@
         // 最后回滚
         setTimeout(function(){
             BaisWorkBean.setDbRollback();
-			restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+			// 恢复下边和左边 footer 运行状态
+			parent.parent.editorToolFrame.changeExecNoRun(0, "execIsRunButton");
+			parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
         },600);
 
 

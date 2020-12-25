@@ -299,7 +299,10 @@ function changeExecNoRun(runFlag,imagesName) {
 			if (parent.parent.leftFrameList.getWindowType() == "FUN") {
 				execNoRunIcon = '../../images/exec_fun_norun.gif';
 				execRunningIcon = '../../images/exec_running.gif';
-			} else if (parent.parent.leftFrameList.getWindowType() == "CIO") {
+			} else if (parent.parent.leftFrameList.getWindowType() == "EPL") {
+                execNoRunIcon = '../../images/view_explain.png';
+                execRunningIcon = '../../images/compile_invalid_object_f_r.png';
+            } else if (parent.parent.leftFrameList.getWindowType() == "CIO") {
                 execNoRunIcon = '../../images/compile_invalid_object_f.png';
                 execRunningIcon = '../../images/compile_invalid_object_f_r.png';
             }
@@ -3984,7 +3987,7 @@ function changeWindowListTitle(windowType,trRow,titleStr) {
 	var imgIcon = "../images/windowlist_running.gif";
 	var maxLength = 36; //设置左边工具条最大显示的字符数
 	var maxAltLength = 200; //设置鼠标放在上面提示的最大字符数
-	var eplimg = "../images/compile_invalid_object_r.png";
+	var eplimg = "../images/view_table_e_r.png";
 	var cioimg = "../images/compile_invalid_object_r.png";
 
 
