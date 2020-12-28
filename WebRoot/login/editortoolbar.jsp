@@ -136,6 +136,14 @@ table {
 						<img id='columnButton' src="../images/findnext.png" title="Find Next (Ctrl+L)" alt="Find Next (Ctrl+L)"
 							 align="absmiddle">
 					</td>
+					<td class="coolButton" onclick="navigateBack('windowListBar');">
+						<img id='columnButton' src="../images/nav_back.png" title="Navigate back" alt="Navigate back"
+							 align="absmiddle">
+					</td>
+					<td class="coolButton" onclick="navigateForward('windowListBar');">
+						<img id='columnButton' src="../images/nav_forward.png" title="Navigate forward" alt="Navigate forward"
+							 align="absmiddle">
+					</td>
 					<td class="coolButton" onclick="execSysCommand('myTextarea','selectIndent');">
 						<img id='columnButton' src="../images/indent.gif" title="Selection Indent" alt="Selection Indent"
 							align="absmiddle">
@@ -159,18 +167,13 @@ table {
 
 							var toprightcells0 = document.getElementById('topToolBar').rows[0].cells;
 
-							for (var i = 0; i < 17; i++)
+							for (var i = 0; i < toprightcells0.length - 1; i++)
 							{
 								createButton(toprightcells0[i]);
 								//rightcells[i].setToggle(true);
 								//alert(rightcells[i]);
 								//cells1[i].setAlwaysUp(true)
 							}
-							//toprightcells0[1].setEnabled(false);
-							//toprightcells0[2].setEnabled(false);
-							//toprightcells0[3].setEnabled(false);
-							//toprightcells0[4].setEnabled(false);
-
 
 				</script>
 				</tr>
