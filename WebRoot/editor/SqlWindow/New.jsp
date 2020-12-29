@@ -9,6 +9,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link type="text/css" rel="StyleSheet" href="../../css/cb2.css" />
 	<link type="text/css" rel="StyleSheet" href="../../css/grid.css" />
+	<link type="text/css" rel="StyleSheet" href="../../css/tab.winclassic.css" />
 	<link type="text/css" rel="StyleSheet" href="../../css/dhtmlxgrid.css" />
 	<script type="text/javascript" src="../../js/others.js"></script>
 	<script type="text/javascript" src="../../js/mootools.js"></script>
@@ -18,6 +19,8 @@
 	<script type="text/javascript" language="JavaScript1.5"
 			src="../../js/ieemu.js"></script>
 	<script type="text/javascript" src="../../js/cb2.js"></script>
+	<script type="text/javascript" src="../../js/tabpane.js"></script>
+
 	<script type="text/javascript" src="../../js/baisworksql.js"></script>
 	<script type="text/javascript" src="../../js/edit_area/edit_area_full.js"></script>
 	<!--以下是dwr的必备js  -->
@@ -48,6 +51,39 @@
 			border: 2px groove;
 		}
 
+		.dynamic-tab-pane-control .tab-page {
+			height:	100%;
+			padding: 0px;
+		}
+		/*.dynamic-tab-pane-control .tab-page::after {*/
+		/*height:		500px;*/
+		/*display: block;*/
+		/*height: 26px;*/
+		/*content:'';*/
+		/*visibility: hidden;*/
+		/*}*/
+
+		.dynamic-tab-pane-control .tab-page .dynamic-tab-pane-control .tab-page {
+			height:		100px;
+		}
+
+		.dynamic-tab-pane-control.tab-pane {
+			margin:	0px;
+		}
+
+		.dynamic-tab-pane-control h2 {
+			text-align:	center;
+			width:		auto;
+		}
+
+		.dynamic-tab-pane-control h2 a {
+			display:	inline;
+			width:		auto;
+		}
+
+		.dynamic-tab-pane-control a:hover {
+			background: transparent;
+		}
 		p {
 			margin: 0px;
 		}
@@ -284,108 +320,155 @@
 			</div>
 		</div>
 	</div>
-	<div id="t_controlDiv"
-		 style="border: 1px; overflow: no; background-color: ButtonFace; padding-bottom:26px; height: 65%; width: 100%;">
 
-		<div id="foot_outputDiv1"
-			 style="overflow: no; background-color : ButtonFace; width: 100%">
 
-			<table border="0" id="toolBar" style="background: ButtonFace;"
-				   cellspacing="3">
-				<tr>
-					<td class="coolButton">
-						<img id='columnButton' src="../../images/column.gif"
-							 align="absmiddle">
-					</td>
-					<td onclick="changeLock('lockButton')" id="lockButtonTd">
-						<img id='lockButton' src="../../images/lock.gif" title="Edit data"
-							 alt="Edit data" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id='insertRecordTd'
-						onclick="insertRecord()">
-						<img id='insertRecordButton' src="../../images/insert_record.gif"
-							 title="Insert record" alt="Insert record" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id='deleteRecordTd'
-						onclick="deleteRecord()">
-						<img id='deleteRecordButton' src="../../images/delete_record.gif"
-							 title="Delete record" alt="Delete record" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id='postChangesTd'
-						onclick="postChangeRecord()">
-						<img id='postChangesButton' src="../../images/post_changes.gif"
-							 title="Post changes" alt="Post changes" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="fetchNextTd"
-						onclick="getFYSql()">
-						<img id='fetchNextButton' src="../../images/fetch_next.gif"
-							 title="Fetch next page" alt="Fetch next page" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="fetchLastTd"
-						onclick="getFYQSql()">
-						<img id='fetchLastButton' src="../../images/fetch_last.gif"
-							 title="Fetch last page" alt="Fetch last page" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="queryByExampleTd"
-						onclick="queryByExample()">
-						<img id='queryByExampleButton'
-							 src="../../images/query_by_example.gif" title="Query By Example"
-							 alt="Query By Example" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="clearRecordTd"
-						onclick="clearRecord()">
-						<img id='clearRecordButton' src="../../images/clear_record.gif"
-							 title="Clear record" alt="Clear record" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="singleRecordViewTd"
-						onclick="changeRecordView()">
-						<img id='singleRecordViewButton'
-							 src="../../images/single_record_view.gif"
-							 title="Single Record View" alt="Single Record View"
-							 align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="nextRecord"
-						onclick="changeNextRecordView()">
-						<img id='nextRecordButton' src="../../images/next_record.gif"
-							 title="Next record" alt="Next record" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="previousRecord"
-						onclick="changePreviousRecordView()">
-						<img id='previousRecordButton'
-							 src="../../images/previous_record.gif" title="Previous record"
-							 alt="Previous record" align="absmiddle">
-					</td>
-					<td class="coolButtonDisabled" id="exportResultResultsTd"
-						onclick="execExportResults('excel',event);">
-						<img id='exportResultResultsButton'
-							 src="../../images/export_query_results.gif"
-							 title="Export Query Results..." alt="Export Query Results..."
-							 align="absmiddle">
-					</td>
-					<td class="coolButton" width="95%">
-						&nbsp;
-					</td>
-				</tr>
 
-			</table>
+		<div id="t_controlDiv"
+			 style="border: 1px; overflow: no; background-color: ButtonFace; padding-bottom:26px; height: 65%; width: 100%;">
+
+            <%-- del start--%>
+		<div class="tab-pane" id="sqlWindowtabPanel" style=" height:100px; ">
+			<div class="tab-page" id="tabpage_1" style=" height:100px;">
+				<h2 class="tab" id="tabTitle_1"><img style="border:none" id='objIcoId_1' src='' align='absmiddle' /><span id="tmpImg_1" style="display:none"></span> <span id='objTitle_1'>SQL1</span></h2>
+
+					<div id="foot_outputDiv1"
+						 style="overflow: no; background-color : ButtonFace; width: 100%">
+
+						<table border="0" id="toolBar" style="background: ButtonFace;"
+							   cellspacing="3">
+							<tr>
+								<td class="coolButton">
+									<img id='columnButton' src="../../images/column.gif"
+										 align="absmiddle">
+								</td>
+								<td onclick="changeLock('lockButton')" id="lockButtonTd">
+									<img id='lockButton' src="../../images/lock.gif" title="Edit data"
+										 alt="Edit data" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id='insertRecordTd'
+									onclick="insertRecord()">
+									<img id='insertRecordButton' src="../../images/insert_record.gif"
+										 title="Insert record" alt="Insert record" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id='deleteRecordTd'
+									onclick="deleteRecord()">
+									<img id='deleteRecordButton' src="../../images/delete_record.gif"
+										 title="Delete record" alt="Delete record" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id='postChangesTd'
+									onclick="postChangeRecord()">
+									<img id='postChangesButton' src="../../images/post_changes.gif"
+										 title="Post changes" alt="Post changes" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="fetchNextTd"
+									onclick="getFYSql()">
+									<img id='fetchNextButton' src="../../images/fetch_next.gif"
+										 title="Fetch next page" alt="Fetch next page" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="fetchLastTd"
+									onclick="getFYQSql()">
+									<img id='fetchLastButton' src="../../images/fetch_last.gif"
+										 title="Fetch last page" alt="Fetch last page" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="queryByExampleTd"
+									onclick="queryByExample()">
+									<img id='queryByExampleButton'
+										 src="../../images/query_by_example.gif" title="Query By Example"
+										 alt="Query By Example" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="clearRecordTd"
+									onclick="clearRecord()">
+									<img id='clearRecordButton' src="../../images/clear_record.gif"
+										 title="Clear record" alt="Clear record" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="singleRecordViewTd"
+									onclick="changeRecordView()">
+									<img id='singleRecordViewButton'
+										 src="../../images/single_record_view.gif"
+										 title="Single Record View" alt="Single Record View"
+										 align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="nextRecord"
+									onclick="changeNextRecordView()">
+									<img id='nextRecordButton' src="../../images/next_record.gif"
+										 title="Next record" alt="Next record" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="previousRecord"
+									onclick="changePreviousRecordView()">
+									<img id='previousRecordButton'
+										 src="../../images/previous_record.gif" title="Previous record"
+										 alt="Previous record" align="absmiddle">
+								</td>
+								<td class="coolButtonDisabled" id="exportResultResultsTd"
+									onclick="execExportResults('excel',event);">
+									<img id='exportResultResultsButton'
+										 src="../../images/export_query_results.gif"
+										 title="Export Query Results..." alt="Export Query Results..."
+										 align="absmiddle">
+								</td>
+								<td class="coolButton" width="95%">
+									&nbsp;
+								</td>
+							</tr>
+
+						</table>
+
+					</div>
+					<div style="width: 100%; height: 100px; background-color: white"
+						 name="outResultDiv" id="outResultDiv"
+						 onclick="hiddenBaisworkMenu(event)"
+						 onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
+					</div>
+					<div
+							style="width: 100%; height: 90%; background-color: white; display: none;"
+							name="changeOutResultDiv" id="changeOutResultDiv"
+							onclick="hiddenBaisworkMenu(event)"
+							onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
+					</div>
+
+			</div>
+			<div class="tab-page" id="tabpage_2" style=" height:100px;">
+				<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>SQL2</span></h2>
+
+
+			</div>
+			<div class="tab-page" id="tabpage_3" style=" height:100px;">
+				<h2 class="tab" id="tabTitle_3"><img style="border:none" id='objIcoId_3' src='' align='absmiddle' /><span id="tmpImg_3" style="display:none"></span> <span id='objTitle_3'>SQL3</span></h2>
+
+			</div>
+			<div class="tab-page" id="tabpage_4" style=" height:100px;">
+				<h2 class="tab" id="tabTitle_4"><img style="border:none" id='objIcoId_4' src='' align='absmiddle' /><span id="tmpImg_4" style="display:none"></span> <span id='objTitle_4'>SQL4</span></h2>
+
+			</div>
+
 
 		</div>
-		<div style="width: 100%; height: 95%; background-color: white"
-			 name="outResultDiv" id="outResultDiv"
-			 onclick="hiddenBaisworkMenu(event)"
-			 onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
+			<%--tab end--%>
+
+			<div id="outResultMenu" name="outResultMenu" class="BaisworkM"></div>
+
+            <%-- del end--%>
+
 		</div>
-		<div
-				style="width: 100%; height: 100%; background-color: white; display: none;"
-				name="changeOutResultDiv" id="changeOutResultDiv"
-				onclick="hiddenBaisworkMenu(event)"
-				onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
-		</div>
-		<div id="outResultMenu" name="outResultMenu" class="BaisworkM"></div>
+        <script>
+            // var ctHeightObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('t_controlDiv');
+            // var ctpageObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_1');
+            // var ctpageEditorObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_2');
+            // var outResultDivObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('outResultDiv');
+            //
+            // var deHeight = 49; // footer 26px + tabtitle 23 px
+            // var deGridHeight = 32; // 32 px
+            // var ctpageHeight = ctHeightObj.clientHeight - deHeight;
+            // ctpageObj.style.height = ctpageHeight + "px";
+            // ctpageEditorObj.style.height = ctpageHeight + "px";
+            // outResultDivObj.style.height = (parseInt(ctpageHeight) -  32) + "px";
+            // var commandTabPane = new WebFXTabPane( document.getElementById( "sqlWindowtabPanel" ), true );
+            // commandTabPane.setSelectedIndex(0);
+
+        </script>
 
 
 	</div>
-    </div>
     <footer id="foot_outputDiv" class="footer">
         <table border="0" id="toolBar_footer" style="background: ButtonFace;"
                cellspacing="1" width="100%">
@@ -470,7 +553,7 @@
         ,save_callback: "winsave"
 	});
 
-	createOutResultMenu('outResultMenu');
+	// createOutResultMenu('outResultMenu');
 
 	function initToolBarButton() {
 		var cells = document.getElementById('toolBar').rows[0].cells;
@@ -512,9 +595,9 @@
 		// cells1[0].setValue(true, true);
 		setEditortoolbarReset();
 	}
-	initToolBarButton();
+	// initToolBarButton();
 
-	createBaisWorkMenu('BaisworkMenu');
+	// createBaisWorkMenu('BaisworkMenu');
 
 	function editAreaLoaded(id){
 

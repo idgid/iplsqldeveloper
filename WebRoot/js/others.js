@@ -666,9 +666,12 @@ function controlbuttonReset() {
 
 function changeRecordViewRestore() {
 
+    var styletmp = 'width:100%;height:100%; background-color:white; display:block';
+    var styleheighttmp = 'height:' + (parseInt(parent.parent.editorFrame.GGETFRAME.ctpageHeight) - 32) + 'px';
+    styletmp = styletmp.replace('height:100%',styleheighttmp);
 	setDivValueNull ('changeOutResultDiv');
 	parent.parent.editorFrame.GGETFRAME.$('changeOutResultDiv').set('style','display:none');
-	parent.parent.editorFrame.GGETFRAME.$('outResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
+	parent.parent.editorFrame.GGETFRAME.$('outResultDiv').set('style',styletmp);
     parent.parent.editorFrame.GGETFRAME.$('singleRecordViewTd').setValue(false,true);
 }
 
@@ -912,6 +915,9 @@ function executeRun(textareaname) {
             parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(),alltmpSql);
 
             if (currWindoType == "SQL") {
+                //初始化一下页面
+                parent.parent.editorFrame.GGETFRAME.createResultTabForSQL(1, 't_controlDiv');
+
                 parent.parent.editorFrame.executeSQL(textareaname);
             } else if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
                 || currWindoType == "PAB" || currWindoType == "TYP" || currWindoType == "TYB"
@@ -963,6 +969,7 @@ function executeSQL(textareaname) {
     if (getIfForupdate(textareaname, 0) && getIfSelect(textareaname, 0)) {
 		//如果为for update，并且开始为select
 		//设置commit、rollback按钮可用
+
         parent.parent.editorFrame.GGETFRAME.DDLFlag = 1;
 		setCommit(true);
 		setRollback(true);
@@ -978,6 +985,8 @@ function executeSQL(textareaname) {
 
         tempSql = tempSql.trim().replace(/[;]*$/, '');
         parent.parent.parent.editorFrame.GGETFRAME.tempSql = tempSql;
+
+
         //提交给接口
         getResultFromSql(tempSql);
 		//getResultFromSql(tempSql); 有问题
@@ -3759,6 +3768,10 @@ function doRadioNew(_trType, _prevTrType, _trRow) {
         windowlistcell[i].setValue(true,true);
     }
     //parent.parent.editorFrame.location.replace("./editor.jsp");
+
+	setNavigateButton(_trRow, rowlength);
+
+
 }
 
 
@@ -4461,14 +4474,21 @@ function execQueryObjData(textareaname,objname) {
 	var texttmp = "select * from " + objname + " t";
 	parent.parent.leftFrameList.createNewSql('SQL','myTextarea');
 	parent.parent.editorFrame.setDivValueText (textareaname,texttmp);
-	parent.parent.editorToolFrame.executeRun(textareaname);
+	setTimeout(function() {
+	    // 等待 editarea 初始化完成
+        parent.parent.editorToolFrame.executeRun(textareaname);
+    },500);
+
 }
 
 function execQueryTable(textareaname, tablename) {
 	var texttmp = "select * from " + tablename + " t";
 	parent.parent.editorToolFrame.createNewSql('SQL','myTextarea');
 	parent.parent.editorFrame.setDivValueText (textareaname,texttmp);
-	parent.parent.editorToolFrame.executeRun(textareaname);
+    setTimeout(function() {
+        // 等待 editarea 初始化完成
+        parent.parent.editorToolFrame.executeRun(textareaname);
+    },500);
 }
 
 function getUserObject(data) {
@@ -4976,16 +4996,25 @@ function setEditortoolbarForCIO() {
     var toprightcells0 = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[0].cells;
     // 第二行
     var toprightcells = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[1].cells;
+	var leftTr = parent.parent.leftFrameList.getWindowTr();
+	var cellMax = parent.parent.leftFrameList.document.getElementById('windowListBar').rows.length;
 
-    for (var i = 2; i < toprightcells0.length - 1; i++)
+
+	for (var i = 2; i < toprightcells0.length - 1; i++)
     {
         toprightcells0[i].setEnabled(false);
-    }
+		// 特殊处理
+		if (i == toprightcells0.length - 6 || i == toprightcells0.length - 7)  toprightcells0[i].setEnabled(true);
+		setNavigateButton(leftTr, cellMax);
+
+	}
 
     for (var i = 2; i < toprightcells.length - 3; i++)
     {
         toprightcells[i].setEnabled(false);
     }
+
+
 }
 
 
@@ -4995,11 +5024,14 @@ function setEditortoolbarReset() {
     var toprightcells0 = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[0].cells;
     // 第二行
     var toprightcells = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[1].cells;
+	var leftTr = parent.parent.leftFrameList.getWindowTr();
+	var cellMax = parent.parent.leftFrameList.document.getElementById('windowListBar').rows.length;
 
-    for (var i = 2; i < toprightcells0.length - 1; i++)
+	for (var i = 2; i < toprightcells0.length - 1; i++)
     {
         toprightcells0[i].setEnabled(true);
-    }
+		setNavigateButton(leftTr, cellMax);
+	}
 
     for (var i = toprightcells.length - 5; i < toprightcells.length - 3; i++)
     {
@@ -5067,6 +5099,216 @@ function execCompileInObj() {
     parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
 
 }
+
+
+// navigate back
+function navigateBack(listbarname) {
+	var leftTr = parent.parent.leftFrameList.getWindowTr();
+	var cellMax = parent.parent.leftFrameList.document.getElementById(listbarname).rows.length;
+
+	if ( parseInt(leftTr) > 0 ) {
+		leftTr --;
+		parent.parent.leftFrameList.document.getElementById(
+			parent.parent.leftFrameList.document.getElementById(listbarname).rows[leftTr].cells[0].id
+		).click();
+	}
+
+}
+
+function navigateForward(listbarname) {
+	var leftTr = parent.parent.leftFrameList.getWindowTr();
+	var cellMax = parent.parent.leftFrameList.document.getElementById(listbarname).rows.length;
+	if ( parseInt(leftTr) < cellMax ) {
+		leftTr ++;
+		parent.parent.leftFrameList.document.getElementById(
+			parent.parent.leftFrameList.document.getElementById(listbarname).rows[leftTr].cells[0].id
+		).click();
+	}
+}
+
+
+// ctr 当前窗口序号 getWindowTr() 得到
+// cmax 左边窗口总数 rows.cell
+function setNavigateButton(ctr, cmax) {
+	var toprightcells0 = parent.parent.editorToolFrame.document.getElementById('topToolBar').rows[0].cells;
+	if (cmax == 1) {
+		  toprightcells0[toprightcells0.length - 6].setEnabled(true);
+		  toprightcells0[toprightcells0.length - 7].setEnabled(false);
+	} else if (cmax > 1) {
+		if ( ctr > 0 ) {
+			if ( ctr != cmax - 1) {
+				toprightcells0[toprightcells0.length - 6].setEnabled(true);
+				toprightcells0[toprightcells0.length - 7].setEnabled(true);
+			} else {
+				toprightcells0[toprightcells0.length - 6].setEnabled(false);
+				toprightcells0[toprightcells0.length - 7].setEnabled(true);
+			}
+		} else {
+			toprightcells0[toprightcells0.length - 6].setEnabled(true);
+			toprightcells0[toprightcells0.length - 7].setEnabled(false);
+		}
+	}
+}
+
+
+// Type = SQL 窗口创建结果分 tab
+// n = 窗口数  dn = divname
+function createResultTabForSQL(n, dn) {
+    var crts = "";
+    var tabDivObj = parent.parent.editorFrame.GGETFRAME.document.getElementById(dn);
+    var tid = "foot_outputDiv";
+    var tdiv = "";
+    var resultBartmp = '<table border="0" id="toolBar" style="background: ButtonFace;"\n' +
+        '\t\t\t\t\t\t\t   cellspacing="3">\n' +
+        '\t\t\t\t\t\t\t<tr>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButton">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="columnButton" src="../../images/column.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td onclick="changeLock(\'lockButton\')" id="lockButtonTd">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="lockButton" src="../../images/lock.gif" title="Edit data"\n' +
+        '\t\t\t\t\t\t\t\t\t\t alt="Edit data" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="insertRecordTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="insertRecord()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="insertRecordButton" src="../../images/insert_record.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Insert record" alt="Insert record" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="deleteRecordTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="deleteRecord()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="deleteRecordButton" src="../../images/delete_record.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Delete record" alt="Delete record" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="postChangesTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="postChangeRecord()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="postChangesButton" src="../../images/post_changes.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Post changes" alt="Post changes" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="fetchNextTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="getFYSql()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="fetchNextButton" src="../../images/fetch_next.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Fetch next page" alt="Fetch next page" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="fetchLastTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="getFYQSql()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="fetchLastButton" src="../../images/fetch_last.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Fetch last page" alt="Fetch last page" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="queryByExampleTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="queryByExample()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="queryByExampleButton"\n' +
+        '\t\t\t\t\t\t\t\t\t\t src="../../images/query_by_example.gif" title="Query By Example"\n' +
+        '\t\t\t\t\t\t\t\t\t\t alt="Query By Example" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="clearRecordTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="clearRecord()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="clearRecordButton" src="../../images/clear_record.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Clear record" alt="Clear record" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="singleRecordViewTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="changeRecordView()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="singleRecordViewButton"\n' +
+        '\t\t\t\t\t\t\t\t\t\t src="../../images/single_record_view.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Single Record View" alt="Single Record View"\n' +
+        '\t\t\t\t\t\t\t\t\t\t align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="nextRecord"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="changeNextRecordView()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="nextRecordButton" src="../../images/next_record.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Next record" alt="Next record" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="previousRecord"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="changePreviousRecordView()">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="previousRecordButton"\n' +
+        '\t\t\t\t\t\t\t\t\t\t src="../../images/previous_record.gif" title="Previous record"\n' +
+        '\t\t\t\t\t\t\t\t\t\t alt="Previous record" align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="exportResultResultsTd"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="execExportResults(\'excel\',event);">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="exportResultResultsButton"\n' +
+        '\t\t\t\t\t\t\t\t\t\t src="../../images/export_query_results.gif"\n' +
+        '\t\t\t\t\t\t\t\t\t\t title="Export Query Results..." alt="Export Query Results..."\n' +
+        '\t\t\t\t\t\t\t\t\t\t align="absmiddle">\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButton" width="95%">\n' +
+        '\t\t\t\t\t\t\t\t\t&nbsp;\n' +
+        '\t\t\t\t\t\t\t\t</td>\n' +
+        '\t\t\t\t\t\t\t</tr>\n' +
+        '\n' +
+        '\t\t\t\t\t\t</table>';
+    var ordtmp = '<div style="width: 100%; height: 100px; background-color: white"\n' +
+        '\t\t\t\t\t\t name="outResultDiv" id="outResultDiv"\n' +
+        '\t\t\t\t\t\t onclick="hiddenBaisworkMenu(event)"\n' +
+        '\t\t\t\t\t\t onmouseup="showBaisworkMenu(\'outResultDiv\',\'outResultMenu\',event)">\n' +
+        '\t\t\t\t\t</div>';
+    var cordtmp = '<div\n' +
+        '\t\t\t\t\t\t\tstyle="width: 100%; height: 90%; background-color: white; display: none;"\n' +
+        '\t\t\t\t\t\t\tname="changeOutResultDiv" id="changeOutResultDiv"\n' +
+        '\t\t\t\t\t\t\tonclick="hiddenBaisworkMenu(event)"\n' +
+        '\t\t\t\t\t\t\tonmouseup="showBaisworkMenu(\'outResultDiv\',\'outResultMenu\',event)">\n' +
+        '\t\t\t\t\t</div>';
+
+    var orddiv = '';
+    var corddiv = '';
+    var ordtivTmpid = 'outResultDiv';
+    var cordtivTmpid = 'changeOutResultDiv';
+    var ormenudiv = '';
+    var ormenuid = 'outResultMenu';
+
+
+    if (n <= 1) {
+        // 构造 无 Tab 页页面
+        tid = tid + n.toString();
+        tdiv = document.createElement('div');
+        tdiv.id = tid;
+        tdiv.style.overflow = 'no';
+        tdiv.style.backgroundColor = 'ButtonFace';
+        tdiv.style.width = '100%';
+        tdiv.innerHTML = resultBartmp;
+
+        orddiv = document.createElement('div');
+        orddiv.id = ordtivTmpid;
+        orddiv.name = ordtivTmpid;
+        orddiv.style.width = '100%';
+        orddiv.style.height = '95%';
+        orddiv.style.backgroundColor = 'white';
+		orddiv.setAttribute('onclik', 'hiddenBaisworkMenu(event)');
+		orddiv.setAttribute('onmouseup', 'showBaisworkMenu(\''+ordtivTmpid+'\',\'outResultMenu\',event)');
+
+        corddiv = document.createElement('div');
+        corddiv.id = cordtivTmpid;
+        corddiv.name = cordtivTmpid;
+        corddiv.style.width = '100%';
+        corddiv.style.height = '90%';
+        corddiv.style.backgroundColor = 'white';
+        corddiv.style.display = 'none';
+        corddiv.setAttribute('onclik', 'hiddenBaisworkMenu(event)');
+		corddiv.setAttribute('onmouseup', 'showBaisworkMenu(\''+ordtivTmpid+'\',\'outResultMenu\',event)');
+
+        // menu div
+        ormenudiv = document.createElement('div');
+        ormenudiv.id = ormenuid;
+        ormenudiv.className = 'BaisworkM';
+
+
+        tdiv.appendChild(orddiv);
+        tdiv.appendChild(corddiv);
+        tdiv.appendChild(ormenudiv);
+
+		tabDivObj.innerHTML = '';
+        tabDivObj.appendChild(tdiv);
+
+        createOutResultMenu('outResultMenu');
+        createBaisWorkMenu('BaisworkMenu');
+        initToolBarButton();
+
+    } else {
+        // 构造多个 Tab 页页面
+
+    }
+
+}
+
 
 //关于我们团队
 function aboutUS() {
