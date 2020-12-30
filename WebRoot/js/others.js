@@ -56,7 +56,7 @@ if (globalSameWindowFlag == null) var globalSameWindowFlag = false;
 
 //全局调用JSP页面地址
 if (warname == null) var warname = "iplsqldevJ"; //包名,换包名时需修改该值
-if (sqlURL == null) var sqlURL = warname + "/login/editor1.jsp";
+if (sqlURL == null) var sqlURL = warname + "/login/editor.jsp";
 if (funURL == null) var funURL = "../treeoperate/common/New.jsp";
 if (funViewURL == null) var funViewURL = "../treeoperate/common/View.jsp";
 if (funEditURL == null) var funEditURL = "../treeoperate/common/Edit.jsp";
@@ -121,6 +121,13 @@ if (compileInvalidMygrid == null)  var compileInvalidMygrid;
 
 //设置 DDL SQL 标志
 if (DDLFlag == null) var DDLFlag = 0;
+
+// 设置多SQL数组
+if (GMSQL == null) var GMSQL = [];
+
+// 设置当前结果输出 outResultDiv 的 ID
+if (GOUTRESULTDIVID == null) var GOUTRESULTDIVID = 1;
+
 
 
 
@@ -916,7 +923,7 @@ function executeRun(textareaname) {
 
             if (currWindoType == "SQL") {
                 //初始化一下页面
-                parent.parent.editorFrame.GGETFRAME.createResultTabForSQL(1, 't_controlDiv');
+                parent.parent.editorFrame.GGETFRAME.createResultTabForSQL(3, 't_controlDiv', ['1','2','3']);
 
                 parent.parent.editorFrame.executeSQL(textareaname);
             } else if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
@@ -963,6 +970,8 @@ function executeRun(textareaname) {
 //SQL执行控制
 function executeSQL(textareaname) {
 	tempSql = getTextareaContents(textareaname);
+    GMSQL = tempSql.split(';');
+    parent.parent.parent.editorFrame.GGETFRAME.GMSQL = GMSQL;
     tempSql = tempSql.trim().replace(/[;]*$/, '');
     parent.parent.parent.editorFrame.GGETFRAME.tempSql = tempSql;
 
@@ -988,7 +997,8 @@ function executeSQL(textareaname) {
 
 
         //提交给接口
-        getResultFromSql(tempSql);
+        getResultFromSql(tempSql, 'outResultDiv');
+
 		//getResultFromSql(tempSql); 有问题
 		//alert("oK");
 	} else if (getIfDelete(textareaname, 0) || getIfInsertInto(textareaname, 0) || getIfUpdate(textareaname, 0) || !getIfSelect(textareaname, 0)) {
@@ -1030,30 +1040,35 @@ function executeSQL(textareaname) {
  		}
  		//alert("delete or insert");
 		} else {
-		//其他sql语句
-		//设置commit、rollback按钮不可用
-		//setCommit(false);
-		//setRollback(false);
-		//否则为正常select
+			//其他sql语句
+			//设置commit、rollback按钮不可用
+			//setCommit(false);
+			//setRollback(false);
+			//否则为正常select
 
-		setFetchNext(false);
-		setFetchLast(false);
+			setFetchNext(false);
+			setFetchLast(false);
 
-		// 从窗口最大化恢复，只做一次
-		if (parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen) {
-			parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.execCommand('toggle_full_screen');
-			parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen = false;
-			GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
-		}
+			// 从窗口最大化恢复，只做一次
+			if (parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen) {
+				parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea.execCommand('toggle_full_screen');
+				parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen = false;
+				GToggleFullScreen = parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen;
+			}
 
-		// 过滤一下字符
-
-        //提交给接口
-		getResultFromSql(tempSql);
-		//alert(tempSql);
-		//breakRun(textareaname);
-		//changeExecute();
-
+			// 多SQL处理 2020-12-30
+			for ( var i = 0; i < GMSQL.length; i++ ) {
+				if ( GMSQL[i] != "" && GMSQL[i] != null && GMSQL[i] != '\n' ) {
+					var dname = 'outResultDiv';
+					GOUTRESULTDIVID = i + 1;
+					parent.parent.parent.editorFrame.GGETFRAME.GOUTRESULTDIVID = GOUTRESULTDIVID;
+					dname = dname + GOUTRESULTDIVID.toString();
+					// 替换到 '\n' 字符
+					GMSQL[i] = GMSQL[i].trim().replace('\n', '');
+					//提交给接口 select 查询
+					getResultFromSql(GMSQL[i], dname);
+				}
+			}
 		}
 
 
@@ -1364,11 +1379,12 @@ function isGreatZeroFloat(str){       //是否是一个大于或等于0的实数
 
 //将展用新的展示方式， 对数据进行动态创建表格
 //phanrider 2009-05-21
-function showDataHtml(rows,data) {
+function showDataHtml(rows,data, id) {
 
+	if (id == '' || id == null || id == '\n') id = 1;
    //mygrid = new dhtmlXGridObject('outResultDiv');
-
-    mygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject('outResultDiv');
+	var odivObj = 'outResultDiv' + id.toString();
+    mygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject(odivObj);
     parent.parent.editorFrame.GGETFRAME.mygrid = mygrid;
 	GGRIDHEADATTR = parent.parent.editorFrame.GGETFRAME.GGRIDHEADATTR;
 
@@ -1623,7 +1639,7 @@ function showDataHtml(rows,data) {
 
 }
 
-function addDataHtml(rows,data) {
+function addDataHtml(rows,data, id) {
 	// mygrid = new dhtmlXGridObject('outResultDiv');
 
 
@@ -1689,7 +1705,7 @@ function addDataHtml(rows,data) {
 }
 
 
-function addFullDataHtml(rows,data) {
+function addFullDataHtml(rows,data, id) {
 	//mygrid = new dhtmlXGridObject('outResultDiv');
 
     mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
@@ -1922,13 +1938,24 @@ function getIfForupdate(textareaname, cflag) {
 		//设置forupdate标志为1
         parent.parent.editorFrame.GGETFRAME.forUpdateFlag = 1;
 		//如果为真，设置为固定按钮
-		lockButtonObject.setToggle(true);
+        (lockButtonObject == null || lockButtonObject == '') ? (setTimeout(
+                function() {
+                    lockButtonObject = parent.parent.editorFrame.GGETFRAME.$('lockButtonTd');
+                    lockButtonObject.setToggle(true);
+                }
+            , 300)) :	lockButtonObject.setToggle(true);
 		return true;
 	} else {
 		//设置forupdate标志为0
         parent.parent.editorFrame.GGETFRAME.forUpdateFlag = 0;
 		//否则，设置为非固定按钮
-		lockButtonObject.setToggle(false);
+        (lockButtonObject == null || lockButtonObject == '') ? (setTimeout(
+            function() {
+                lockButtonObject = parent.parent.editorFrame.GGETFRAME.$('lockButtonTd');
+                lockButtonObject.setToggle(false);
+            }
+            , 300)) :	lockButtonObject.setToggle(false);
+		// lockButtonObject.setToggle(false);
 		return false;
 	}
 }
@@ -2951,7 +2978,7 @@ function showDataHtmlCompileInvalid(s,data) {
         var bk = "width: 100%; color: #800000;";
         var intdata = [];
         parseInt(tlow) > 0 ? intdata[0] = (parseInt(tlow) - 1) + " invalid object(s) found" : intdata[0] = "0 invalid object(s) found";
-        intdata[1] = "Press the Execute button to compile thess objects";
+        intdata[1] = "Press the Execute button to compile these objects";
          for (var i = 0; i < 2; i++) {
             o.innerHTML += "<div style='" + bk + "' onclick='parent.parent.parent.editorFrame.GGETFRAME.chcolor(event)'><span style='width: 100%; display: inline-block;'>" + intdata[i] + "</span></div>";
         }
@@ -3825,6 +3852,7 @@ function clearSQLWindow(windowType) {
 		// controlbuttonReset();
 		//清除结果集后，需重新设置工作结果区的工具条状态
 		resetBaseWorkToolBar(false);
+
 	} else if (windowType == "FUN" || windowType == "PRO" || windowType == "PAC"
         || windowType == "PAB" || windowType == "TYP" || windowType == "TYB"
         || windowType == "TRI" || windowType == "JAV" || windowType == "VIE"
@@ -5115,6 +5143,7 @@ function navigateBack(listbarname) {
 
 }
 
+// navigate forward
 function navigateForward(listbarname) {
 	var leftTr = parent.parent.leftFrameList.getWindowTr();
 	var cellMax = parent.parent.leftFrameList.document.getElementById(listbarname).rows.length;
@@ -5152,8 +5181,8 @@ function setNavigateButton(ctr, cmax) {
 
 
 // Type = SQL 窗口创建结果分 tab
-// n = 窗口数  dn = divname
-function createResultTabForSQL(n, dn) {
+// n = 窗口数  dn = divname s = [] tab页面的名称数组
+function createResultTabForSQL(n, dn, s) {
     var crts = "";
     var tabDivObj = parent.parent.editorFrame.GGETFRAME.document.getElementById(dn);
     var tid = "foot_outputDiv";
@@ -5303,7 +5332,148 @@ function createResultTabForSQL(n, dn) {
         initToolBarButton();
 
     } else {
-        // 构造多个 Tab 页页面
+        // 构造 N 多个 Tab 页页面
+        var tabpanid = "sqlWindowtabPanel";
+        var tabpanObj = '';
+
+        // 创建最外层的 tab-pan
+        tabpanObj = document.createElement('div');
+        tabpanObj.className = 'tab-pane';
+        tabpanObj.id = tabpanid;
+        tabpanObj.style.height = '100px';
+
+        // 清空
+        tabDivObj.innerHTML = '';
+        // 添加为子节点
+        tabDivObj.appendChild(tabpanObj);
+
+        var ctHeightObj = tabDivObj;
+        var deHeight = 49; // footer 26px + tabtitle 23 px
+        var deGridHeight = 32; // 32 px
+        var ctpageHeight = ctHeightObj.clientHeight - deHeight;
+
+        for ( var i = 1; i <= n; i++ ) {
+            var tabpageid = "tabpage_";
+            var tabpagetitleid = "tabTitle_";
+            var tabpagetitleimgid = "objIcoId_";
+            var tabpagetitleimgspanid = "tmpImg_";
+            var tabpagetitleimgspantextid = "objTitle_";
+
+            var tabpageObj = '';
+            var tabpagetitleObj = '';
+            var tabpagetitleimgObj = '';
+            var tabpagetitleimgspanObj = '';
+            var tabpagetitleimgspantextObj = '';
+
+
+            tid = "foot_outputDiv";
+			ordtivTmpid = 'outResultDiv';
+
+
+            // 设置动态 id
+            // <div class="tab-page" id="tabpage_1" style=" height:100px;">
+            tabpageid = tabpageid + i.toString();
+            tabpageObj = document.createElement('div');
+            tabpageObj.className = 'tab-page';
+            tabpageObj.id = tabpageid;
+            tabpageObj.style.height = ctpageHeight + "px";
+            tabpanObj.appendChild(tabpageObj);
+
+            // <h2 class="tab" id="tabTitle_1">
+            tabpagetitleid = tabpagetitleid + i.toString();
+            tabpagetitleObj = document.createElement('h2');
+            tabpagetitleObj.className = 'tab';
+            tabpagetitleObj.id = tabpagetitleid;
+            tabpageObj.appendChild(tabpagetitleObj);
+
+            // <img style="border:none" id='objIcoId_1' src='' align='absmiddle' />
+            tabpagetitleimgid = tabpagetitleimgid + i.toString();
+            tabpagetitleimgObj = document.createElement('img');
+            tabpagetitleimgObj.id = tabpagetitleimgid;
+            tabpagetitleimgObj.style.border = 'none';
+            tabpagetitleimgObj.src = '';
+            tabpagetitleimgObj.align = 'absmiddle';
+            tabpagetitleObj.appendChild(tabpagetitleimgObj);
+
+            // <span id="tmpImg_1" style="display:none"></span>
+            tabpagetitleimgspanid = tabpagetitleimgspanid + i.toString();
+            tabpagetitleimgspanObj = document.createElement('span');
+            tabpagetitleimgspanObj.id = tabpagetitleimgspanid;
+            tabpagetitleimgspanObj.style.display = 'none';
+            tabpagetitleObj.appendChild(tabpagetitleimgspanObj);
+
+            // <span id='objTitle_1'>SQL1</span>
+            tabpagetitleimgspantextid = tabpagetitleimgspantextid + i.toString();
+            tabpagetitleimgspantextObj = document.createElement('span');
+            tabpagetitleimgspantextObj.id = tabpagetitleimgspantextid;
+            tabpagetitleimgspantextObj.innerText = s[i-1];
+            tabpagetitleObj.appendChild(tabpagetitleimgspantextObj);
+
+            // 添加子 tab 页面中的内容
+            tid = tid + i.toString();
+            tdiv = document.createElement('div');
+            tdiv.id = tid;
+            tdiv.style.overflow = 'no';
+            tdiv.style.backgroundColor = 'ButtonFace';
+            tdiv.style.width = '100%';
+            tdiv.innerHTML = resultBartmp;
+
+
+            //<div style="width: 100%; height: 100px; background-color: white"
+            // 						 name="outResultDiv" id="outResultDiv"
+            // 						 onclick="hiddenBaisworkMenu(event)"
+            // 						 onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
+            // 					</div>
+            ordtivTmpid = ordtivTmpid + i.toString();
+            orddiv = document.createElement('div');
+            orddiv.id = ordtivTmpid;
+            orddiv.name = ordtivTmpid;
+            orddiv.style.width = '100%';
+            orddiv.style.height = (parseInt(ctpageHeight) -  32) + "px";;
+            orddiv.style.backgroundColor = 'white';
+            orddiv.setAttribute('onclik', 'hiddenBaisworkMenu(event)');
+            orddiv.setAttribute('onmouseup', 'showBaisworkMenu(\''+ordtivTmpid+'\',\'outResultMenu\',event)');
+
+            //<div
+            // 							style="width: 100%; height: 90%; background-color: white; display: none;"
+            // 							name="changeOutResultDiv" id="changeOutResultDiv"
+            // 							onclick="hiddenBaisworkMenu(event)"
+            // 							onmouseup="showBaisworkMenu('outResultDiv','outResultMenu',event)">
+            // 					</div>
+            cordtivTmpid = cordtivTmpid + i.toString();
+            corddiv = document.createElement('div');
+            corddiv.id = cordtivTmpid;
+            corddiv.name = cordtivTmpid;
+            corddiv.style.width = '100%';
+            corddiv.style.height = '90%';
+            corddiv.style.backgroundColor = 'white';
+            corddiv.style.display = 'none';
+            corddiv.setAttribute('onclik', 'hiddenBaisworkMenu(event)');
+            corddiv.setAttribute('onmouseup', 'showBaisworkMenu(\''+ordtivTmpid+'\',\'outResultMenu\',event)');
+
+            // menu div
+            // <div id="outResultMenu" name="outResultMenu" class="BaisworkM"></div>
+            ormenudiv = document.createElement('div');
+            ormenudiv.id = ormenuid;
+            ormenudiv.className = 'BaisworkM';
+
+            tabpageObj.appendChild(tdiv);
+            tabpageObj.appendChild(orddiv);
+            tabpageObj.appendChild(corddiv);
+
+
+        }
+
+        // 结果输出区统一右键菜单
+        tabDivObj.appendChild(ormenudiv);
+
+        createOutResultMenu('outResultMenu');
+        createBaisWorkMenu('BaisworkMenu');
+        initToolBarButton();
+
+
+        var commandTabPane = new WebFXTabPane( document.getElementById( "sqlWindowtabPanel" ), true );
+        commandTabPane.setSelectedIndex(0);
 
     }
 

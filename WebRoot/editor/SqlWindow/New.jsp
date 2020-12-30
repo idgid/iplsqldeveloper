@@ -455,7 +455,7 @@
             // var ctpageObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_1');
             // var ctpageEditorObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('tabpage_2');
             // var outResultDivObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('outResultDiv');
-            //
+			//
             // var deHeight = 49; // footer 26px + tabtitle 23 px
             // var deGridHeight = 32; // 32 px
             // var ctpageHeight = ctHeightObj.clientHeight - deHeight;
@@ -595,7 +595,9 @@
 		// cells1[0].setValue(true, true);
 		setEditortoolbarReset();
 	}
-	// initToolBarButton();
+    setEditortoolbarReset();
+
+    // initToolBarButton();
 
 	// createBaisWorkMenu('BaisworkMenu');
 

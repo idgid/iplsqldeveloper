@@ -37,8 +37,8 @@ var sqlNum = [];//数组记录每次传到BEAN中的SQL和分页的行数起始
 var fyNum = 0;//记录分页的次数
 var sql2 = "";//记录sql
 /*传入SQL把数据从数据库里面拉出来展示--新*/
-function getResultFromSql(localsql) {
-	deletTable();//置空
+function getResultFromSql(localsql, dname) {
+	deletTable(dname);//置空
 	parent.parent.editorFrame.GGETFRAME.fyNum = 1;
 	fyNum = parent.parent.editorFrame.GGETFRAME.fyNum;
 	sqlNum[0] = localsql;
@@ -50,9 +50,76 @@ function getResultFromSql(localsql) {
 	//这里加入执行开始的时间计算
 	//BaisWorkBean.initBean(sqlNum, callbackadd);
 
+	var  goutid = parent.parent.parent.editorFrame.GGETFRAME.GOUTRESULTDIVID;
+
 	//将展用新的展示方式，返回类型为list
 	//phanrider 2009-05-17
 	BaisWorkBean.GetResultList(sqlNum, callbackadd);
+
+	function callbackadd(dataadd) {
+
+		var oldtime = $time();
+		var rows;
+		var more = "";
+		//alert(dataadd);
+		//setDivValueNull("outResultDiv");
+
+		//phanrider add 2009-05-21
+		//alert(fyNum);
+		if (fyNum > 1 && sqlNum[2] != "Q") {
+			addDataHtml(fyNum, dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
+			if (dataadd.length > 20) {
+				rows = dataadd.length - 1;  //去掉最后一个测试标志行
+				more = " (more...)";
+				setFetchNext(true);
+				setFetchLast(true);
+			} else {
+				rows = dataadd.length;  //无标志行可去
+				setFetchNext(false);
+				setFetchLast(false);
+			}
+		} else {
+			if (sqlNum[2] == "Q") {
+				addFullDataHtml(fyNum, dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
+				rows = dataadd.length;
+				setFetchNext(false);
+				setFetchLast(false);
+			} else {
+				showDataHtml(fyNum, dataadd, goutid);	//初始 Execute 调用的方法
+				if (dataadd.length > 21) {
+					rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
+					more = " (more...)";
+					setFetchNext(true);
+					setFetchLast(true);
+				} else {
+					rows = dataadd.length - 1; //只能去掉第一个标题行
+					setFetchNext(false);
+					setFetchLast(false);
+				}
+			}
+		}
+
+		//TrColor();
+		breakRun("myTextarea");
+		//这里加入执行的结束时间计算
+		//这里设置右下角提示信息--执行条数和时间，例：1(结果集) row selected in 0.062(执行时间) seconds
+		var newtime = ($time() - oldtime) / 1000;
+		pageNo = fyNum - 1;
+		rows = pageNo * countPage + rows;
+		var oracleTitle = "";
+		if ( errOracleMsg != "") {
+			oracleTitle = errOracleMsg;
+			errOracleMsg = "";
+			var errResult = "(no result set)";
+			setNoresult('outResultDiv',errResult);
+		} else  {
+			oracleTitle = rows + " rows selected in " + newtime + " seconds" + more;	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
+		}
+		setFootView(9999, oracleTitle);
+		parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+	}
+
+
 }
 
 // for CommandSQL  2020-11-15
@@ -110,19 +177,18 @@ function getFYQSql_run_New(framesql) {
     sqlNum[1] = fyNum; //全局变理，分页数
     sqlNum[2] = "Q";  //代表全部分页
     //BaisWorkBean.initBean(sqlNum, callbackadd);
-
-    BaisWorkBean.GetResultList(sqlNum, callbackadd);
+	BaisWorkBean.GetResultList(sqlNum, callbackadd);
 }
 
 
 function callbackadd(dataadd) {
 
-	var optionadd = parent.parent.editorFrame.GGETFRAME.document.getElementById("outResultDiv");
 	var oldtime = $time();
 	var rows;
 	var more = "";
 	//alert(dataadd);
 	//setDivValueNull("outResultDiv");
+	console.log(goutid);
 
 	//phanrider add 2009-05-21
 	//alert(fyNum);
@@ -145,7 +211,7 @@ function callbackadd(dataadd) {
 			setFetchNext(false);
 			setFetchLast(false);
 		} else {
-			showDataHtml(fyNum, dataadd);	//初始 Execute 调用的方法
+			showDataHtml(fyNum, dataadd, GOUTRESULTDIVID);	//初始 Execute 调用的方法
 			if (dataadd.length > 21) {
 				rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
 				more = " (more...)";
@@ -158,7 +224,6 @@ function callbackadd(dataadd) {
 			}
 		}
 	}
-	//optionadd.insertAdjacentHTML("beforeEnd", dataadd);
 
 	//TrColor();
 	breakRun("myTextarea");
@@ -179,15 +244,11 @@ function callbackadd(dataadd) {
 	setFootView(9999, oracleTitle);
 	parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
 }
+
+
 /*删除已有TABLE*/
-function deletTable() {
-	//if (fyNum > 0) {
-		//var Table = parent.editorFrame.document.getElementById("outResultDiv").getElementsByTagName("table");
-		//for (var i = 0; i < fyNum; i++) {
-		//	Table[0].removeNode(true);
-		//}
-        parent.editorFrame.GGETFRAME.$("outResultDiv").set("text", "");
-	//}
+function deletTable(dname) {
+	parent.parent.editorFrame.GGETFRAME.$(dname).set("text", "");
 }
 /*设置颜色*/
 function TrColor() {
