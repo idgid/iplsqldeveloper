@@ -128,6 +128,8 @@ if (GMSQL == null) var GMSQL = [];
 // 设置当前结果输出 outResultDiv 的 ID
 if (GOUTRESULTDIVID == null) var GOUTRESULTDIVID = 1;
 
+// 设置结果集输出 grid 数组
+if (GOUTRESULTGRID == null) var GOUTRESULTGRID = [];
 
 
 
@@ -224,8 +226,11 @@ function breakbuttonpress() {
 //分页按钮是否可按
 //true : 可按
 //false : 不可按
-function fetchnextbuttonpress() {
-	var fetchnextId = 'fetchNextTd';
+function fetchnextbuttonpress(id) {
+	var fetchnextId = '';
+	 (id == null || id == '' || id == undefined) ?
+		fetchnextId = 'fetchNextTd' : fetchnextId = id;
+
 	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
 
 	if (fetchnextObject.getEnabled()) {
@@ -239,8 +244,11 @@ function fetchnextbuttonpress() {
 //全部分页按钮是否可按
 //true : 可按
 //false : 不可按
-function fetchlastbuttonpress() {
-	var fetchLastTd = 'fetchLastTd';
+function fetchlastbuttonpress(id) {
+	var fetchLastTd = '';
+	(id == null || id == '' || id == undefined) ?
+		fetchLastTd = 'fetchLastTd' : fetchLastTd = id;
+
 	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastTd);
 
 	if (fetchLastObject.getEnabled()) {
@@ -570,12 +578,25 @@ function changeRecordViewInit() {
 	var previousRecordId = 'previousRecord';
 	var nextRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(nextRecordId);
 	var previousRecordObject = parent.parent.editorFrame.GGETFRAME.document.getElementById(previousRecordId);
-
+	var c = 'changeOutResultDiv';
 	mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
 
-	parent.parent.editorFrame.GGETFRAME.$('outResultDiv').set('style','display:none');
 
-	parent.parent.editorFrame.GGETFRAME.setDivValueNull ('changeOutResultDiv');
+	var tcObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('t_controlDiv');
+	if (tcObj.childElementCount <= 1) {
+		c =  c + '1';
+		parent.parent.editorFrame.GGETFRAME.$('outResultDiv1').set('style','display:none');
+		parent.parent.editorFrame.GGETFRAME.setDivValueNull (c );
+	} else {
+		var tabObj = parent.parent.editorFrame.GGETFRAME.document.getElementById( "sqlWindowtabPanel");
+		var s = tabObj.tabPane.getSelectedIndex() + 1;
+		c = c + s.toString();
+		parent.parent.editorFrame.GGETFRAME.$('outResultDiv' + s.toString()).set('style','display:none');
+		parent.parent.editorFrame.GGETFRAME.setDivValueNull (c);
+
+		mygrid = parent.parent.editorFrame.GGETFRAME.GOUTRESULTGRID[tabObj.tabPane.getSelectedIndex()];
+	}
+
 
 	//setDivValueHtml ('changeOutResultDiv','asdfasdfas');
 	//执行显示函数changeNextRecordView
@@ -599,7 +620,7 @@ function changeRecordViewInit() {
 		}
 	changeRecordShowHtml();
 
-	parent.parent.editorFrame.GGETFRAME.$('changeOutResultDiv').set('style','width:100%;height:100%; background-color:white; display:block');
+	parent.parent.editorFrame.GGETFRAME.$(c).set('style','width:100%;height:100%; background-color:white; display:block');
 }
 
 //按下NextRecord按钮执行的功能
@@ -665,8 +686,8 @@ function controlbuttonReset() {
 	if (nextRecordObject != null && typeof(nextRecordObject) != "undefined") nextRecordObject.setEnabled(false);
     if (previousRecordObject != null && typeof(previousRecordObject) != "undefined") previousRecordObject.setEnabled(false);
 
-    if (setFetchNext != null && typeof setFetchNext != undefined) setFetchNext(false);
-    if (setFetchLast != null && typeof setFetchLast != undefined) setFetchLast(false);
+    if (setFetchNext != null && typeof setFetchNext != undefined) setFetchNext(false, '');
+    if (setFetchLast != null && typeof setFetchLast != undefined) setFetchLast(false, '');
 
 }
 
@@ -676,9 +697,28 @@ function changeRecordViewRestore() {
     var styletmp = 'width:100%;height:100%; background-color:white; display:block';
     var styleheighttmp = 'height:' + (parseInt(parent.parent.editorFrame.GGETFRAME.ctpageHeight) - 32) + 'px';
     styletmp = styletmp.replace('height:100%',styleheighttmp);
-	setDivValueNull ('changeOutResultDiv');
-	parent.parent.editorFrame.GGETFRAME.$('changeOutResultDiv').set('style','display:none');
-	parent.parent.editorFrame.GGETFRAME.$('outResultDiv').set('style',styletmp);
+
+	var c = 'changeOutResultDiv';
+	var o = 'outResultDiv';
+	var tcObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('t_controlDiv');
+	if (tcObj.childElementCount <= 1) {
+		c =  c + '1';
+		o = o + '1';
+	} else {
+		var tabObj = parent.parent.editorFrame.GGETFRAME.document.getElementById( "sqlWindowtabPanel");
+		var s = tabObj.tabPane.getSelectedIndex() + 1;
+		c = c + s.toString();
+		o = o + s.toString();
+	}
+
+	// setDivValueNull ('changeOutResultDiv');
+	// parent.parent.editorFrame.GGETFRAME.$('changeOutResultDiv').set('style','display:none');
+	// parent.parent.editorFrame.GGETFRAME.$('outResultDiv').set('style',styletmp);
+
+	setDivValueNull (c);
+	parent.parent.editorFrame.GGETFRAME.$(c).set('style','display:none');
+	parent.parent.editorFrame.GGETFRAME.$(o).set('style',styletmp);
+
     parent.parent.editorFrame.GGETFRAME.$('singleRecordViewTd').setValue(false,true);
 }
 
@@ -695,6 +735,7 @@ function getExecuteFlag() {
 
 //改变锁定标志
 function setLockFlag(loFlag) {
+	parent.parent.editorFrame.GGETFRAME.lockFlag = loFlag;
 	lockFlag = parent.parent.editorFrame.GGETFRAME.lockFlag;
 }
 
@@ -923,9 +964,18 @@ function executeRun(textareaname) {
 
             if (currWindoType == "SQL") {
                 //初始化一下页面
-                parent.parent.editorFrame.GGETFRAME.createResultTabForSQL(3, 't_controlDiv', ['1','2','3']);
-
-                parent.parent.editorFrame.executeSQL(textareaname);
+				var gmsqltmp = getTextareaContents(textareaname).split(';');
+				var cgmsqltmp = [];
+				var j = 0;
+				for ( var i = 0; i <= gmsqltmp.length; i++ ) {
+					if ( gmsqltmp[i] != "" && gmsqltmp[i] != null && gmsqltmp[i] != '\n' ) {
+						// 去掉换行符号，并且只取前 30 个字符
+						cgmsqltmp[j] = gmsqltmp[i].replace('\n','').substr(0,30);
+						j++;
+					}
+				}
+				parent.parent.editorFrame.GGETFRAME.createResultTabForSQL(cgmsqltmp.length, 't_controlDiv', cgmsqltmp);
+				parent.parent.editorFrame.executeSQL(textareaname);
             } else if (currWindoType == "FUN" || currWindoType == "PRO" || currWindoType == "PAC"
                 || currWindoType == "PAB" || currWindoType == "TYP" || currWindoType == "TYB"
                 || currWindoType == "TRI" || currWindoType == "JAV" || currWindoType == "VIE"
@@ -997,7 +1047,7 @@ function executeSQL(textareaname) {
 
 
         //提交给接口
-        getResultFromSql(tempSql, 'outResultDiv');
+        getResultFromSql(tempSql, 'outResultDiv1');
 
 		//getResultFromSql(tempSql); 有问题
 		//alert("oK");
@@ -1046,8 +1096,8 @@ function executeSQL(textareaname) {
 			//setRollback(false);
 			//否则为正常select
 
-			setFetchNext(false);
-			setFetchLast(false);
+			setFetchNext(false, '');
+			setFetchLast(false, '');
 
 			// 从窗口最大化恢复，只做一次
 			if (parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen) {
@@ -1385,7 +1435,9 @@ function showDataHtml(rows,data, id) {
    //mygrid = new dhtmlXGridObject('outResultDiv');
 	var odivObj = 'outResultDiv' + id.toString();
     mygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject(odivObj);
+    GOUTRESULTGRID[id-1] =  mygrid;
     parent.parent.editorFrame.GGETFRAME.mygrid = mygrid;
+    parent.parent.editorFrame.GGETFRAME.GOUTRESULTGRID[id-1] = GOUTRESULTGRID[id-1];
 	GGRIDHEADATTR = parent.parent.editorFrame.GGETFRAME.GGRIDHEADATTR;
 
     mygrid.setImagePath("../../js/codebase/imgs/");
@@ -1640,11 +1692,13 @@ function showDataHtml(rows,data, id) {
 }
 
 function addDataHtml(rows,data, id) {
-	// mygrid = new dhtmlXGridObject('outResultDiv');
 
 
+    if (id == '' || id == null || id == '\n') id = 1;
 
-    mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+    // mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
+    mygrid = parent.parent.editorFrame.GGETFRAME.GOUTRESULTGRID[id-1];
 
 
     tlow_flag_num = data.length; //表格展示的行数
@@ -1706,9 +1760,13 @@ function addDataHtml(rows,data, id) {
 
 
 function addFullDataHtml(rows,data, id) {
-	//mygrid = new dhtmlXGridObject('outResultDiv');
 
-    mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+    if (id == '' || id == null || id == '\n') id = 1;
+
+
+    // mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+    mygrid = parent.parent.editorFrame.GGETFRAME.GOUTRESULTGRID[id-1];
+
 
 
     tlow_flag_num = data.length; //表格展示的行数
@@ -1768,13 +1826,26 @@ function addFullDataHtml(rows,data, id) {
 
 //改变记录显示的grid
 function changeRecordShowHtml() {
-    mygrid = parent.parent.editorFrame.GGETFRAME.mygrid;
+
+	var c = 'changeOutResultDiv';
+	var tcObj = parent.parent.editorFrame.GGETFRAME.document.getElementById('t_controlDiv');
+	if (tcObj.childElementCount <= 1) {
+		mygrid = parent.parent.editorFrame.GGETFRAME.GOUTRESULTGRID[0];
+		c =  c + '1';
+	} else {
+		var tabObj = parent.parent.editorFrame.GGETFRAME.document.getElementById( "sqlWindowtabPanel");
+		var s = tabObj.tabPane.getSelectedIndex();
+		mygrid = parent.parent.editorFrame.GGETFRAME.GOUTRESULTGRID[s];
+		s = s + 1;
+		c =  c + s.toString();
+	}
+
     resultbakHead = parent.parent.editorFrame.GGETFRAME.resultbakHead;
 	GGRIDHEADATTR = parent.parent.editorFrame.GGETFRAME.GGRIDHEADATTR;
 	var tmprows = mygrid.getSelectedId();
 	if (mygrid.getSelectedId() == null) tmprows = "0";
 
-	changemygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject('changeOutResultDiv');
+	changemygrid = new parent.parent.editorFrame.GGETFRAME.dhtmlXGridObject(c);
 
 	changemygrid.setImagePath("../imgs/");
     changemygrid.setHeader(" ,Row " + tmprows + ",Fields");
@@ -1824,8 +1895,10 @@ function changeRecordShowHtml() {
 
 
 //设置分页按钮状态 True 或者 False
-function setFetchNext(flag) {
-	var fetchnextId = 'fetchNextTd';
+function setFetchNext(flag, id) {
+	var fetchnextId = '';
+	(id == null || id == '' || id == undefined) ?
+		fetchnextId = 'fetchNextTd' : fetchnextId = id;
 
 	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
 
@@ -1833,8 +1906,11 @@ function setFetchNext(flag) {
 }
 
 //设置全部分页按钮状态 True 或者 False
-function setFetchLast(flag) {
-	var fetchLastId = 'fetchLastTd';
+function setFetchLast(flag, id) {
+	var fetchLastId = '';
+	(id == null || id == '' || id == undefined) ?
+		fetchLastId = 'fetchLastTd' : fetchLastId = id;
+
 	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastId);
 
 	fetchLastObject.setEnabled(flag);
@@ -1853,7 +1929,7 @@ function setQueryByExampleAndClearRecord(flag) {
 
 //按钮Fetch next page按下执行的函数
 function getFYSql() {
-	if ( fetchnextbuttonpress () ) {
+	if ( fetchnextbuttonpress ('') ) {
 		//改变相互作用的按钮状态
 		executebuttonpress();
 		//设置页脚注释 正在执行...
@@ -1870,7 +1946,7 @@ function getFYSql() {
 
 //按钮Fetch last page按下执行的函数
 function getFYQSql() {
-	if( fetchlastbuttonpress() ) {
+	if( fetchlastbuttonpress('') ) {
 		//改变相互作用的按钮状态
 		executebuttonpress();
 		//设置页脚注释 正在执行...
@@ -2265,8 +2341,8 @@ function queryByExample() {
         // queryByExample 按钮按下
 	    clearRecordObject.setEnabled(true);
         parent.parent.editorFrame.GGETFRAME.queryByExampleFlag = 1;
-        setFetchNext(false);
-        setFetchLast(false);
+        setFetchNext(false, '');
+        setFetchLast(false, '');
         qmygrid.setColumnIds(colid);
 		qmygrid.clearAll();
 		qmygrid.setEditable(true);
@@ -5279,8 +5355,8 @@ function createResultTabForSQL(n, dn, s) {
 
     var orddiv = '';
     var corddiv = '';
-    var ordtivTmpid = 'outResultDiv';
-    var cordtivTmpid = 'changeOutResultDiv';
+    var ordtivTmpid = 'outResultDiv1';
+    var cordtivTmpid = 'changeOutResultDiv1';
     var ormenudiv = '';
     var ormenuid = 'outResultMenu';
 
@@ -5368,6 +5444,7 @@ function createResultTabForSQL(n, dn, s) {
 
             tid = "foot_outputDiv";
 			ordtivTmpid = 'outResultDiv';
+			cordtivTmpid = 'changeOutResultDiv';
 
 
             // 设置动态 id
@@ -5460,6 +5537,7 @@ function createResultTabForSQL(n, dn, s) {
             tabpageObj.appendChild(tdiv);
             tabpageObj.appendChild(orddiv);
             tabpageObj.appendChild(corddiv);
+			initToolBarButton();
 
 
         }
@@ -5469,11 +5547,10 @@ function createResultTabForSQL(n, dn, s) {
 
         createOutResultMenu('outResultMenu');
         createBaisWorkMenu('BaisworkMenu');
-        initToolBarButton();
 
 
-        var commandTabPane = new WebFXTabPane( document.getElementById( "sqlWindowtabPanel" ), true );
-        commandTabPane.setSelectedIndex(0);
+        var sqlWindowTabPane = new WebFXTabPane( document.getElementById( "sqlWindowtabPanel" ), true );
+		sqlWindowTabPane.setSelectedIndex(0);
 
     }
 

@@ -427,19 +427,7 @@
 					</div>
 
 			</div>
-			<div class="tab-page" id="tabpage_2" style=" height:100px;">
-				<h2 class="tab" id="tabTitle_2"><img style="border:none" id='objIcoId_2' src='' align='absmiddle' /><span id="tmpImg_2" style="display:none"></span> <span id='objTitle_2'>SQL2</span></h2>
 
-
-			</div>
-			<div class="tab-page" id="tabpage_3" style=" height:100px;">
-				<h2 class="tab" id="tabTitle_3"><img style="border:none" id='objIcoId_3' src='' align='absmiddle' /><span id="tmpImg_3" style="display:none"></span> <span id='objTitle_3'>SQL3</span></h2>
-
-			</div>
-			<div class="tab-page" id="tabpage_4" style=" height:100px;">
-				<h2 class="tab" id="tabTitle_4"><img style="border:none" id='objIcoId_4' src='' align='absmiddle' /><span id="tmpImg_4" style="display:none"></span> <span id='objTitle_4'>SQL4</span></h2>
-
-			</div>
 
 
 		</div>

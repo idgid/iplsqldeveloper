@@ -71,30 +71,30 @@ function getResultFromSql(localsql, dname) {
 			if (dataadd.length > 20) {
 				rows = dataadd.length - 1;  //去掉最后一个测试标志行
 				more = " (more...)";
-				setFetchNext(true);
-				setFetchLast(true);
+				setFetchNext(true, '');
+				setFetchLast(true, '');
 			} else {
 				rows = dataadd.length;  //无标志行可去
-				setFetchNext(false);
-				setFetchLast(false);
+				setFetchNext(false, '');
+				setFetchLast(false, '');
 			}
 		} else {
 			if (sqlNum[2] == "Q") {
 				addFullDataHtml(fyNum, dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
 				rows = dataadd.length;
-				setFetchNext(false);
-				setFetchLast(false);
+				setFetchNext(false, '');
+				setFetchLast(false, '');
 			} else {
 				showDataHtml(fyNum, dataadd, goutid);	//初始 Execute 调用的方法
 				if (dataadd.length > 21) {
 					rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
 					more = " (more...)";
-					setFetchNext(true);
-					setFetchLast(true);
+					setFetchNext(true, '');
+					setFetchLast(true, '');
 				} else {
 					rows = dataadd.length - 1; //只能去掉第一个标题行
-					setFetchNext(false);
-					setFetchLast(false);
+					setFetchNext(false, '');
+					setFetchLast(false, '');
 				}
 			}
 		}
@@ -155,8 +155,73 @@ function getFYSql_run_New(framesql) {
     sqlNum[0] = framesql;
     sqlNum[1] = fyNum;
     sqlNum[2] = "";
+    var  goutid = parent.parent.parent.editorFrame.GGETFRAME.GOUTRESULTDIVID;
+
     //BaisWorkBean.initBean(sqlNum, callbackadd);
     BaisWorkBean.GetResultList(sqlNum, callbackadd);
+
+    function callbackadd(dataadd) {
+
+        var oldtime = $time();
+        var rows;
+        var more = "";
+        //alert(dataadd);
+        //setDivValueNull("outResultDiv");
+
+        //phanrider add 2009-05-21
+        //alert(fyNum);
+        if (fyNum > 1 && sqlNum[2] != "Q") {
+            addDataHtml(fyNum, dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
+            if (dataadd.length > 20) {
+                rows = dataadd.length - 1;  //去掉最后一个测试标志行
+                more = " (more...)";
+                setFetchNext(true, '');
+                setFetchLast(true, '');
+            } else {
+                rows = dataadd.length;  //无标志行可去
+                setFetchNext(false, '');
+                setFetchLast(false, '');
+            }
+        } else {
+            if (sqlNum[2] == "Q") {
+                addFullDataHtml(fyNum, dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
+                rows = dataadd.length;
+                setFetchNext(false, '');
+                setFetchLast(false, '');
+            } else {
+                showDataHtml(fyNum, dataadd, goutid);	//初始 Execute 调用的方法
+                if (dataadd.length > 21) {
+                    rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
+                    more = " (more...)";
+                    setFetchNext(true, '');
+                    setFetchLast(true, '');
+                } else {
+                    rows = dataadd.length - 1; //只能去掉第一个标题行
+                    setFetchNext(false, '');
+                    setFetchLast(false, '');
+                }
+            }
+        }
+
+        //TrColor();
+        breakRun("myTextarea");
+        //这里加入执行的结束时间计算
+        //这里设置右下角提示信息--执行条数和时间，例：1(结果集) row selected in 0.062(执行时间) seconds
+        var newtime = ($time() - oldtime) / 1000;
+        pageNo = fyNum - 1;
+        rows = pageNo * countPage + rows;
+        var oracleTitle = "";
+        if ( errOracleMsg != "") {
+            oracleTitle = errOracleMsg;
+            errOracleMsg = "";
+            var errResult = "(no result set)";
+            setNoresult('outResultDiv',errResult);
+        } else  {
+            oracleTitle = rows + " rows selected in " + newtime + " seconds" + more;	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
+        }
+        setFootView(9999, oracleTitle);
+        parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+    }
 }
 
 
@@ -177,7 +242,71 @@ function getFYQSql_run_New(framesql) {
     sqlNum[1] = fyNum; //全局变理，分页数
     sqlNum[2] = "Q";  //代表全部分页
     //BaisWorkBean.initBean(sqlNum, callbackadd);
-	BaisWorkBean.GetResultList(sqlNum, callbackadd);
+    var  goutid = parent.parent.parent.editorFrame.GGETFRAME.GOUTRESULTDIVID;
+
+    BaisWorkBean.GetResultList(sqlNum, callbackadd);
+    function callbackadd(dataadd) {
+
+        var oldtime = $time();
+        var rows;
+        var more = "";
+        //alert(dataadd);
+        //setDivValueNull("outResultDiv");
+
+        //phanrider add 2009-05-21
+        //alert(fyNum);
+        if (fyNum > 1 && sqlNum[2] != "Q") {
+            addDataHtml(fyNum, dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
+            if (dataadd.length > 20) {
+                rows = dataadd.length - 1;  //去掉最后一个测试标志行
+                more = " (more...)";
+                setFetchNext(true, '');
+                setFetchLast(true, '');
+            } else {
+                rows = dataadd.length;  //无标志行可去
+                setFetchNext(false, '');
+                setFetchLast(false, '');
+            }
+        } else {
+            if (sqlNum[2] == "Q") {
+                addFullDataHtml(fyNum, dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
+                rows = dataadd.length;
+                setFetchNext(false, '');
+                setFetchLast(false, '');
+            } else {
+                showDataHtml(fyNum, dataadd, goutid);	//初始 Execute 调用的方法
+                if (dataadd.length > 21) {
+                    rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
+                    more = " (more...)";
+                    setFetchNext(true, '');
+                    setFetchLast(true, '');
+                } else {
+                    rows = dataadd.length - 1; //只能去掉第一个标题行
+                    setFetchNext(false, '');
+                    setFetchLast(false, '');
+                }
+            }
+        }
+
+        //TrColor();
+        breakRun("myTextarea");
+        //这里加入执行的结束时间计算
+        //这里设置右下角提示信息--执行条数和时间，例：1(结果集) row selected in 0.062(执行时间) seconds
+        var newtime = ($time() - oldtime) / 1000;
+        pageNo = fyNum - 1;
+        rows = pageNo * countPage + rows;
+        var oracleTitle = "";
+        if ( errOracleMsg != "") {
+            oracleTitle = errOracleMsg;
+            errOracleMsg = "";
+            var errResult = "(no result set)";
+            setNoresult('outResultDiv',errResult);
+        } else  {
+            oracleTitle = rows + " rows selected in " + newtime + " seconds" + more;	//这里需要把SQL执行后ORACLE反映出来的提示信息放进变量
+        }
+        setFootView(9999, oracleTitle);
+        parent.parent.leftFrameList.restoreWindowListImg(parent.parent.leftFrameList.getWindowTr());
+    }
 }
 
 
@@ -197,30 +326,30 @@ function callbackadd(dataadd) {
 		if (dataadd.length > 20) {
 			rows = dataadd.length - 1;  //去掉最后一个测试标志行
 			more = " (more...)";
-			setFetchNext(true);
-			setFetchLast(true);
+			setFetchNext(true, '');
+			setFetchLast(true, '');
 		} else {
 			rows = dataadd.length;  //无标志行可去
-			setFetchNext(false);
-			setFetchLast(false);
+			setFetchNext(false, '');
+			setFetchLast(false, '');
 		}
 	} else {
 		if (sqlNum[2] == "Q") {
 			addFullDataHtml(fyNum, dataadd);  //点击按钮 Fetch Last 调用的方法
 			rows = dataadd.length;
-			setFetchNext(false);
-			setFetchLast(false);
+			setFetchNext(false, '');
+			setFetchLast(false, '');
 		} else {
 			showDataHtml(fyNum, dataadd, GOUTRESULTDIVID);	//初始 Execute 调用的方法
 			if (dataadd.length > 21) {
 				rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
 				more = " (more...)";
-				setFetchNext(true);
-				setFetchLast(true);
+				setFetchNext(true, '');
+				setFetchLast(true, '');
 			} else {
 				rows = dataadd.length - 1; //只能去掉第一个标题行
-				setFetchNext(false);
-				setFetchLast(false);
+				setFetchNext(false, '');
+				setFetchLast(false, '');
 			}
 		}
 	}
@@ -416,7 +545,7 @@ function backInsert(dataResult) {
 		foottitled = rowsA[1] > 1 ?  rowsA[1] + " records deleted, " : rowsA[1] + " record deleted, " ;
 		foottitlei = rowsA[2] > 1 ?  rowsA[2] + " records inserted" : rowsA[2] + " record inserted" ;
 
-		foottitle = foottileu + foottiled + foottilei;
+		foottitle = foottitleu + foottitled + foottitlei;
 
 		setFootView(9999, foottitle);
 
