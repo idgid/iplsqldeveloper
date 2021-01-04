@@ -229,7 +229,7 @@ function breakbuttonpress() {
 function fetchnextbuttonpress(id) {
 	var fetchnextId = '';
 	 (id == null || id == '' || id == undefined) ?
-		fetchnextId = 'fetchNextTd' : fetchnextId = id;
+		fetchnextId = 'fetchNextTd' : fetchnextId = 'fetchNextTd' + id;
 
 	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
 
@@ -247,7 +247,7 @@ function fetchnextbuttonpress(id) {
 function fetchlastbuttonpress(id) {
 	var fetchLastTd = '';
 	(id == null || id == '' || id == undefined) ?
-		fetchLastTd = 'fetchLastTd' : fetchLastTd = id;
+		fetchLastTd = 'fetchLastTd' : fetchLastTd = 'fetchLastTd' + id;
 
 	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastTd);
 
@@ -1096,8 +1096,7 @@ function executeSQL(textareaname) {
 			//setRollback(false);
 			//否则为正常select
 
-			setFetchNext(false, '');
-			setFetchLast(false, '');
+
 
 			// 从窗口最大化恢复，只做一次
 			if (parent.parent.parent.editorFrame.GGETFRAME.GToggleFullScreen) {
@@ -1107,16 +1106,22 @@ function executeSQL(textareaname) {
 			}
 
 			// 多SQL处理 2020-12-30
+			var jtmp = 0;
 			for ( var i = 0; i < GMSQL.length; i++ ) {
 				if ( GMSQL[i] != "" && GMSQL[i] != null && GMSQL[i] != '\n' ) {
 					var dname = 'outResultDiv';
-					GOUTRESULTDIVID = i + 1;
+					GOUTRESULTDIVID = jtmp + 1;
 					parent.parent.parent.editorFrame.GGETFRAME.GOUTRESULTDIVID = GOUTRESULTDIVID;
 					dname = dname + GOUTRESULTDIVID.toString();
+
+					setFetchNext(false, GOUTRESULTDIVID);
+					setFetchLast(false, GOUTRESULTDIVID);
+
 					// 替换到 '\n' 字符
 					GMSQL[i] = GMSQL[i].trim().replace('\n', '');
 					//提交给接口 select 查询
 					getResultFromSql(GMSQL[i], dname);
+					jtmp++;
 				}
 			}
 		}
@@ -1898,7 +1903,7 @@ function changeRecordShowHtml() {
 function setFetchNext(flag, id) {
 	var fetchnextId = '';
 	(id == null || id == '' || id == undefined) ?
-		fetchnextId = 'fetchNextTd' : fetchnextId = id;
+		fetchnextId = 'fetchNextTd' : fetchnextId = 'fetchNextTd' + id;
 
 	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
 
@@ -1909,7 +1914,7 @@ function setFetchNext(flag, id) {
 function setFetchLast(flag, id) {
 	var fetchLastId = '';
 	(id == null || id == '' || id == undefined) ?
-		fetchLastId = 'fetchLastTd' : fetchLastId = id;
+		fetchLastId = 'fetchLastTd' : fetchLastId = 'fetchLastTd' + id;
 
 	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastId);
 
@@ -1928,8 +1933,8 @@ function setQueryByExampleAndClearRecord(flag) {
 
 
 //按钮Fetch next page按下执行的函数
-function getFYSql() {
-	if ( fetchnextbuttonpress ('') ) {
+function getFYSql(id) {
+	if ( fetchnextbuttonpress (id) ) {
 		//改变相互作用的按钮状态
 		executebuttonpress();
 		//设置页脚注释 正在执行...
@@ -1939,14 +1944,15 @@ function getFYSql() {
 		//同时更改左边工具条的状态
 		parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(),parent.parent.leftFrameList.getWindowTr(), parent.parent.editorFrame.GGETFRAME.getTextareaContents('myTextarea'));
 		//调用真正的分页执行方法 2020-09-23 换成新的方法
-        getFYSql_run_New(parent.parent.editorFrame.GGETFRAME.tempSql);
+		var tempSqli = parent.parent.editorFrame.GGETFRAME.GMSQL[id-1];
+        getFYSql_run_New(tempSqli, id);
 	}
 }
 
 
 //按钮Fetch last page按下执行的函数
-function getFYQSql() {
-	if( fetchlastbuttonpress('') ) {
+function getFYQSql(id) {
+	if( fetchlastbuttonpress(id) ) {
 		//改变相互作用的按钮状态
 		executebuttonpress();
 		//设置页脚注释 正在执行...
@@ -1957,7 +1963,8 @@ function getFYQSql() {
         parent.parent.leftFrameList.changeWindowListTitle(parent.parent.leftFrameList.getWindowType(), parent.parent.leftFrameList.getWindowTr(), parent.parent.editorFrame.GGETFRAME.getTextareaContents('myTextarea'));
 		//调用真正的全部分页执行方法 2020-09-23 换成新的方法
 		// getFYQSql_run();
-        getFYQSql_run_New(parent.parent.editorFrame.GGETFRAME.tempSql);
+		var tempSqli = parent.parent.editorFrame.GGETFRAME.GMSQL[id-1];
+		getFYQSql_run_New(tempSqli, id);
 
 	}
 }
@@ -2619,14 +2626,16 @@ function execExportResults(oName, e) {
 function execFetchNextPage(e) {
 	hiddenBaisworkMenu(e);
 	//直接调用fetch next page按钮执行的函数
-	getFYSql();
+	var tpan = parent.parent.editorFrame.GGETFRAME.sqlWindowtabPanel;
+	(tpan != '' && tpan != null) ? getFYSql(tpan.tabPane.getSelectedIndex() + 1) : getFYSql(1);
 }
 
 //工作结果输出区右键Fetch Last Page命令执行函数
 function execFetchLastPage(e) {
 	hiddenBaisworkMenu(e);
 	//直接调用fetch last page按钮执行的函数
-	getFYQSql();
+	var tpan = parent.parent.editorFrame.GGETFRAME.sqlWindowtabPanel;
+	(tpan != '' && tpan != null) ? getFYQSql(tpan.tabPane.getSelectedIndex() + 1) : getFYQSql(1);
 }
 
 //工作结果输出区右键Copy命令执行函数
@@ -5263,7 +5272,12 @@ function createResultTabForSQL(n, dn, s) {
     var tabDivObj = parent.parent.editorFrame.GGETFRAME.document.getElementById(dn);
     var tid = "foot_outputDiv";
     var tdiv = "";
-    var resultBartmp = '<table border="0" id="toolBar" style="background: ButtonFace;"\n' +
+    var resultBarFetchNextTd = 'fetchNextTd1';
+	var resultBarFetchNextImg = 'fetchNextButton1';
+	var resultBarFetchLastTd = 'fetchLastTd1';
+	var resultBarFetchLastImg = 'fetchLastButton1';
+
+	var resultBartmp = '<table border="0" id="toolBar" style="background: ButtonFace;"\n' +
         '\t\t\t\t\t\t\t   cellspacing="3">\n' +
         '\t\t\t\t\t\t\t<tr>\n' +
         '\t\t\t\t\t\t\t\t<td class="coolButton">\n' +
@@ -5289,14 +5303,14 @@ function createResultTabForSQL(n, dn, s) {
         '\t\t\t\t\t\t\t\t\t<img id="postChangesButton" src="../../images/post_changes.gif"\n' +
         '\t\t\t\t\t\t\t\t\t\t title="Post changes" alt="Post changes" align="absmiddle">\n' +
         '\t\t\t\t\t\t\t\t</td>\n' +
-        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="fetchNextTd"\n' +
-        '\t\t\t\t\t\t\t\t\tonclick="getFYSql()">\n' +
-        '\t\t\t\t\t\t\t\t\t<img id="fetchNextButton" src="../../images/fetch_next.gif"\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="' + resultBarFetchNextTd + '"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="getFYSql(1)">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="' + resultBarFetchNextImg + '" src="../../images/fetch_next.gif"\n' +
         '\t\t\t\t\t\t\t\t\t\t title="Fetch next page" alt="Fetch next page" align="absmiddle">\n' +
         '\t\t\t\t\t\t\t\t</td>\n' +
-        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="fetchLastTd"\n' +
-        '\t\t\t\t\t\t\t\t\tonclick="getFYQSql()">\n' +
-        '\t\t\t\t\t\t\t\t\t<img id="fetchLastButton" src="../../images/fetch_last.gif"\n' +
+        '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="' + resultBarFetchLastTd + '"\n' +
+        '\t\t\t\t\t\t\t\t\tonclick="getFYQSql(1)">\n' +
+        '\t\t\t\t\t\t\t\t\t<img id="' + resultBarFetchLastImg + '" src="../../images/fetch_last.gif"\n' +
         '\t\t\t\t\t\t\t\t\t\t title="Fetch last page" alt="Fetch last page" align="absmiddle">\n' +
         '\t\t\t\t\t\t\t\t</td>\n' +
         '\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="queryByExampleTd"\n' +
@@ -5441,6 +5455,10 @@ function createResultTabForSQL(n, dn, s) {
             var tabpagetitleimgspanObj = '';
             var tabpagetitleimgspantextObj = '';
 
+			resultBarFetchNextTd = 'fetchNextTd';
+			resultBarFetchNextImg = 'fetchNextButton';
+			resultBarFetchLastTd = 'fetchLastTd';
+			resultBarFetchLastImg = 'fetchLastButton';
 
             tid = "foot_outputDiv";
 			ordtivTmpid = 'outResultDiv';
@@ -5487,6 +5505,89 @@ function createResultTabForSQL(n, dn, s) {
             tabpagetitleObj.appendChild(tabpagetitleimgspantextObj);
 
             // 添加子 tab 页面中的内容
+			resultBarFetchNextTd = resultBarFetchNextTd + i.toString();
+			resultBarFetchNextImg = resultBarFetchNextImg + i.toString();
+			resultBarFetchLastTd = resultBarFetchLastTd + i.toString();
+			resultBarFetchLastImg = resultBarFetchLastImg + i.toString();
+			resultBartmp = '<table border="0" id="toolBar' + i.toString() + '" style="background: ButtonFace;"\n' +
+				'\t\t\t\t\t\t\t   cellspacing="3">\n' +
+				'\t\t\t\t\t\t\t<tr>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButton">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="columnButton" src="../../images/column.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td onclick="changeLock(\'lockButton\')" id="lockButtonTd">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="lockButton" src="../../images/lock.gif" title="Edit data"\n' +
+				'\t\t\t\t\t\t\t\t\t\t alt="Edit data" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="insertRecordTd"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="insertRecord()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="insertRecordButton" src="../../images/insert_record.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Insert record" alt="Insert record" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="deleteRecordTd"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="deleteRecord()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="deleteRecordButton" src="../../images/delete_record.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Delete record" alt="Delete record" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="postChangesTd"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="postChangeRecord()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="postChangesButton" src="../../images/post_changes.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Post changes" alt="Post changes" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="' + resultBarFetchNextTd + '"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="getFYSql(' + i + ')">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="' + resultBarFetchNextImg + '" src="../../images/fetch_next.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Fetch next page" alt="Fetch next page" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="' + resultBarFetchLastTd + '"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="getFYQSql(' + i + ')">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="' + resultBarFetchLastImg + '" src="../../images/fetch_last.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Fetch last page" alt="Fetch last page" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="queryByExampleTd"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="queryByExample()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="queryByExampleButton"\n' +
+				'\t\t\t\t\t\t\t\t\t\t src="../../images/query_by_example.gif" title="Query By Example"\n' +
+				'\t\t\t\t\t\t\t\t\t\t alt="Query By Example" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="clearRecordTd"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="clearRecord()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="clearRecordButton" src="../../images/clear_record.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Clear record" alt="Clear record" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="singleRecordViewTd"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="changeRecordView()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="singleRecordViewButton"\n' +
+				'\t\t\t\t\t\t\t\t\t\t src="../../images/single_record_view.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Single Record View" alt="Single Record View"\n' +
+				'\t\t\t\t\t\t\t\t\t\t align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="nextRecord"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="changeNextRecordView()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="nextRecordButton" src="../../images/next_record.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Next record" alt="Next record" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="previousRecord"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="changePreviousRecordView()">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="previousRecordButton"\n' +
+				'\t\t\t\t\t\t\t\t\t\t src="../../images/previous_record.gif" title="Previous record"\n' +
+				'\t\t\t\t\t\t\t\t\t\t alt="Previous record" align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButtonDisabled" id="exportResultResultsTd"\n' +
+				'\t\t\t\t\t\t\t\t\tonclick="execExportResults(\'excel\',event);">\n' +
+				'\t\t\t\t\t\t\t\t\t<img id="exportResultResultsButton"\n' +
+				'\t\t\t\t\t\t\t\t\t\t src="../../images/export_query_results.gif"\n' +
+				'\t\t\t\t\t\t\t\t\t\t title="Export Query Results..." alt="Export Query Results..."\n' +
+				'\t\t\t\t\t\t\t\t\t\t align="absmiddle">\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t\t<td class="coolButton" width="95%">\n' +
+				'\t\t\t\t\t\t\t\t\t&nbsp;\n' +
+				'\t\t\t\t\t\t\t\t</td>\n' +
+				'\t\t\t\t\t\t\t</tr>\n' +
+				'\n' +
+				'\t\t\t\t\t\t</table>';
+
             tid = tid + i.toString();
             tdiv = document.createElement('div');
             tdiv.id = tid;
@@ -5537,7 +5638,7 @@ function createResultTabForSQL(n, dn, s) {
             tabpageObj.appendChild(tdiv);
             tabpageObj.appendChild(orddiv);
             tabpageObj.appendChild(corddiv);
-			initToolBarButton();
+			initToolBarButton(i);
 
 
         }
@@ -5548,14 +5649,30 @@ function createResultTabForSQL(n, dn, s) {
         createOutResultMenu('outResultMenu');
         createBaisWorkMenu('BaisworkMenu');
 
-
         var sqlWindowTabPane = new WebFXTabPane( document.getElementById( "sqlWindowtabPanel" ), true );
-		sqlWindowTabPane.setSelectedIndex(0);
+		// 调整到第一个 tab 页面
+        sqlWindowTabPane.setSelectedIndex(0);
+		// 调整到第一行 sql 语句
+		var eobj = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea;
+		eobj.go_to_line( "1" );
+		eobj.focus();
 
-    }
+	}
 
 }
 
+
+// tabpane.js 中 onclick() 调用接口 2021-1-4
+function Gselect(o) {
+	if (parent.parent.leftFrameList.getWindowType() == 'SQL') {
+		// console.log(o);
+		if ( o == undefined || o == null || o == '') ( o = Object, o.index = 0);
+		var eobj = parent.parent.parent.editorFrame.GGETFRAME.document.getElementById('frame_myTextarea').contentWindow.editArea;
+		eobj.go_to_line( (o.index + 1).toString() );
+		eobj.focus();
+
+	}
+}
 
 //关于我们团队
 function aboutUS() {

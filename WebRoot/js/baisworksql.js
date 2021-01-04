@@ -34,15 +34,16 @@ if (typeof HTMLElement != "undefined" && !HTMLElement.prototype.insertAdjacentEl
 	};
 }
 var sqlNum = [];//数组记录每次传到BEAN中的SQL和分页的行数起始
-var fyNum = 0;//记录分页的次数
+var fyNum = [];//记录分页的次数
 var sql2 = "";//记录sql
 /*传入SQL把数据从数据库里面拉出来展示--新*/
 function getResultFromSql(localsql, dname) {
 	deletTable(dname);//置空
-	parent.parent.editorFrame.GGETFRAME.fyNum = 1;
-	fyNum = parent.parent.editorFrame.GGETFRAME.fyNum;
+	var tmpid = parseInt(dname.replace('outResultDiv',''));
+	parent.parent.editorFrame.GGETFRAME.fyNum[tmpid-1] = 1;
+	fyNum[tmpid-1] = parent.parent.editorFrame.GGETFRAME.fyNum[tmpid-1];
 	sqlNum[0] = localsql;
-	sqlNum[1] = fyNum;
+	sqlNum[1] = fyNum[tmpid-1];
 	sqlNum[2] = "";
 	sql2 = localsql;
     //设置右下角提示信息--正在执行 --phanrider 2009-04-30 增加
@@ -66,35 +67,35 @@ function getResultFromSql(localsql, dname) {
 
 		//phanrider add 2009-05-21
 		//alert(fyNum);
-		if (fyNum > 1 && sqlNum[2] != "Q") {
-			addDataHtml(fyNum, dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
+		if (fyNum[tmpid-1] > 1 && sqlNum[2] != "Q") {
+			addDataHtml(fyNum[tmpid-1], dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
 			if (dataadd.length > 20) {
 				rows = dataadd.length - 1;  //去掉最后一个测试标志行
 				more = " (more...)";
-				setFetchNext(true, '');
-				setFetchLast(true, '');
+				setFetchNext(true, goutid);
+				setFetchLast(true, goutid);
 			} else {
 				rows = dataadd.length;  //无标志行可去
-				setFetchNext(false, '');
-				setFetchLast(false, '');
+				setFetchNext(false, goutid);
+				setFetchLast(false, goutid);
 			}
 		} else {
 			if (sqlNum[2] == "Q") {
-				addFullDataHtml(fyNum, dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
+				addFullDataHtml(fyNum[tmpid-1], dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
 				rows = dataadd.length;
-				setFetchNext(false, '');
-				setFetchLast(false, '');
+				setFetchNext(false, goutid);
+				setFetchLast(false, goutid);
 			} else {
-				showDataHtml(fyNum, dataadd, goutid);	//初始 Execute 调用的方法
+				showDataHtml(fyNum[tmpid-1], dataadd, goutid);	//初始 Execute 调用的方法
 				if (dataadd.length > 21) {
 					rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
 					more = " (more...)";
-					setFetchNext(true, '');
-					setFetchLast(true, '');
+					setFetchNext(true, goutid);
+					setFetchLast(true, goutid);
 				} else {
 					rows = dataadd.length - 1; //只能去掉第一个标题行
-					setFetchNext(false, '');
-					setFetchLast(false, '');
+					setFetchNext(false, goutid);
+					setFetchLast(false, goutid);
 				}
 			}
 		}
@@ -104,7 +105,7 @@ function getResultFromSql(localsql, dname) {
 		//这里加入执行的结束时间计算
 		//这里设置右下角提示信息--执行条数和时间，例：1(结果集) row selected in 0.062(执行时间) seconds
 		var newtime = ($time() - oldtime) / 1000;
-		pageNo = fyNum - 1;
+		pageNo = fyNum[tmpid-1] - 1;
 		rows = pageNo * countPage + rows;
 		var oracleTitle = "";
 		if ( errOracleMsg != "") {
@@ -124,10 +125,10 @@ function getResultFromSql(localsql, dname) {
 
 // for CommandSQL  2020-11-15
 function getResultFromCommmandSql(localsql, callfun) {
-	parent.parent.editorFrame.GGETFRAME.fyNum = 1;
-	fyNum = parent.parent.editorFrame.GGETFRAME.fyNum;
+	parent.parent.editorFrame.GGETFRAME.fyNum[0] = 1;
+	fyNum[0] = parent.parent.editorFrame.GGETFRAME.fyNum[0];
 	sqlNum[0] = localsql;
-	sqlNum[1] = fyNum;
+	sqlNum[1] = fyNum[0];
 	sqlNum[2] = "Q";
 	sql2 = localsql;
 	//设置右下角提示信息--正在执行 --phanrider 2009-04-30 增加
@@ -142,20 +143,22 @@ function getResultFromCommmandSql(localsql, callfun) {
 
 /*传入SQL把数据从数据库里面拉出来展示--新*分页用*/
 function getFYSql_run() {
-	fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum ;
+	fyNum[0] = ++parent.parent.editorFrame.GGETFRAME.fyNum[0] ;
 	sqlNum[0] = parent.parent.editorFrame.sql2;
-	sqlNum[1] = fyNum;
+	sqlNum[1] = fyNum[0];
 	sqlNum[2] = "";
 	//BaisWorkBean.initBean(sqlNum, callbackadd);
 	BaisWorkBean.GetResultList(sqlNum, callbackadd);
 }
 
-function getFYSql_run_New(framesql) {
-    fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum ;
+function getFYSql_run_New(framesql, id) {
+	(id == null || id == '' || id == undefined) ? id = 1 : '';
+	fyNum[id-1] = ++parent.parent.editorFrame.GGETFRAME.fyNum[id-1] ;
     sqlNum[0] = framesql;
-    sqlNum[1] = fyNum;
+    sqlNum[1] = fyNum[id-1];
     sqlNum[2] = "";
-    var  goutid = parent.parent.parent.editorFrame.GGETFRAME.GOUTRESULTDIVID;
+
+	var  goutid = id;
 
     //BaisWorkBean.initBean(sqlNum, callbackadd);
     BaisWorkBean.GetResultList(sqlNum, callbackadd);
@@ -170,35 +173,35 @@ function getFYSql_run_New(framesql) {
 
         //phanrider add 2009-05-21
         //alert(fyNum);
-        if (fyNum > 1 && sqlNum[2] != "Q") {
-            addDataHtml(fyNum, dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
+        if (fyNum[id-1] > 1 && sqlNum[2] != "Q") {
+            addDataHtml(fyNum[id-1], dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
             if (dataadd.length > 20) {
                 rows = dataadd.length - 1;  //去掉最后一个测试标志行
                 more = " (more...)";
-                setFetchNext(true, '');
-                setFetchLast(true, '');
+                setFetchNext(true, goutid);
+                setFetchLast(true, goutid);
             } else {
                 rows = dataadd.length;  //无标志行可去
-                setFetchNext(false, '');
-                setFetchLast(false, '');
+                setFetchNext(false, goutid);
+                setFetchLast(false, goutid);
             }
         } else {
             if (sqlNum[2] == "Q") {
-                addFullDataHtml(fyNum, dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
+                addFullDataHtml(fyNum[id-1], dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
                 rows = dataadd.length;
-                setFetchNext(false, '');
-                setFetchLast(false, '');
+                setFetchNext(false, goutid);
+                setFetchLast(false, goutid);
             } else {
-                showDataHtml(fyNum, dataadd, goutid);	//初始 Execute 调用的方法
+                showDataHtml(fyNum[id-1], dataadd, goutid);	//初始 Execute 调用的方法
                 if (dataadd.length > 21) {
                     rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
                     more = " (more...)";
-                    setFetchNext(true, '');
-                    setFetchLast(true, '');
+                    setFetchNext(true, goutid);
+                    setFetchLast(true, goutid);
                 } else {
                     rows = dataadd.length - 1; //只能去掉第一个标题行
-                    setFetchNext(false, '');
-                    setFetchLast(false, '');
+                    setFetchNext(false, goutid);
+                    setFetchLast(false, goutid);
                 }
             }
         }
@@ -208,7 +211,7 @@ function getFYSql_run_New(framesql) {
         //这里加入执行的结束时间计算
         //这里设置右下角提示信息--执行条数和时间，例：1(结果集) row selected in 0.062(执行时间) seconds
         var newtime = ($time() - oldtime) / 1000;
-        pageNo = fyNum - 1;
+        pageNo = fyNum[id-1] - 1;
         rows = pageNo * countPage + rows;
         var oracleTitle = "";
         if ( errOracleMsg != "") {
@@ -227,22 +230,24 @@ function getFYSql_run_New(framesql) {
 
 /*传入SQL把数据从数据库里面拉出来展示--新*全显示*/
 function getFYQSql_run() {
-	fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum;
+	fyNum[0] = ++parent.parent.editorFrame.GGETFRAME.fyNum[0];
 	sqlNum[0] = parent.parent.editorFrame.sql2; //sql
-	sqlNum[1] = fyNum; //全局变理，分页数
+	sqlNum[1] = fyNum[0]; //全局变理，分页数
 	sqlNum[2] = "Q";  //代表全部分页
 	//BaisWorkBean.initBean(sqlNum, callbackadd);
 
 	BaisWorkBean.GetResultList(sqlNum, callbackadd);
 }
 
-function getFYQSql_run_New(framesql) {
-    fyNum = ++parent.parent.editorFrame.GGETFRAME.fyNum;
+function getFYQSql_run_New(framesql,id) {
+	(id == null || id == '' || id == undefined) ? id = 1 : '';
+	fyNum[id-1] = ++parent.parent.editorFrame.GGETFRAME.fyNum[id-1];
     sqlNum[0] = framesql; //sql
-    sqlNum[1] = fyNum; //全局变理，分页数
+    sqlNum[1] = fyNum[id-1]; //全局变理，分页数
     sqlNum[2] = "Q";  //代表全部分页
     //BaisWorkBean.initBean(sqlNum, callbackadd);
-    var  goutid = parent.parent.parent.editorFrame.GGETFRAME.GOUTRESULTDIVID;
+
+	var  goutid = id;
 
     BaisWorkBean.GetResultList(sqlNum, callbackadd);
     function callbackadd(dataadd) {
@@ -255,35 +260,35 @@ function getFYQSql_run_New(framesql) {
 
         //phanrider add 2009-05-21
         //alert(fyNum);
-        if (fyNum > 1 && sqlNum[2] != "Q") {
-            addDataHtml(fyNum, dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
+        if (fyNum[id-1] > 1 && sqlNum[2] != "Q") {
+            addDataHtml(fyNum[id-1], dataadd, goutid);	 //点击按钮 Fetch Next 调用的方法
             if (dataadd.length > 20) {
                 rows = dataadd.length - 1;  //去掉最后一个测试标志行
                 more = " (more...)";
-                setFetchNext(true, '');
-                setFetchLast(true, '');
+                setFetchNext(true, goutid);
+                setFetchLast(true, goutid);
             } else {
                 rows = dataadd.length;  //无标志行可去
-                setFetchNext(false, '');
-                setFetchLast(false, '');
+                setFetchNext(false, goutid);
+                setFetchLast(false, goutid);
             }
         } else {
             if (sqlNum[2] == "Q") {
-                addFullDataHtml(fyNum, dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
+                addFullDataHtml(fyNum[id-1], dataadd, goutid);  //点击按钮 Fetch Last 调用的方法
                 rows = dataadd.length;
-                setFetchNext(false, '');
-                setFetchLast(false, '');
+                setFetchNext(false, goutid);
+                setFetchLast(false, goutid);
             } else {
-                showDataHtml(fyNum, dataadd, goutid);	//初始 Execute 调用的方法
+                showDataHtml(fyNum[id-1], dataadd, goutid);	//初始 Execute 调用的方法
                 if (dataadd.length > 21) {
                     rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
                     more = " (more...)";
-                    setFetchNext(true, '');
-                    setFetchLast(true, '');
+                    setFetchNext(true, goutid);
+                    setFetchLast(true, goutid);
                 } else {
                     rows = dataadd.length - 1; //只能去掉第一个标题行
-                    setFetchNext(false, '');
-                    setFetchLast(false, '');
+                    setFetchNext(false, goutid);
+                    setFetchLast(false, goutid);
                 }
             }
         }
@@ -293,7 +298,7 @@ function getFYQSql_run_New(framesql) {
         //这里加入执行的结束时间计算
         //这里设置右下角提示信息--执行条数和时间，例：1(结果集) row selected in 0.062(执行时间) seconds
         var newtime = ($time() - oldtime) / 1000;
-        pageNo = fyNum - 1;
+        pageNo = fyNum[id-1] - 1;
         rows = pageNo * countPage + rows;
         var oracleTitle = "";
         if ( errOracleMsg != "") {
@@ -317,12 +322,12 @@ function callbackadd(dataadd) {
 	var more = "";
 	//alert(dataadd);
 	//setDivValueNull("outResultDiv");
-	console.log(goutid);
+	// console.log(goutid);
 
 	//phanrider add 2009-05-21
 	//alert(fyNum);
-	if (fyNum > 1 && sqlNum[2] != "Q") {
-		addDataHtml(fyNum, dataadd);	 //点击按钮 Fetch Next 调用的方法
+	if (fyNum[0] > 1 && sqlNum[2] != "Q") {
+		addDataHtml(fyNum[0], dataadd);	 //点击按钮 Fetch Next 调用的方法
 		if (dataadd.length > 20) {
 			rows = dataadd.length - 1;  //去掉最后一个测试标志行
 			more = " (more...)";
@@ -335,12 +340,12 @@ function callbackadd(dataadd) {
 		}
 	} else {
 		if (sqlNum[2] == "Q") {
-			addFullDataHtml(fyNum, dataadd);  //点击按钮 Fetch Last 调用的方法
+			addFullDataHtml(fyNum[0], dataadd);  //点击按钮 Fetch Last 调用的方法
 			rows = dataadd.length;
 			setFetchNext(false, '');
 			setFetchLast(false, '');
 		} else {
-			showDataHtml(fyNum, dataadd, GOUTRESULTDIVID);	//初始 Execute 调用的方法
+			showDataHtml(fyNum[0], dataadd, GOUTRESULTDIVID);	//初始 Execute 调用的方法
 			if (dataadd.length > 21) {
 				rows = dataadd.length - 2; //去掉第一个标题行与最后一个测试标志行
 				more = " (more...)";
@@ -359,7 +364,7 @@ function callbackadd(dataadd) {
 	//这里加入执行的结束时间计算
 	//这里设置右下角提示信息--执行条数和时间，例：1(结果集) row selected in 0.062(执行时间) seconds
 	var newtime = ($time() - oldtime) / 1000;
-	pageNo = fyNum - 1;
+	pageNo = fyNum[0] - 1;
 	rows = pageNo * countPage + rows;
 	var oracleTitle = "";
 	if ( errOracleMsg != "") {
