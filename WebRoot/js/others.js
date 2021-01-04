@@ -229,7 +229,7 @@ function breakbuttonpress() {
 function fetchnextbuttonpress(id) {
 	var fetchnextId = '';
 	 (id == null || id == '' || id == undefined) ?
-		fetchnextId = 'fetchNextTd' : fetchnextId = 'fetchNextTd' + id;
+		fetchnextId = 'fetchNextTd1' : fetchnextId = 'fetchNextTd' + id;
 
 	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
 
@@ -247,7 +247,7 @@ function fetchnextbuttonpress(id) {
 function fetchlastbuttonpress(id) {
 	var fetchLastTd = '';
 	(id == null || id == '' || id == undefined) ?
-		fetchLastTd = 'fetchLastTd' : fetchLastTd = 'fetchLastTd' + id;
+		fetchLastTd = 'fetchLastTd1' : fetchLastTd = 'fetchLastTd' + id;
 
 	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastTd);
 
@@ -1903,7 +1903,7 @@ function changeRecordShowHtml() {
 function setFetchNext(flag, id) {
 	var fetchnextId = '';
 	(id == null || id == '' || id == undefined) ?
-		fetchnextId = 'fetchNextTd' : fetchnextId = 'fetchNextTd' + id;
+		fetchnextId = 'fetchNextTd1' : fetchnextId = 'fetchNextTd' + id;
 
 	var fetchnextObject = parent.parent.editorFrame.GGETFRAME.$(fetchnextId);
 
@@ -1914,7 +1914,7 @@ function setFetchNext(flag, id) {
 function setFetchLast(flag, id) {
 	var fetchLastId = '';
 	(id == null || id == '' || id == undefined) ?
-		fetchLastId = 'fetchLastTd' : fetchLastId = 'fetchLastTd' + id;
+		fetchLastId = 'fetchLastTd1' : fetchLastId = 'fetchLastTd' + id;
 
 	var fetchLastObject = parent.parent.editorFrame.GGETFRAME.$(fetchLastId);
 
@@ -2595,8 +2595,18 @@ function execClearAll(textareaname, e) {
 //工作结果输出区右键clear result命令执行函数
 function execClearResults(e) {
 	hiddenBaisworkMenu(e);
-	setDivValueText('outResultDiv','');
-	setDivValueText('changeOutResultDiv','');
+	var tabObj = parent.parent.editorFrame.GGETFRAME.document.getElementById( "sqlWindowtabPanel");
+	if ( tabObj == null ) {
+		setDivValueText('outResultDiv1','');
+		setDivValueText('changeOutResultDiv1','');
+	} else {
+		var s = tabObj.tabPane.getSelectedIndex();
+		s =  s + 1;
+		setDivValueText('outResultDiv' + s.toString(),'');
+		setDivValueText('changeOutResultDiv' + s.toString(),'');
+	}
+	// setDivValueText('outResultDiv','');
+	// setDivValueText('changeOutResultDiv','');
 	//按钮恢复成初始状态
 	controlbuttonReset();
 	//状态栏初始为空
@@ -5356,15 +5366,15 @@ function createResultTabForSQL(n, dn, s) {
         '\n' +
         '\t\t\t\t\t\t</table>';
     var ordtmp = '<div style="width: 100%; height: 100px; background-color: white"\n' +
-        '\t\t\t\t\t\t name="outResultDiv" id="outResultDiv"\n' +
+        '\t\t\t\t\t\t name="outResultDiv1" id="outResultDiv1"\n' +
         '\t\t\t\t\t\t onclick="hiddenBaisworkMenu(event)"\n' +
-        '\t\t\t\t\t\t onmouseup="showBaisworkMenu(\'outResultDiv\',\'outResultMenu\',event)">\n' +
+        '\t\t\t\t\t\t onmouseup="showBaisworkMenu(\'outResultDiv1\',\'outResultMenu\',event)">\n' +
         '\t\t\t\t\t</div>';
     var cordtmp = '<div\n' +
         '\t\t\t\t\t\t\tstyle="width: 100%; height: 90%; background-color: white; display: none;"\n' +
-        '\t\t\t\t\t\t\tname="changeOutResultDiv" id="changeOutResultDiv"\n' +
+        '\t\t\t\t\t\t\tname="changeOutResultDiv1" id="changeOutResultDiv1"\n' +
         '\t\t\t\t\t\t\tonclick="hiddenBaisworkMenu(event)"\n' +
-        '\t\t\t\t\t\t\tonmouseup="showBaisworkMenu(\'outResultDiv\',\'outResultMenu\',event)">\n' +
+        '\t\t\t\t\t\t\tonmouseup="showBaisworkMenu(\'outResultDiv1\',\'outResultMenu\',event)">\n' +
         '\t\t\t\t\t</div>';
 
     var orddiv = '';
