@@ -3,7 +3,7 @@ package org.reddragonfly.iplsqldevj;
 public class Utilities {
 
 	public static String getVersion(){
-		return "Version 2.3.0.1222";
+		return "Version 2.4.0.0105";
 	}
 
 	public static String getTeam() {
@@ -11,7 +11,7 @@ public class Utilities {
 					+"		face=\"Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif\">Copyright"
 					+"		<a href=\"http://www.reddragonfly.org\" target=\"_blank\"><font color=#000000"
 					+"			face=\"Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif\">Reddragonfly"
-					+"				&amp; Studio</font> </a> &copy; 2007-2020 Code By </font>"
+					+"				&amp; Studio</font> </a> &copy; 2007-2021 Code By </font>"
 					+"	<a href=\"http://iplsqldeveloper.sf.net\" target=\"_blank\"> <font"
 					+"		color=#000000"
 					+"		face=\"Verdana, Tahoma, Times New Roman, 宋体, MS Sans Serif\">iPlsqldeveloper Team</font>"
